@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/resource">
         <file>images/github.ico</file>
-        <file>images/icon.ico</file>
+        <file>images/y2mate.ico</file>
     </qresource>
 </RCC>

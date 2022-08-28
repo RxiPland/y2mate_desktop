@@ -220,7 +220,7 @@
   <action name="actiony2mate_com">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/resource/images/icon.ico</normaloff>:/resource/images/icon.ico</iconset>
+     <normaloff>:/resource/images/y2mate.ico</normaloff>:/resource/images/y2mate.ico</iconset>
    </property>
    <property name="text">
     <string>y2mate.com</string>
