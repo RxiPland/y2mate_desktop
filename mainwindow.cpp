@@ -10,6 +10,7 @@
 #include <windows.h>
 #include <QList>
 
+
 using namespace std;
 
 QString response = "";
@@ -34,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (QSslSocket::supportsSsl() == false){
 
-        system("start https://www.filehorse.com/download-openssl-64/");
+        ShellExecute(0, 0, L"https://www.filehorse.com/download-openssl-64", 0, 0, SW_HIDE);
         QMessageBox::critical(this, "Problém | y2mate desktop - by RxiPland", "Verze OpenSSL není platná<br><br>Nainstalování verze \"" + QSslSocket::sslLibraryBuildVersionString() + "\" problém opraví<br>Odkaz na stažení: <a href=\"https://www.filehorse.com/download-openssl-64\">https://www.filehorse.com/download-openssl-64</a><br><br>Před stažením je důležité označit správnou verzi!<br>Vaše aktuální nainstalovaná verze: \"" + QSslSocket::sslLibraryVersionString() + "\"");
 
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -85,7 +86,6 @@ void MainWindow::post(QString location, QByteArray data)
     response = response_data;
 
 }
-
 
 // void replaceAll() -> https://stackoverflow.com/questions/3418231/replace-part-of-a-string-with-another-string
 
@@ -170,7 +170,7 @@ void MainWindow::on_pushButton_clicked(){
             data.append("&");
             data.append("ajax=1");
 
-            post("https://www.y2mate.com/mates/mp3/ajax", data);     // post request na získání informací o videu
+            MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data);     // post request na získání informací o videu
 
             string response_str = response.toLocal8Bit().constData();
 
@@ -308,7 +308,7 @@ void MainWindow::on_pushButton_clicked(){
                     data.append(splitted_kvalita[0]);
 
 
-                    post("https://www.y2mate.com/mates/mp3Convert", data);     // post request na získání odkazu ke stažení
+                    MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data);     // post request na získání odkazu ke stažení
 
                     string response_str = response.toLocal8Bit().constData();
 
@@ -342,7 +342,8 @@ void MainWindow::on_pushButton_clicked(){
 
                             replaceAll(stazeni_url, "&", "^&");
 
-                            system(("start " + stazeni_url).c_str());
+                            //system(("start " + stazeni_url).c_str());
+                            ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
                             QMessageBox::information(this, "V pořádku", "Zvukový soubor se začal úspěšně stahovat");
                             on_pushButton_2_clicked();
@@ -391,7 +392,7 @@ void MainWindow::on_pushButton_clicked(){
 
                     data.append(splitted_kvalita[0]);
 
-                    post("https://www.y2mate.com/mates/convert", data);     // post request na získání odkazu ke stažení
+                    MainWindow::post("https://www.y2mate.com/mates/convert", data);     // post request na získání odkazu ke stažení
 
 
                     string response_str = response.toLocal8Bit().constData();
@@ -429,10 +430,10 @@ void MainWindow::on_pushButton_clicked(){
 
 
                             string stazeni_url = odkaz_na_stazeni.toLocal8Bit().constData();
-
                             replaceAll(stazeni_url, "&", "^&");
 
-                            system(("start " + stazeni_url).c_str());
+                            ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
+
                             QMessageBox::information(this, "V pořádku", "Video se začalo úspěšně stahovat");
 
 
@@ -534,12 +535,16 @@ void MainWindow::on_lineEdit_returnPressed()
 
 void MainWindow::on_actiony2mate_com_triggered()
 {
-    system("start https://www.y2mate.com");
-}
+    //system("start https://www.y2mate.com");
+
+    ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+    }
 
 
 void MainWindow::on_actionzdrojovy_kod_triggered()
 {
-    system("start https://github.com/RxiPland/y2mate_desktop");
+
+    ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
+
 }
 
