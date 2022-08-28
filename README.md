@@ -1,6 +1,7 @@
 # y2mate Youtube downloader
 
-https://www.y2mate.com/
+- Program využívá stránku [y2mate.com](https://www.y2mate.com/)
+- Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
 
 # Náhled
 
