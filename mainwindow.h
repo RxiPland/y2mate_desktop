@@ -34,6 +34,10 @@ private slots:
 
     void on_lineEdit_returnPressed();
 
+    void on_actiony2mate_com_triggered();
+
+    void on_actionzdrojovy_kod_triggered();
+
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager manager;

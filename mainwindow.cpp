@@ -531,3 +531,15 @@ void MainWindow::on_lineEdit_returnPressed()
 
     on_pushButton_clicked();
 }
+
+void MainWindow::on_actiony2mate_com_triggered()
+{
+    system("start https://www.y2mate.com");
+}
+
+
+void MainWindow::on_actionzdrojovy_kod_triggered()
+{
+    system("start https://github.com/RxiPland/y2mate_desktop");
+}
+
