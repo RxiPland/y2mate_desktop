@@ -1,4 +1,4 @@
-# y2mate Youtube downloader desktop
+# y2mate Youtube downloader
 
 https://www.y2mate.com/
 
