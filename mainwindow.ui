@@ -218,16 +218,26 @@
    <addaction name="menuInfo"/>
   </widget>
   <action name="actiony2mate_com">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resource/images/icon.ico</normaloff>:/resource/images/icon.ico</iconset>
+   </property>
    <property name="text">
     <string>y2mate.com</string>
    </property>
   </action>
   <action name="actionzdrojovy_kod">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/resource/images/github.ico</normaloff>:/resource/images/github.ico</iconset>
+   </property>
    <property name="text">
     <string>zdrojový kód</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
