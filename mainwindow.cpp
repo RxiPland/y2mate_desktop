@@ -9,13 +9,13 @@
 #include <QRegExp>
 #include <windows.h>
 #include <QList>
-#include <QHttpPart>
 #include <QByteArray>
+#include <QFileDialog>
 
 
 using namespace std;
 
-QString response = "";
+QString response = "", response_najit_formaty = "";
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 
@@ -42,9 +42,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->horizontalSpacer->changeSize(250, 35);
     ui->verticalSpacer_2->changeSize(20, 45);
-
-    //connect(ui->pushButton, &QPushButton::clicked,this, &MainWindow::on_pushButton_clicked);
-
 }
 
 MainWindow::~MainWindow()
@@ -52,29 +49,76 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*
-void MainWindow::get(QString location)
+void MainWindow::httpReadyRead()
 {
-
-    QNetworkRequest request = QNetworkRequest(QUrl(location));
-    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
-
-    QNetworkReply *reply = manager.get(request);
-
-    while (!reply->isFinished())
-    {
-        qApp->processEvents();
+    // This slot gets called every time the QNetworkReply has new data.
+    // We read all of its new data and write it into the file.
+    // That way we use less RAM than when reading it at the finished()
+    // signal of the QNetworkReply
+    if (file){
+        file->write(reply->readAll());
     }
-
-    QString response_data = reply->readAll();
-    reply->deleteLater();
-
-    response = response_data;
 }
 
-*/
+void MainWindow::httpFinished()
+{
+    QFileInfo fi;
+    if (file) {
+        fi.setFile(file->fileName());
+        file->close();
+        file.reset();
 
-void MainWindow::post(QString location, QByteArray data)
+        QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stáhnut.");
+
+        enable_disable_widgets(false);
+        on_pushButton_2_clicked();
+    }
+
+    QNetworkReply::NetworkError error = reply->error();
+    const QString &errorString = reply->errorString();
+
+    reply.reset();
+    if (error != QNetworkReply::NoError) {
+        QFile::remove(fi.absoluteFilePath());
+        return;
+    }
+
+}
+
+std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
+{
+    std::unique_ptr<QFile> file = std::make_unique<QFile>(fileName);
+
+    file->open(QIODevice::WriteOnly);
+
+    return file;
+}
+
+void MainWindow::get(QString url, QString koncovka)
+{
+
+    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "", koncovka);
+
+    if (cesta != ""){
+
+        enable_disable_widgets(false);
+
+        file = openFileForWrite(cesta);
+        if (!file){
+            QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + cesta);
+        }
+
+        QNetworkRequest request = QNetworkRequest(QUrl(url));
+        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+
+        reply.reset(manager.get(request));
+
+        connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
+        connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
+    }
+}
+
+void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 {
 
     QNetworkRequest request = QNetworkRequest(QUrl(location));
@@ -91,7 +135,13 @@ void MainWindow::post(QString location, QByteArray data)
     QString response_data = reply->readAll();
     reply->deleteLater();
 
-    response = response_data;
+    if (druh_promenne == 1){
+        response_najit_formaty = response_data;
+
+    } else if (druh_promenne == 2){
+
+        response = response_data;
+    }
 
 }
 
@@ -117,7 +167,7 @@ QList<QString> najit_data(){
     QString video_id = "error";
 
     QRegExp rx("k__id = \\\\\\\"(\\w+)");
-    int pos = rx.indexIn(response);
+    int pos = rx.indexIn(response_najit_formaty);
     int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
     if (pozice > -1) {
@@ -127,7 +177,7 @@ QList<QString> najit_data(){
 
 
     QRegExp rx2("k_data_vid = \\\\\\\"(\\w+)");
-    pos = rx2.indexIn(response);
+    pos = rx2.indexIn(response_najit_formaty);
     pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
     if (pozice > -1) {
@@ -177,11 +227,11 @@ void MainWindow::on_pushButton_clicked(){
             data.append("&");
             data.append("ajax=1");
 
-            MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data);     // post request na získání informací o videu
+            MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data, 1);     // post request na získání informací o videu
 
-            string response_str = response.toLocal8Bit().constData();
+            string response_str = response_najit_formaty.toLocal8Bit().constData();
 
-            if (response == "error"){
+            if (response_najit_formaty == "error"){
                 QMessageBox::critical(this, "Chyba", "Problém v post requestu!");
 
             }
@@ -190,14 +240,14 @@ void MainWindow::on_pushButton_clicked(){
                 QMessageBox::critical(this, "Chyba", "Video pod tímto odkazem neexistuje!");
 
             }
-            else if (response != ""){
+            else if (response_najit_formaty != ""){
 
                 ui->lineEdit->setReadOnly(true);        // read only na line edit s URL videa
                 ui->label->setHidden(false);
                 ui->label_2->setHidden(false);
 
                 QRegExp rx("Duration: (..:..:..)");
-                int pos = rx.indexIn(response);
+                int pos = rx.indexIn(response_najit_formaty);
                 int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
                 if (pozice > -1) {
@@ -207,7 +257,7 @@ void MainWindow::on_pushButton_clicked(){
                 }
 
                 QRegExp rx2(" <b>(.+)<\\\\/b> <p ");
-                pos = rx2.indexIn(response);
+                pos = rx2.indexIn(response_najit_formaty);
                 pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
                 if (pozice > -1) {
@@ -315,7 +365,7 @@ void MainWindow::on_pushButton_clicked(){
                     data.append(splitted_kvalita[0].toLocal8Bit());
 
 
-                    MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data);     // post request na získání odkazu ke stažení
+                    MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
 
                     string response_str = response.toLocal8Bit().constData();
 
@@ -346,14 +396,13 @@ void MainWindow::on_pushButton_clicked(){
                         if (odkaz_na_stazeni != "error"){
 
                             string stazeni_url = odkaz_na_stazeni.toLocal8Bit().constData();
+                            replaceAll(stazeni_url, "\\", "");
 
-                            //replaceAll(stazeni_url, "&", "^&");
+                            //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
-                            //system(("start " + stazeni_url).c_str());
-                            ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
+                            odkaz_na_stazeni = QString::fromStdString(stazeni_url);
+                            MainWindow::get(odkaz_na_stazeni, "Zvuk (*.mp3)");
 
-                            QMessageBox::information(this, "V pořádku", "Zvukový soubor se začal úspěšně stahovat");
-                            on_pushButton_2_clicked();
                         }else{
                             QMessageBox::warning(this, "Problém", "Zvukový soubor se nepodařilo začít stahovat!");
                         }
@@ -399,7 +448,7 @@ void MainWindow::on_pushButton_clicked(){
 
                     data.append(splitted_kvalita[0].toLocal8Bit());
 
-                    MainWindow::post("https://www.y2mate.com/mates/convert", data);     // post request na získání odkazu ke stažení
+                    MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
 
 
                     string response_str = response.toLocal8Bit().constData();
@@ -435,16 +484,13 @@ void MainWindow::on_pushButton_clicked(){
 
                         if (odkaz_na_stazeni != "error"){
 
-
                             string stazeni_url = odkaz_na_stazeni.toLocal8Bit().constData();
-                            //replaceAll(stazeni_url, "&", "^&"); // kvuli tomu možna nefungoval get()
+                            //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
-                            ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
+                            replaceAll(stazeni_url, "\\", "");
+                            odkaz_na_stazeni = QString::fromStdString(stazeni_url);
 
-                            QMessageBox::information(this, "V pořádku", "Video se začalo úspěšně stahovat");
-
-
-                            on_pushButton_2_clicked();
+                            MainWindow::get(odkaz_na_stazeni, "Video (*.mp4)");
 
                         } else{
                             QMessageBox::warning(this, "Problém", "Video se nepodařilo začít stahovat!");
@@ -484,6 +530,16 @@ void MainWindow::on_pushButton_2_clicked()
     ui->verticalSpacer_2->changeSize(20, 45);
 
     response = "";
+}
+
+void MainWindow::enable_disable_widgets(bool vypnout){
+
+    ui->pushButton->setDisabled(vypnout);
+    ui->pushButton_2->setDisabled(vypnout);
+
+    ui->comboBox->setDisabled(vypnout);
+    ui->comboBox_2->setDisabled(vypnout);
+
 }
 
 

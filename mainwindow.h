@@ -8,6 +8,7 @@
 #include <QNetworkRequest>
 #include <QAuthenticator>
 #include <QNetworkProxy>
+#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,19 +23,27 @@ public:
     ~MainWindow();
 
 public slots:
-    //void get(QString location);
-    void post(QString location, QByteArray data);
+    void get(QString url, QString koncovka);
+    void post(QString location, QByteArray data, int druh_promenne);
 
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
+    void enable_disable_widgets(bool vypnout);
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_lineEdit_returnPressed();
     void on_actiony2mate_com_triggered();
     void on_actionzdrojovy_kod_triggered();
 
+    std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
+
+    void httpFinished();
+    void httpReadyRead();
+
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager manager;
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply;
+    std::unique_ptr<QFile> file;
 };
 #endif // MAINWINDOW_H
