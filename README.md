@@ -3,7 +3,8 @@
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
 - Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
 - Verze knihovny: QT6
-- Primárně stavěno pro windows 64bit
+
+[Stáhnout](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.0.0/y2mate_setup.exe) instalaci (windows)
 
 # Náhled
 
