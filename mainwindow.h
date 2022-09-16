@@ -29,7 +29,7 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
-    void enable_disable_widgets(bool vypnout);
+    void disable_widgets(bool vypnout);
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_lineEdit_returnPressed();
     void on_actiony2mate_com_triggered();
@@ -39,6 +39,8 @@ private slots:
 
     void httpFinished();
     void httpReadyRead();
+    void get_headers(QString location);
+    void get_nazev();
 
 private:
     Ui::MainWindow *ui;

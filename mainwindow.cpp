@@ -11,13 +11,14 @@
 #include <QList>
 #include <QByteArray>
 #include <QFileDialog>
-
+#include <QTextCodec>
 
 using namespace std;
 
-QString response = "", response_najit_formaty = "";
-string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
+QString response = "", response_najit_formaty = "";     // různé proměnné pro různé http requesty
+string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
+QString nazev_souboru = "";  // název videa
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -49,6 +50,60 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::get_headers(QString location)
+{
+    // cancel download & read headers
+    // najde název souboru z headru a zapíše ho do globální proměnné
+
+    QNetworkRequest request = QNetworkRequest(QUrl(location));
+    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+
+    QNetworkReply *reply = manager.get(request);
+
+    while (!reply->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    QList<QByteArray> headerlist = reply->rawHeaderList();
+    QByteArray header;
+
+    nazev_souboru = "error";
+
+
+    for (auto it = headerlist.cbegin(); it != headerlist.cend(); ++it)
+    {
+        header = reply->rawHeader(*it);
+
+        QString headers_qstring = QTextCodec::codecForMib(106)->toUnicode(header);
+
+        if(headers_qstring.contains("filename")){
+
+            QRegExp rx("filename=\\\"(.+)\\\";");
+            int pos = rx.indexIn(headers_qstring);
+            int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
+
+            if (pozice > -1) {
+                nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
+                nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
+
+                nazev_souboru.replace("y2mate.com - ", "");
+                nazev_souboru.replace("  ", " ");
+
+
+                QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
+                QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
+
+                for (int i=0; i<6; i++){
+                    nazev_souboru.replace("_" + formaty_mp4[i], "");
+                    nazev_souboru.replace("_" + formaty_mp3[i], "");
+                }
+            }
+         break;
+        }
+    }
+}
+
 void MainWindow::httpReadyRead()
 {
     // This slot gets called every time the QNetworkReply has new data.
@@ -62,6 +117,7 @@ void MainWindow::httpReadyRead()
 
 void MainWindow::httpFinished()
 {
+
     QFileInfo fi;
     if (file) {
         fi.setFile(file->fileName());
@@ -70,7 +126,7 @@ void MainWindow::httpFinished()
 
         QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stáhnut.");
 
-        enable_disable_widgets(false);
+        disable_widgets(false);
         on_pushButton_2_clicked();
     }
 
@@ -96,12 +152,11 @@ std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
 
 void MainWindow::get(QString url, QString koncovka)
 {
+    disable_widgets(true);
 
-    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "", koncovka);
+    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + nazev_souboru, koncovka);
 
     if (cesta != ""){
-
-        enable_disable_widgets(false);
 
         file = openFileForWrite(cesta);
         if (!file){
@@ -115,7 +170,11 @@ void MainWindow::get(QString url, QString koncovka)
 
         connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
         connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
+    } else {
+
+        disable_widgets(false);
     }
+
 }
 
 void MainWindow::post(QString location, QByteArray data, int druh_promenne)
@@ -145,20 +204,6 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
 }
 
-// void replaceAll() -> https://stackoverflow.com/questions/3418231/replace-part-of-a-string-with-another-string
-
-void replaceAll(std::string& str, const std::string& from, const std::string& to) {
-    if(from.empty())
-        return;
-    size_t start_pos = 0;
-    while((start_pos = str.find(from, start_pos)) != std::string::npos) {
-        str.replace(start_pos, from.length(), to);
-        start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
-    }
-}
-
-
-
 QList<QString> najit_data(){
 
     QList<QString> udaje; // prvni: _id; druhy: video_id
@@ -186,6 +231,56 @@ QList<QString> najit_data(){
     udaje.append(video_id);
 
     return udaje; // [_id, video_id]
+}
+
+void MainWindow::get_nazev(){
+
+    QList<QString> udaje;
+    udaje = najit_data();
+
+    QString _id = udaje[0];
+    QString k_data_vid = udaje[1];
+
+    if ((_id != "error") && (k_data_vid != "error")){
+
+        QByteArray data;
+
+        data.append("type=youtube");
+        data.append("&");
+        data.append("_id=");
+        data.append(_id.toLocal8Bit());
+        data.append("&");
+        data.append("v_id=");
+        data.append(k_data_vid.toLocal8Bit());
+        data.append("&");
+        data.append("ajax=1");
+        data.append("&");
+        data.append("token=");
+        data.append("&");
+        data.append("ftype=mp3");
+        data.append("&");
+        data.append("fquality=128");
+
+        MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
+
+        QRegExp rx("href=\\\\\\\"(.+)\\\\\\\" rel=");
+        int pos = rx.indexIn(response);
+        int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
+
+        QString odkaz_na_stazeni = "error";
+
+        if (pozice > -1) {
+            odkaz_na_stazeni = rx.cap(1); // download link (https://)
+        }
+
+        if (odkaz_na_stazeni != "error"){
+
+            odkaz_na_stazeni.replace("\\", "");
+            get_headers(odkaz_na_stazeni);
+
+        }
+
+    }
 }
 
 void MainWindow::on_pushButton_clicked(){
@@ -256,18 +351,12 @@ void MainWindow::on_pushButton_clicked(){
                     ui->label->setText("Délka videa: " + video_duration);
                 }
 
-                QRegExp rx2(" <b>(.+)<\\\\/b> <p ");
-                pos = rx2.indexIn(response_najit_formaty);
-                pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
-
-                if (pozice > -1) {
-                    QString nazev_videa = rx2.cap(1); // název videa
-
-                    ui->label_2->setText("Název videa: " + nazev_videa);
-                }
+                get_nazev();
+                nazev_souboru.replace(".mp3", "");
+                nazev_souboru.replace(".mp4", "");
+                ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
 
                 ui->pushButton->setText("Stáhnout");    // změna najít na stáhnout
-
                 ui->horizontalSpacer->changeSize(20, 35);   // tlačítko "stáhnout" se vyrovná s boxem s kvalitou
 
                 ui->comboBox->setHidden(false);     // formát (mp3, mp4)
@@ -305,7 +394,6 @@ void MainWindow::on_pushButton_clicked(){
                     }
                 }
 
-
             } else{
 
                 QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
@@ -314,6 +402,8 @@ void MainWindow::on_pushButton_clicked(){
         }
 
     }else if(text_tlacitka == "Stáhnout"){
+
+        disable_widgets(true);
 
         QString text_format = ui->comboBox->currentText();
         QString text_kvalita = ui->comboBox_2->currentText();
@@ -392,16 +482,17 @@ void MainWindow::on_pushButton_clicked(){
                             odkaz_na_stazeni = rx.cap(1); // download link (https://)
                         }
 
-
                         if (odkaz_na_stazeni != "error"){
 
-                            string stazeni_url = odkaz_na_stazeni.toLocal8Bit().constData();
-                            replaceAll(stazeni_url, "\\", "");
+                            odkaz_na_stazeni.replace("\\", "");
+                            get_headers(odkaz_na_stazeni);
 
                             //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
-                            odkaz_na_stazeni = QString::fromStdString(stazeni_url);
-                            MainWindow::get(odkaz_na_stazeni, "Zvuk (*.mp3)");
+
+                            MainWindow::get(odkaz_na_stazeni, "Zvukový soubor (*.mp3)");
+
+                            return;
 
                         }else{
                             QMessageBox::warning(this, "Problém", "Zvukový soubor se nepodařilo začít stahovat!");
@@ -484,13 +575,12 @@ void MainWindow::on_pushButton_clicked(){
 
                         if (odkaz_na_stazeni != "error"){
 
-                            string stazeni_url = odkaz_na_stazeni.toLocal8Bit().constData();
-                            //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
-
-                            replaceAll(stazeni_url, "\\", "");
-                            odkaz_na_stazeni = QString::fromStdString(stazeni_url);
+                            odkaz_na_stazeni.replace("\\", "");
+                            get_headers(odkaz_na_stazeni);
 
                             MainWindow::get(odkaz_na_stazeni, "Video (*.mp4)");
+
+                            return;
 
                         } else{
                             QMessageBox::warning(this, "Problém", "Video se nepodařilo začít stahovat!");
@@ -507,11 +597,13 @@ void MainWindow::on_pushButton_clicked(){
 
     }
 
-    ui->pushButton->setDisabled(false);
+    disable_widgets(false);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
+    // pushButton_2 je tlačítko zrušit
+
     ui->lineEdit->setReadOnly(false);        // odebrání read only na line edit s URL
     ui->lineEdit->clear();
     ui->lineEdit->setClearButtonEnabled(true);
@@ -532,7 +624,9 @@ void MainWindow::on_pushButton_2_clicked()
     response = "";
 }
 
-void MainWindow::enable_disable_widgets(bool vypnout){
+void MainWindow::disable_widgets(bool vypnout){
+
+    // zakáže/povolí widgety
 
     ui->pushButton->setDisabled(vypnout);
     ui->pushButton_2->setDisabled(vypnout);
@@ -545,6 +639,9 @@ void MainWindow::enable_disable_widgets(bool vypnout){
 
 void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 {
+    // při vybrání mp3 načte příslušné formáty (128kbps, 192kbps, ...)
+    // to stejné u mp4 (720p, ...)
+
     ui->comboBox_2->clear();
     ui->comboBox_2->addItem("<Vyberte kvalitu>");
 
