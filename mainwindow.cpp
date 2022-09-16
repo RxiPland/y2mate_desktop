@@ -98,8 +98,10 @@ void MainWindow::get_headers(QString location)
                     nazev_souboru.replace("_" + formaty_mp4[i], "");
                     nazev_souboru.replace("_" + formaty_mp3[i], "");
                 }
+                break;
+            } else{
+                nazev_souboru = "[Nepodařilo se najít]";
             }
-         break;
         }
     }
 }
@@ -125,6 +127,7 @@ void MainWindow::httpFinished()
         file.reset();
 
         QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stáhnut.");
+        nazev_souboru = "";
 
         disable_widgets(false);
         on_pushButton_2_clicked();
@@ -280,6 +283,8 @@ void MainWindow::get_nazev(){
 
         }
 
+    } else {
+        nazev_souboru = "[Nepodařilo se najít]";
     }
 }
 
@@ -489,7 +494,6 @@ void MainWindow::on_pushButton_clicked(){
 
                             //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
-
                             MainWindow::get(odkaz_na_stazeni, "Zvukový soubor (*.mp3)");
 
                             return;
@@ -499,8 +503,31 @@ void MainWindow::on_pushButton_clicked(){
                         }
 
                     }
-                }else{
-                    QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování zvuku)");
+                }else if(_id == "error"){
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                        }
+
+
+                }else if(k_data_vid == "error"){
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                    }
+                }
+
+                else{
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                    }
                 }
 
 
@@ -587,8 +614,31 @@ void MainWindow::on_pushButton_clicked(){
                         }
 
                     }
-                }else{
-                    QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování videa), zkuste to zachvíli znovu.");
+                }else if(_id == "error"){
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                        }
+
+
+                }else if(k_data_vid == "error"){
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                    }
+                }
+
+                else{
+
+                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                    if (reply == QMessageBox::Yes){
+                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                    }
                 }
 
             }
@@ -622,6 +672,7 @@ void MainWindow::on_pushButton_2_clicked()
     ui->verticalSpacer_2->changeSize(20, 45);
 
     response = "";
+    nazev_souboru = "";
 }
 
 void MainWindow::disable_widgets(bool vypnout){
