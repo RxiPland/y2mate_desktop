@@ -189,6 +189,7 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
     QNetworkReply *reply = manager.post(request, data);
 
+
     while (!reply->isFinished())
     {
         qApp->processEvents();
@@ -223,8 +224,7 @@ QList<QString> najit_data(){
     }
     udaje.append(_id);
 
-
-    QRegExp rx2("k_data_vid = \\\\\\\"(\\w+)");
+    QRegExp rx2("k_data_vid = \\\\\\\"(.+)\\\\\\\"; var k_data_vtitle");
     pos = rx2.indexIn(response_najit_formaty);
     pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
