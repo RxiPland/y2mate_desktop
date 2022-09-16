@@ -661,7 +661,9 @@ void MainWindow::on_pushButton_2_clicked()
     ui->pushButton->setDisabled(false);
     ui->pushButton_2->setHidden(true);
     ui->label->setHidden(true);
+    ui->label->clear();
     ui->label_2->setHidden(true);
+    ui->label_2->clear();
 
     ui->comboBox->setHidden(true);
     ui->comboBox->setCurrentIndex(0);
