@@ -349,9 +349,10 @@ void MainWindow::on_pushButton_clicked(){
             }
         }
 
-        if (chyba_url == false){
+        if (chyba_url != true){
 
             // post request na získání informací o url
+            // dostupné kvality u mp4/mp3, délka videa
 
             QByteArray data;
 
@@ -367,7 +368,7 @@ void MainWindow::on_pushButton_clicked(){
             string response_str = response_najit_formaty.toLocal8Bit().constData();
 
             if (response_najit_formaty == "error"){
-                QMessageBox::critical(this, "Chyba", "Problém v post requestu!");
+                QMessageBox::critical(this, "Chyba", "[kód 1] Problém v post requestu!");
 
             }
             else if (response_str.find("Video not found") != string::npos) {
@@ -436,7 +437,7 @@ void MainWindow::on_pushButton_clicked(){
 
             } else{
 
-                QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
+                QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
 
             }
         }
@@ -501,12 +502,12 @@ void MainWindow::on_pushButton_clicked(){
 
 
                     if (response == "error"){
-                        QMessageBox::critical(this, "Chyba", "Problém v post requestu!");
+                        QMessageBox::critical(this, "Chyba", "[kód 3] Problém v post requestu!");
 
                     }
                     else if (response_str.find("Download") == string::npos) {
 
-                        QMessageBox::critical(this, "Chyba", "Nepovedlo se stáhnout mp3");
+                        QMessageBox::critical(this, "Chyba", "[kód 4] Nepovedlo se stáhnout mp3");
 
                     }
                     else if (response != ""){
@@ -533,35 +534,44 @@ void MainWindow::on_pushButton_clicked(){
                             return;
 
                         }else{
-                            QMessageBox::warning(this, "Problém", "Zvukový soubor se nepodařilo začít stahovat!");
+
+                            QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Problém", "[kód 5] Zvukový soubor se nepodařilo začít stahovat!\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                            if (reply_box == QMessageBox::Yes){
+                                    QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                                    ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                                }
                         }
 
                     }
                 }else if(_id == "error"){
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 6] Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                         }
 
 
                 }else if(k_data_vid == "error"){
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 7] Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
-                    }
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                        }
                 }
 
                 else{
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 8] Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
-                    }
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                        }
                 }
 
 
@@ -607,17 +617,17 @@ void MainWindow::on_pushButton_clicked(){
 
 
                     if (response == "error"){
-                        QMessageBox::critical(this, "Chyba", "Problém v post requestu!");
+                        QMessageBox::critical(this, "Chyba", "[kód 9] Problém v post requestu!");
 
                     }
                     else if (response_str.find("Refresh to try again") != string::npos) {
 
-                        QMessageBox::critical(this, "Chyba", "Nepovedlo se stáhnout mp4, zkuste to zachvíli.");
+                        QMessageBox::critical(this, "Chyba", "[kód 10] Nepovedlo se stáhnout mp4, zkuste to zachvíli.");
 
                     }
                     else if (response_str.find("Download") == string::npos) {
 
-                        QMessageBox::critical(this, "Chyba", "Nepovedlo se stáhnout mp4");
+                        QMessageBox::critical(this, "Chyba", "[kód 11] Nepovedlo se stáhnout mp4");
 
                     }
                     else if (response != ""){
@@ -642,35 +652,43 @@ void MainWindow::on_pushButton_clicked(){
                             return;
 
                         } else{
-                            QMessageBox::warning(this, "Problém", "Video se nepodařilo začít stahovat!");
+                            QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Problém", "[kód 12] Video se nepodařilo začít stahovat!\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+
+                            if (reply_box == QMessageBox::Yes){
+                                    QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                                    ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                            }
                         }
 
                     }
                 }else if(_id == "error"){
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 12] Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                         }
 
 
                 }else if(k_data_vid == "error"){
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 13] Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
-                    }
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                        }
                 }
 
                 else{
 
-                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 14] Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
                     if (reply_box == QMessageBox::Yes){
-                            ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
-                    }
+                            QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
+                            ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+                        }
                 }
 
             }
@@ -804,6 +822,8 @@ void MainWindow::on_actiony2mate_com_triggered()
 
 void MainWindow::on_actionzdrojovy_kod_triggered()
 {
+
+    // zdrojový kód
 
     ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
 
