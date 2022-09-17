@@ -140,9 +140,10 @@ void MainWindow::httpFinished()
     if (file) {
         fi.setFile(file->fileName());
         file->close();
+        file->deleteLater();
         file.reset();
 
-        QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stáhnut.");
+        QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stažen.");
         nazev_souboru = "";
 
         disable_widgets(false);
@@ -152,11 +153,13 @@ void MainWindow::httpFinished()
     QNetworkReply::NetworkError error = reply->error();
     const QString &errorString = reply->errorString();
 
+    reply->deleteLater();
     reply.reset();
     if (error != QNetworkReply::NoError) {
         QFile::remove(fi.absoluteFilePath());
         return;
     }
+
 
 }
 
@@ -199,7 +202,6 @@ void MainWindow::get(QString url, QString koncovka)
 
         disable_widgets(false);
     }
-
 }
 
 void MainWindow::post(QString location, QByteArray data, int druh_promenne)
@@ -212,7 +214,6 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
     QNetworkReply *reply = manager.post(request, data);
 
     ui->progressBar->setHidden(false);
-
     ui->label_3->setHidden(false);
 
     if (druh_promenne == 1){
@@ -538,27 +539,27 @@ void MainWindow::on_pushButton_clicked(){
                     }
                 }else if(_id == "error"){
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                         }
 
 
                 }else if(k_data_vid == "error"){
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                     }
                 }
 
                 else{
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                     }
                 }
@@ -647,27 +648,27 @@ void MainWindow::on_pushButton_clicked(){
                     }
                 }else if(_id == "error"){
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                         }
 
 
                 }else if(k_data_vid == "error"){
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                     }
                 }
 
                 else{
 
-                    QMessageBox::StandardButton reply = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
+                    QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
-                    if (reply == QMessageBox::Yes){
+                    if (reply_box == QMessageBox::Yes){
                             ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
                     }
                 }
@@ -708,6 +709,7 @@ void MainWindow::on_pushButton_2_clicked()
     nazev_souboru = "";
 
     reply->deleteLater();
+
 }
 
 void MainWindow::disable_widgets(bool vypnout){
