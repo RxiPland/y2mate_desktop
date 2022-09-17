@@ -41,6 +41,7 @@ private slots:
     void httpReadyRead();
     void get_headers(QString location);
     void get_nazev();
+    void downloadProgress(qint64 ist, qint64 max);
 
 private:
     Ui::MainWindow *ui;

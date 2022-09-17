@@ -19,8 +19,10 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -35,6 +37,8 @@ public:
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer_3;
+    QLabel *label_3;
+    QProgressBar *progressBar;
     QLineEdit *lineEdit;
     QLabel *label_2;
     QLabel *label;
@@ -53,12 +57,13 @@ public:
     QSpacerItem *verticalSpacer_4;
     QMenuBar *menuBar;
     QMenu *menuInfo;
+    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(481, 197);
+        MainWindow->resize(495, 271);
         actiony2mate_com = new QAction(MainWindow);
         actiony2mate_com->setObjectName(QString::fromUtf8("actiony2mate_com"));
         QIcon icon;
@@ -78,6 +83,17 @@ public:
         verticalSpacer_3 = new QSpacerItem(20, 49, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer_3);
+
+        label_3 = new QLabel(centralwidget);
+        label_3->setObjectName(QString::fromUtf8("label_3"));
+
+        verticalLayout->addWidget(label_3);
+
+        progressBar = new QProgressBar(centralwidget);
+        progressBar->setObjectName(QString::fromUtf8("progressBar"));
+        progressBar->setValue(24);
+
+        verticalLayout->addWidget(progressBar);
 
         lineEdit = new QLineEdit(centralwidget);
         lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
@@ -169,10 +185,13 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 481, 21));
+        menuBar->setGeometry(QRect(0, 0, 495, 21));
         menuInfo = new QMenu(menuBar);
         menuInfo->setObjectName(QString::fromUtf8("menuInfo"));
         MainWindow->setMenuBar(menuBar);
+        statusBar = new QStatusBar(MainWindow);
+        statusBar->setObjectName(QString::fromUtf8("statusBar"));
+        MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuInfo->menuAction());
         menuInfo->addAction(actiony2mate_com);
@@ -188,6 +207,7 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         actiony2mate_com->setText(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
         actionzdrojovy_kod->setText(QCoreApplication::translate("MainWindow", "zdrojov\303\275 k\303\263d", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev: ", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "D\303\251lka videa:", nullptr));

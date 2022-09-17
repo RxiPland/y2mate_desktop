@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>197</height>
+    <width>495</width>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,20 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Informace o stahování</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>24</number>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLineEdit" name="lineEdit">
@@ -204,7 +218,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>481</width>
+     <width>495</width>
      <height>21</height>
     </rect>
    </property>
@@ -217,6 +231,7 @@
    </widget>
    <addaction name="menuInfo"/>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actiony2mate_com">
    <property name="icon">
     <iconset resource="resources.qrc">

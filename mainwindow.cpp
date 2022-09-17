@@ -41,8 +41,16 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label->setHidden(true);
     ui->label_2->setHidden(true);
 
+    ui->label_3->setHidden(true);
+
+    ui->progressBar->setHidden(true);
+    ui->progressBar->setValue(0);
+
     ui->horizontalSpacer->changeSize(250, 35);
     ui->verticalSpacer_2->changeSize(20, 45);
+
+    ui->statusBar->addPermanentWidget(ui->label_3, 1);
+    ui->statusBar->addPermanentWidget(ui->progressBar, 2);
 }
 
 MainWindow::~MainWindow()
@@ -55,10 +63,17 @@ void MainWindow::get_headers(QString location)
     // cancel download & read headers
     // najde název souboru z headru a zapíše ho do globální proměnné
 
+    ui->progressBar->setHidden(false);
+
     QNetworkRequest request = QNetworkRequest(QUrl(location));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
     QNetworkReply *reply = manager.get(request);
+
+    ui->label_3->setHidden(false);
+    ui->label_3->setText("Získávám název souboru");
+
+    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
 
     while (!reply->isFinished())
     {
@@ -162,6 +177,11 @@ void MainWindow::get(QString url, QString koncovka)
 
     if (cesta != ""){
 
+        ui->progressBar->setHidden(false);
+
+        ui->label_3->setHidden(false);
+        ui->label_3->setText("Stahuji soubor");
+
         file = openFileForWrite(cesta);
         if (!file){
             QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + cesta);
@@ -174,6 +194,7 @@ void MainWindow::get(QString url, QString koncovka)
 
         connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
         connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
+        connect(reply.get(), &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
     } else {
 
         disable_widgets(false);
@@ -190,6 +211,18 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
     QNetworkReply *reply = manager.post(request, data);
 
+    ui->progressBar->setHidden(false);
+
+    ui->label_3->setHidden(false);
+
+    if (druh_promenne == 1){
+        ui->label_3->setText("Hledám dostupné formáty");
+
+    } else if (druh_promenne == 2){
+        ui->label_3->setText("Získávám odkaz na stažení souboru");
+    }
+
+    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
 
     while (!reply->isFinished())
     {
@@ -677,6 +710,9 @@ void MainWindow::on_pushButton_2_clicked()
     response = "";
     nazev_souboru = "";
 
+    MainWindow w;
+    w.resize(495,0);
+
     reply->deleteLater();
 }
 
@@ -739,6 +775,19 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     else {
         ui->comboBox_2->setHidden(true);
     }
+}
+
+void MainWindow::downloadProgress(qint64 ist, qint64 max)
+{
+    ui->progressBar->setRange(0,max);
+    ui->progressBar->setValue(ist);
+
+    if(max == ist){
+        ui->label_3->setHidden(true);
+        ui->progressBar->setHidden(true);
+        ui->progressBar->setValue(0);
+    }
+
 }
 
 
