@@ -104,6 +104,7 @@ void MainWindow::get_headers(QString location)
             }
         }
     }
+    reply->deleteLater();
 }
 
 void MainWindow::httpReadyRead()
@@ -675,6 +676,8 @@ void MainWindow::on_pushButton_2_clicked()
 
     response = "";
     nazev_souboru = "";
+
+    reply->deleteLater();
 }
 
 void MainWindow::disable_widgets(bool vypnout){
