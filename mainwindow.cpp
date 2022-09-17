@@ -71,7 +71,7 @@ void MainWindow::get_headers(QString location)
     QNetworkReply *reply = manager.get(request);
 
     ui->label_3->setHidden(false);
-    ui->label_3->setText("Získávám název souboru");
+    ui->label_3->setText("Získávám název videa");
 
     connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
 
@@ -524,7 +524,6 @@ void MainWindow::on_pushButton_clicked(){
                         if (odkaz_na_stazeni != "error"){
 
                             odkaz_na_stazeni.replace("\\", "");
-                            get_headers(odkaz_na_stazeni);
 
                             //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
 
@@ -637,8 +636,6 @@ void MainWindow::on_pushButton_clicked(){
                         if (odkaz_na_stazeni != "error"){
 
                             odkaz_na_stazeni.replace("\\", "");
-                            get_headers(odkaz_na_stazeni);
-
                             MainWindow::get(odkaz_na_stazeni, "Video (*.mp4)");
 
                             return;
@@ -709,9 +706,6 @@ void MainWindow::on_pushButton_2_clicked()
 
     response = "";
     nazev_souboru = "";
-
-    MainWindow w;
-    w.resize(495,0);
 
     reply->deleteLater();
 }
