@@ -5,7 +5,7 @@
 - Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
 - Verze knihovny: QT6
 
-[Stáhnout](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.0.0/y2mate_setup.exe) instalaci programu (windows)
+[Stáhnout](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.1.0/y2mate_setup.exe) instalaci programu (windows)
 
 # Náhled
 
