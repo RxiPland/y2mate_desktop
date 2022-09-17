@@ -163,6 +163,7 @@ void MainWindow::httpFinished()
 
     reply->deleteLater();
     reply.reset();
+
     if (error != QNetworkReply::NoError) {
         QFile::remove(fi.absoluteFilePath());
         return;
