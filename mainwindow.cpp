@@ -15,10 +15,10 @@
 
 using namespace std;
 
-QString response = "", response_najit_formaty = "";     // různé proměnné pro různé http requesty
+QString response = "", response_najit_formaty = "";     // různé proměnné pro různé ukládání http responsů
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
-QString nazev_souboru = "";  // název videa
+QString nazev_souboru = "";  // název yt videa
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -26,8 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     if (QSslSocket::supportsSsl() == false){
 
-        ShellExecute(0, 0, L"https://www.filehorse.com/download-openssl-64", 0, 0, SW_HIDE);
-        QMessageBox::critical(this, "Problém | y2mate desktop - by RxiPland", "Verze OpenSSL není platná<br><br>Nainstalování verze \"" + QSslSocket::sslLibraryBuildVersionString() + "\" problém opraví<br>Odkaz na stažení: <a href=\"https://www.filehorse.com/download-openssl-64\">https://www.filehorse.com/download-openssl-64</a><br><br>Před stažením je důležité označit správnou verzi!<br>Vaše aktuální nainstalovaná verze: \"" + QSslSocket::sslLibraryVersionString() + "\"");
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Problém | y2mate desktop - by RxiPland");
+        msgBox.setText("Verze OpenSSL není platná!<br>Bez ní program nemůže přistupovat na zabezpečené weby s protokolem HTTPs<br><br>Nainstalování verze \"" + QSslSocket::sslLibraryBuildVersionString() + "\" nebo velmi podobné problém opraví<br>Odkaz na stažení: <a href=\"https://www.filehorse.com/download-openssl-64\">https://www.filehorse.com/download-openssl-64</a><br><br>Před stažením je důležité označit správnou verzi!<br>Vaše aktuální nainstalovaná verze: \"" + QSslSocket::sslLibraryVersionString() + "\"");
+        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
+        msgBox.addButton("Odejít", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton()==pButtonYes) {
+            ShellExecute(0, 0, L"https://www.filehorse.com/download-openssl-64", 0, 0, SW_HIDE);
+        }
 
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
     }
@@ -102,7 +110,7 @@ void MainWindow::get_headers(QString location)
                 nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
                 nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
 
-                nazev_souboru.replace("y2mate.com - ", "");
+                nazev_souboru.replace("y2mate.com - ", "");      // odebrání watermarku z názvu souboru
                 nazev_souboru.replace("  ", " ");
 
 
@@ -110,7 +118,7 @@ void MainWindow::get_headers(QString location)
                 QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
 
                 for (int i=0; i<6; i++){
-                    nazev_souboru.replace("_" + formaty_mp4[i], "");
+                    nazev_souboru.replace("_" + formaty_mp4[i], "");    // odebrání kvality z názvu souboru
                     nazev_souboru.replace("_" + formaty_mp3[i], "");
                 }
                 break;
@@ -264,7 +272,7 @@ QList<QString> najit_data(){
     pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
     if (pozice > -1) {
-        video_id = rx2.cap(1); // "2psj1O9Fsb4"
+        video_id = rx2.cap(1); // "H10SQesAcwE"
     }
     udaje.append(video_id);
 
@@ -659,7 +667,6 @@ void MainWindow::on_pushButton_clicked(){
                                     ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                             }
                         }
-
                     }
                 }else if(_id == "error"){
 
@@ -668,7 +675,7 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
 
 
                 }else if(k_data_vid == "error"){
@@ -678,7 +685,7 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
                 }
 
                 else{
@@ -688,13 +695,10 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
                 }
-
             }
-
         }
-
     }
 
     disable_widgets(false);
@@ -745,7 +749,7 @@ void MainWindow::disable_widgets(bool vypnout){
 
 void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 {
-    // při vybrání mp3 načte příslušné formáty (128kbps, 192kbps, ...)
+    // při změně formátu v boxu se načtou příslušné typy kvalit (u mp3: 128kbps, 192kbps, ...)
     // to stejné u mp4 (720p, ...)
 
     ui->comboBox_2->clear();
