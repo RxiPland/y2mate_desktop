@@ -229,7 +229,14 @@
     <addaction name="actiony2mate_com"/>
     <addaction name="actionzdrojovy_kod"/>
    </widget>
+   <widget class="QMenu" name="menuNastaven">
+    <property name="title">
+     <string>Nastavení</string>
+    </property>
+    <addaction name="actionHledat_n_zev_videa"/>
+   </widget>
    <addaction name="menuInfo"/>
+   <addaction name="menuNastaven"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actiony2mate_com">
@@ -248,6 +255,14 @@
    </property>
    <property name="text">
     <string>zdrojový kód</string>
+   </property>
+  </action>
+  <action name="actionHledat_n_zev_videa">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hledat název videa</string>
    </property>
   </action>
  </widget>

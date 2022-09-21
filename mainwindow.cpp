@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QFileDialog>
 #include <QTextCodec>
+#include <random>
 
 using namespace std;
 
@@ -59,6 +60,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->statusBar->addPermanentWidget(ui->label_3, 1);
     ui->statusBar->addPermanentWidget(ui->progressBar, 2);
+
+
+    // načtení hodnoty automatické hledání názvu videí
+    QFile file("nastaveni.txt");
+
+    if (file.exists()){
+        file.open(QIODevice::ReadOnly);
+
+        QByteArray obsah = file.readLine(0);
+        file.close();
+
+        QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
+
+        ui->actionHledat_n_zev_videa->setChecked(obsah_nastaveni.contains("1"));   // vypnutí sníží dobu procesu stahování videa
+
+    } else{
+        ui->actionHledat_n_zev_videa->setChecked(true);
+    }
+
 }
 
 MainWindow::~MainWindow()
@@ -169,7 +189,6 @@ void MainWindow::httpFinished()
         return;
     }
 
-
 }
 
 std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
@@ -230,6 +249,9 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
     } else if (druh_promenne == 2){
         ui->label_3->setText("Získávám odkaz na stažení souboru");
+
+    } else if (druh_promenne == 3){
+        ui->label_3->setText("Získávám název videa");
     }
 
     connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
@@ -245,7 +267,7 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
     if (druh_promenne == 1){
         response_najit_formaty = response_data;
 
-    } else if (druh_promenne == 2){
+    } else if (druh_promenne == 2 || druh_promenne == 3){
 
         response = response_data;
     }
@@ -306,9 +328,9 @@ void MainWindow::get_nazev(){
         data.append("&");
         data.append("ftype=mp3");
         data.append("&");
-        data.append("fquality=128");
+        data.append("fquality=64");
 
-        MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
+        MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 3);     // post request na získání odkazu ke stažení
 
         QRegExp rx("href=\\\\\\\"(.+)\\\\\\\" rel=");
         int pos = rx.indexIn(response);
@@ -401,10 +423,28 @@ void MainWindow::on_pushButton_clicked(){
                     ui->label->setText("Délka videa: " + video_duration);
                 }
 
-                get_nazev();
-                nazev_souboru.replace(".mp3", "");
-                nazev_souboru.replace(".mp4", "");
-                ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
+                bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
+
+                if (nazev_videa){
+
+                    // pokud bude chtít uživatel najít skutečný název videa (trvá déle)
+                    get_nazev();
+
+                    nazev_souboru.replace(".mp3", "");
+                    nazev_souboru.replace(".mp4", "");
+                    nazev_souboru.replace(".webm", "");
+                    ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
+
+                } else{
+                    // uživatel nechce hledat název videa
+                    // jako název souboru se dosadí _id hodnota z y2mate
+                    ui->label_2->setHidden(true);
+
+                    QList<QString> udaje;
+                    udaje = najit_data();
+
+                    nazev_souboru = udaje[0];    // např. "62fd01c3f1a87588248b45ba"
+                }
 
                 ui->pushButton->setText("Stáhnout");    // změna najít na stáhnout
                 ui->horizontalSpacer->changeSize(20, 35);   // tlačítko "stáhnout" se vyrovná s boxem s kvalitou
@@ -832,5 +872,56 @@ void MainWindow::on_actionzdrojovy_kod_triggered()
 
     ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
 
+}
+
+
+void MainWindow::on_actionHledat_n_zev_videa_changed()
+{
+    QFile file("nastaveni.txt");
+
+    if(file.exists()){
+
+        file.open(QIODevice::ReadOnly);
+
+        QByteArray obsah = file.readAll();
+        file.close();
+
+        QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
+        QStringList rows_nastaveni = obsah_nastaveni.split("\r\n");
+
+        auto items_count = rows_nastaveni.size();
+
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&file);
+
+        bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
+
+        // zapsání změněné hodnoty do nastaveni.txt
+
+        for(int i=0; i < items_count; i++){
+            if (i==0){  // SEARCH_VIDEO_NAME se nachází na prvním řádku, zbytek se vypíše jak byl
+                if (nazev_videa){
+                    out << "SEARCH_VIDEO_NAME 1" << "\n";
+                } else {
+                    out << "SEARCH_VIDEO_NAME 0" << "\n";
+                }
+            } else{
+                out << rows_nastaveni[i] << "\n";
+            }
+        }
+
+    } else{
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&file);
+        bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
+
+        if (nazev_videa){
+            out << "SEARCH_VIDEO_NAME 1" << "\n";
+        } else {
+            out << "SEARCH_VIDEO_NAME 0" << "\n";
+        }
+    }
+
+    file.close();
 }
 

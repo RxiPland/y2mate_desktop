@@ -43,6 +43,8 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
+    void on_actionHledat_n_zev_videa_changed();
+
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager manager;

@@ -33,6 +33,7 @@ class Ui_MainWindow
 public:
     QAction *actiony2mate_com;
     QAction *actionzdrojovy_kod;
+    QAction *actionHledat_n_zev_videa;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout;
@@ -57,6 +58,7 @@ public:
     QSpacerItem *verticalSpacer_4;
     QMenuBar *menuBar;
     QMenu *menuInfo;
+    QMenu *menuNastaven;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -74,6 +76,9 @@ public:
         QIcon icon1;
         icon1.addFile(QString::fromUtf8(":/images/github.ico"), QSize(), QIcon::Normal, QIcon::Off);
         actionzdrojovy_kod->setIcon(icon1);
+        actionHledat_n_zev_videa = new QAction(MainWindow);
+        actionHledat_n_zev_videa->setObjectName(QString::fromUtf8("actionHledat_n_zev_videa"));
+        actionHledat_n_zev_videa->setCheckable(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout_3 = new QVBoxLayout(centralwidget);
@@ -188,14 +193,18 @@ public:
         menuBar->setGeometry(QRect(0, 0, 495, 21));
         menuInfo = new QMenu(menuBar);
         menuInfo->setObjectName(QString::fromUtf8("menuInfo"));
+        menuNastaven = new QMenu(menuBar);
+        menuNastaven->setObjectName(QString::fromUtf8("menuNastaven"));
         MainWindow->setMenuBar(menuBar);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
         MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuInfo->menuAction());
+        menuBar->addAction(menuNastaven->menuAction());
         menuInfo->addAction(actiony2mate_com);
         menuInfo->addAction(actionzdrojovy_kod);
+        menuNastaven->addAction(actionHledat_n_zev_videa);
 
         retranslateUi(MainWindow);
 
@@ -207,6 +216,7 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         actiony2mate_com->setText(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
         actionzdrojovy_kod->setText(QCoreApplication::translate("MainWindow", "zdrojov\303\275 k\303\263d", nullptr));
+        actionHledat_n_zev_videa->setText(QCoreApplication::translate("MainWindow", "Hledat n\303\241zev videa", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev: ", nullptr));
@@ -220,6 +230,7 @@ public:
         pushButton->setText(QCoreApplication::translate("MainWindow", "Naj\303\255t", nullptr));
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "Zru\305\241it", nullptr));
         menuInfo->setTitle(QCoreApplication::translate("MainWindow", "Info", nullptr));
+        menuNastaven->setTitle(QCoreApplication::translate("MainWindow", "Nastaven\303\255", nullptr));
     } // retranslateUi
 
 };
