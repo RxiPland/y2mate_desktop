@@ -34,6 +34,7 @@ public:
     QAction *actiony2mate_com;
     QAction *actionzdrojovy_kod;
     QAction *actionHledat_n_zev_videa;
+    QAction *actionNahradit_mezery_podtr_tkem;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout;
@@ -79,6 +80,9 @@ public:
         actionHledat_n_zev_videa = new QAction(MainWindow);
         actionHledat_n_zev_videa->setObjectName(QString::fromUtf8("actionHledat_n_zev_videa"));
         actionHledat_n_zev_videa->setCheckable(true);
+        actionNahradit_mezery_podtr_tkem = new QAction(MainWindow);
+        actionNahradit_mezery_podtr_tkem->setObjectName(QString::fromUtf8("actionNahradit_mezery_podtr_tkem"));
+        actionNahradit_mezery_podtr_tkem->setCheckable(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout_3 = new QVBoxLayout(centralwidget);
@@ -205,6 +209,7 @@ public:
         menuInfo->addAction(actiony2mate_com);
         menuInfo->addAction(actionzdrojovy_kod);
         menuNastaven->addAction(actionHledat_n_zev_videa);
+        menuNastaven->addAction(actionNahradit_mezery_podtr_tkem);
 
         retranslateUi(MainWindow);
 
@@ -217,6 +222,7 @@ public:
         actiony2mate_com->setText(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
         actionzdrojovy_kod->setText(QCoreApplication::translate("MainWindow", "zdrojov\303\275 k\303\263d", nullptr));
         actionHledat_n_zev_videa->setText(QCoreApplication::translate("MainWindow", "Hledat n\303\241zev videa", nullptr));
+        actionNahradit_mezery_podtr_tkem->setText(QCoreApplication::translate("MainWindow", "Nahradit mezery podtr\305\276\303\255tkem", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev: ", nullptr));

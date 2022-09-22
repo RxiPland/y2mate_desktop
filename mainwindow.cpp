@@ -68,15 +68,22 @@ MainWindow::MainWindow(QWidget *parent)
     if (file.exists()){
         file.open(QIODevice::ReadOnly);
 
-        QByteArray obsah = file.readLine(0);
+        QByteArray obsah = file.readAll();
         file.close();
 
         QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
+        QStringList rows_nastaveni = obsah_nastaveni.split("\r\n");
 
-        ui->actionHledat_n_zev_videa->setChecked(obsah_nastaveni.contains("1"));   // vypnutí sníží dobu procesu stahování videa
+        QString hledat_nazev_videa = rows_nastaveni[0];
+        QString nahradit_podtrzitkem = rows_nastaveni[1];
+
+
+        ui->actionHledat_n_zev_videa->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
+        ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));
 
     } else{
-        ui->actionHledat_n_zev_videa->setChecked(true);
+        ui->actionHledat_n_zev_videa->setChecked(true); // defaultní hodnota true
+        ui->actionNahradit_mezery_podtr_tkem->setChecked(false); // defaultní hodnota false
     }
 
 }
@@ -204,7 +211,18 @@ void MainWindow::get(QString url, QString koncovka)
 {
     disable_widgets(true);
 
-    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + nazev_souboru, koncovka);
+    QString upraveny_nazev_souboru = "";
+    bool nahradit_podtrzitkem = ui->actionNahradit_mezery_podtr_tkem->isChecked();
+
+    if (nahradit_podtrzitkem){
+
+        upraveny_nazev_souboru = nazev_souboru;
+        upraveny_nazev_souboru.replace(" ", "_");
+    } else{
+        upraveny_nazev_souboru = nazev_souboru;
+    }
+
+    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + upraveny_nazev_souboru, koncovka);
 
     if (cesta != ""){
 
@@ -216,6 +234,7 @@ void MainWindow::get(QString url, QString koncovka)
         file = openFileForWrite(cesta);
         if (!file){
             QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + cesta);
+            return;
         }
 
         QNetworkRequest request = QNetworkRequest(QUrl(url));
@@ -874,9 +893,13 @@ void MainWindow::on_actionzdrojovy_kod_triggered()
 
 }
 
+void MainWindow::ulozit_nastaveni(){
 
-void MainWindow::on_actionHledat_n_zev_videa_changed()
-{
+    // uloží nastavení do souboru
+
+    bool hledat_nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
+    bool nahradit_podtrzitkem = ui->actionNahradit_mezery_podtr_tkem->isChecked();
+
     QFile file("nastaveni.txt");
 
     if(file.exists()){
@@ -894,17 +917,23 @@ void MainWindow::on_actionHledat_n_zev_videa_changed()
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);
 
-        bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
-
         // zapsání změněné hodnoty do nastaveni.txt
 
         for(int i=0; i < items_count; i++){
             if (i==0){  // SEARCH_VIDEO_NAME se nachází na prvním řádku, zbytek se vypíše jak byl
-                if (nazev_videa){
+                if (hledat_nazev_videa){
                     out << "SEARCH_VIDEO_NAME 1" << "\n";
                 } else {
                     out << "SEARCH_VIDEO_NAME 0" << "\n";
                 }
+            } else if(i==1){ // UNDERSCORE_REPLACE se nachází na druhém řádku
+                if (nahradit_podtrzitkem){
+                    out << "UNDERSCORE_REPLACE 1" << "\n";
+                } else {
+                    out << "UNDERSCORE_REPLACE 0" << "\n";
+                }
+
+
             } else{
                 out << rows_nastaveni[i] << "\n";
             }
@@ -913,15 +942,31 @@ void MainWindow::on_actionHledat_n_zev_videa_changed()
     } else{
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);
-        bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
 
-        if (nazev_videa){
+        if (hledat_nazev_videa){
             out << "SEARCH_VIDEO_NAME 1" << "\n";
         } else {
             out << "SEARCH_VIDEO_NAME 0" << "\n";
         }
+
+        if (nahradit_podtrzitkem){
+            out << "UNDERSCORE_REPLACE 1" << "\n";
+        } else {
+            out << "UNDERSCORE_REPLACE 0" << "\n";
+        }
     }
 
     file.close();
+}
+
+
+void MainWindow::on_actionHledat_n_zev_videa_changed()
+{
+    ulozit_nastaveni();
+}
+
+void MainWindow::on_actionNahradit_mezery_podtr_tkem_changed()
+{
+    ulozit_nastaveni();
 }
 

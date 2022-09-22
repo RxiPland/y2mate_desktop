@@ -234,6 +234,7 @@
      <string>Nastavení</string>
     </property>
     <addaction name="actionHledat_n_zev_videa"/>
+    <addaction name="actionNahradit_mezery_podtr_tkem"/>
    </widget>
    <addaction name="menuInfo"/>
    <addaction name="menuNastaven"/>
@@ -263,6 +264,14 @@
    </property>
    <property name="text">
     <string>Hledat název videa</string>
+   </property>
+  </action>
+  <action name="actionNahradit_mezery_podtr_tkem">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Nahradit mezery podtržítkem</string>
    </property>
   </action>
  </widget>

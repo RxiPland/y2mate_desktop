@@ -43,7 +43,10 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
+    void ulozit_nastaveni();
+
     void on_actionHledat_n_zev_videa_changed();
+    void on_actionNahradit_mezery_podtr_tkem_changed();
 
 private:
     Ui::MainWindow *ui;
