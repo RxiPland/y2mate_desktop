@@ -1,6 +1,7 @@
 # y2mate Youtube downloader
 
 - Nenáročný program na stahování videí/hudby z youtube
+- Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
 - Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
 - Verze knihovny: QT6
