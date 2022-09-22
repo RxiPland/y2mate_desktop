@@ -14,4 +14,6 @@
 
 # Náhled
 
-![1](https://user-images.githubusercontent.com/82058894/191620430-93556716-290c-4479-8324-e344f6a86099.png)
+![1](https://user-images.githubusercontent.com/82058894/191858533-40d9a5a3-0f61-4188-b9ca-4d0687dee033.png)
+#
+![2](https://user-images.githubusercontent.com/82058894/191858536-3f82c3f9-c09a-443f-a8ce-888239dc4163.png)
