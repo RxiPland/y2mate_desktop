@@ -13,7 +13,6 @@
 - [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.3.0/y2mate.zip) (win64) ```md5: aea426745b22889202678ec699e850dc```
 
 # Náhled
-
 ![1](https://user-images.githubusercontent.com/82058894/191858533-40d9a5a3-0f61-4188-b9ca-4d0687dee033.png)
 #
-![2](https://user-images.githubusercontent.com/82058894/191858536-3f82c3f9-c09a-443f-a8ce-888239dc4163.png)
+![2](https://user-images.githubusercontent.com/82058894/191860852-49cde4a4-75c1-45f8-a63a-eff5f4497037.png)
