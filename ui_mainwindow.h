@@ -40,6 +40,7 @@ public:
     QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer_3;
     QLabel *label_3;
+    QLabel *label_4;
     QProgressBar *progressBar;
     QLineEdit *lineEdit;
     QLabel *label_2;
@@ -97,6 +98,11 @@ public:
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
         verticalLayout->addWidget(label_3);
+
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        verticalLayout->addWidget(label_4);
 
         progressBar = new QProgressBar(centralwidget);
         progressBar->setObjectName(QString::fromUtf8("progressBar"));
@@ -224,12 +230,13 @@ public:
         actionHledat_n_zev_videa->setText(QCoreApplication::translate("MainWindow", "Hledat n\303\241zev videa", nullptr));
         actionNahradit_mezery_podtr_tkem->setText(QCoreApplication::translate("MainWindow", "Nahradit mezery podtr\305\276\303\255tkem", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "25.6 / 120.7", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev: ", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "D\303\251lka videa:", nullptr));
         comboBox->setItemText(0, QCoreApplication::translate("MainWindow", "<Vyberte form\303\241t>", nullptr));
-        comboBox->setItemText(1, QCoreApplication::translate("MainWindow", "mp3 (zvuk)", nullptr));
-        comboBox->setItemText(2, QCoreApplication::translate("MainWindow", "mp4 (zvuk+video)", nullptr));
+        comboBox->setItemText(1, QCoreApplication::translate("MainWindow", "mp3 (pouze zvuk)", nullptr));
+        comboBox->setItemText(2, QCoreApplication::translate("MainWindow", "mp4 (video)", nullptr));
 
         comboBox_2->setItemText(0, QCoreApplication::translate("MainWindow", "<Vyberte kvalitu>", nullptr));
 

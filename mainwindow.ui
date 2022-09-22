@@ -38,6 +38,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>25.6 / 120.7</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QProgressBar" name="progressBar">
         <property name="value">
          <number>24</number>
@@ -94,12 +101,12 @@
             </item>
             <item>
              <property name="text">
-              <string>mp3 (zvuk)</string>
+              <string>mp3 (pouze zvuk)</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>mp4 (zvuk+video)</string>
+              <string>mp4 (video)</string>
              </property>
             </item>
            </widget>

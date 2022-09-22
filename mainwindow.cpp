@@ -47,10 +47,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->comboBox->setHidden(true);
     ui->comboBox_2->setHidden(true);
     ui->pushButton_2->setHidden(true);
-    ui->label->setHidden(true);
-    ui->label_2->setHidden(true);
+    ui->label->setHidden(true);  // délka videa
+    ui->label_2->setHidden(true);  // název videa
 
-    ui->label_3->setHidden(true);
+    ui->label_3->setHidden(true);  // informace o postupu
+    ui->label_4->setHidden(true);  // postup stahování
 
     ui->progressBar->setHidden(true);
     ui->progressBar->setValue(0);
@@ -59,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->verticalSpacer_2->changeSize(20, 45);
 
     ui->statusBar->addPermanentWidget(ui->label_3, 1);
+    ui->statusBar->addPermanentWidget(ui->label_4, 1);
     ui->statusBar->addPermanentWidget(ui->progressBar, 2);
 
 
@@ -229,6 +231,7 @@ void MainWindow::get(QString url, QString koncovka)
         ui->progressBar->setHidden(false);
 
         ui->label_3->setHidden(false);
+        ui->label_4->setHidden(false);
         ui->label_3->setText("Stahuji soubor");
 
         file = openFileForWrite(cesta);
@@ -528,7 +531,7 @@ void MainWindow::on_pushButton_clicked(){
         } else {
             // v pořádku
 
-            if (text_format == "mp3 (zvuk)"){
+            if (text_format == "mp3 (pouze zvuk)"){
 
                 // stáhnutí zvuku
 
@@ -643,7 +646,7 @@ void MainWindow::on_pushButton_clicked(){
                 }
 
 
-            } else if (text_format == "mp4 (zvuk+video)"){
+            } else if (text_format == "mp4 (video)"){
 
                 // stáhnutí videa
 
@@ -815,7 +818,7 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     ui->comboBox_2->clear();
     ui->comboBox_2->addItem("<Vyberte kvalitu>");
 
-    if (arg1 == "mp3 (zvuk)"){
+    if (arg1 == "mp3 (pouze zvuk)"){
         // načíst z proměnné nalezene_formaty_mp3
 
         QString aktualni_format = "";
@@ -832,7 +835,7 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 
         ui->comboBox_2->setHidden(false);
     }
-    else if (arg1 == "mp4 (zvuk+video)"){
+    else if (arg1 == "mp4 (video)"){
         // načíst z proměnné nalezene_formaty_mp4
 
 
@@ -857,11 +860,15 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
 
 void MainWindow::downloadProgress(qint64 ist, qint64 max)
 {
+
     ui->progressBar->setRange(0,max);
     ui->progressBar->setValue(ist);
 
+    ui->label_4->setText(QString::number(ist/1000000) + "mb / " + QString::number(max/1000000) + "mb");
+
     if(max == ist){
         ui->label_3->setHidden(true);
+        ui->label_4->setHidden(true);
         ui->progressBar->setHidden(true);
         ui->progressBar->setValue(0);
     }
