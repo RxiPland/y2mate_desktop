@@ -864,7 +864,7 @@ void MainWindow::downloadProgress(qint64 ist, qint64 max)
     ui->progressBar->setRange(0,max);
     ui->progressBar->setValue(ist);
 
-    ui->label_4->setText(QString::number(ist/1000000) + "mb / " + QString::number(max/1000000) + "mb");
+    ui->label_4->setText(QString::number(ist/1000000) + "." + QString::number(ist/100000).back() + " / " + QString::number(max/1000000) + "." + QString::number(max/100000).back() + " MB");
 
     if(max == ist){
         ui->label_3->setHidden(true);
