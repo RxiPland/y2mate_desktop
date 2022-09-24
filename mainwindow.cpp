@@ -23,7 +23,7 @@ string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
 string cesta_k_souboru = "";
 
-QString app_version = "v1.5.0";
+QString app_version = "v1.5.1";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
