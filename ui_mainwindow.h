@@ -35,6 +35,8 @@ public:
     QAction *actionzdrojovy_kod;
     QAction *actionHledat_n_zev_videa;
     QAction *actionNahradit_mezery_podtr_tkem;
+    QAction *action_verze;
+    QAction *actionAutomaticky_kontrolovat_verzi;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout_3;
     QVBoxLayout *verticalLayout;
@@ -67,7 +69,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(495, 271);
+        MainWindow->resize(495, 293);
         actiony2mate_com = new QAction(MainWindow);
         actiony2mate_com->setObjectName(QString::fromUtf8("actiony2mate_com"));
         QIcon icon;
@@ -84,6 +86,11 @@ public:
         actionNahradit_mezery_podtr_tkem = new QAction(MainWindow);
         actionNahradit_mezery_podtr_tkem->setObjectName(QString::fromUtf8("actionNahradit_mezery_podtr_tkem"));
         actionNahradit_mezery_podtr_tkem->setCheckable(true);
+        action_verze = new QAction(MainWindow);
+        action_verze->setObjectName(QString::fromUtf8("action_verze"));
+        actionAutomaticky_kontrolovat_verzi = new QAction(MainWindow);
+        actionAutomaticky_kontrolovat_verzi->setObjectName(QString::fromUtf8("actionAutomaticky_kontrolovat_verzi"));
+        actionAutomaticky_kontrolovat_verzi->setCheckable(true);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout_3 = new QVBoxLayout(centralwidget);
@@ -216,6 +223,9 @@ public:
         menuInfo->addAction(actionzdrojovy_kod);
         menuNastaven->addAction(actionHledat_n_zev_videa);
         menuNastaven->addAction(actionNahradit_mezery_podtr_tkem);
+        menuNastaven->addAction(actionAutomaticky_kontrolovat_verzi);
+        menuNastaven->addSeparator();
+        menuNastaven->addAction(action_verze);
 
         retranslateUi(MainWindow);
 
@@ -229,6 +239,11 @@ public:
         actionzdrojovy_kod->setText(QCoreApplication::translate("MainWindow", "zdrojov\303\275 k\303\263d", nullptr));
         actionHledat_n_zev_videa->setText(QCoreApplication::translate("MainWindow", "Hledat n\303\241zev videa", nullptr));
         actionNahradit_mezery_podtr_tkem->setText(QCoreApplication::translate("MainWindow", "Nahradit mezery podtr\305\276\303\255tkem", nullptr));
+        action_verze->setText(QCoreApplication::translate("MainWindow", "Verze:", nullptr));
+#if QT_CONFIG(tooltip)
+        action_verze->setToolTip(QCoreApplication::translate("MainWindow", "Verze:", nullptr));
+#endif // QT_CONFIG(tooltip)
+        actionAutomaticky_kontrolovat_verzi->setText(QCoreApplication::translate("MainWindow", "Automaticky kontrolovat verzi", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "25.6 / 120.7", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));

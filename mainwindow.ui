@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>495</width>
-    <height>271</height>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -242,6 +242,9 @@
     </property>
     <addaction name="actionHledat_n_zev_videa"/>
     <addaction name="actionNahradit_mezery_podtr_tkem"/>
+    <addaction name="actionAutomaticky_kontrolovat_verzi"/>
+    <addaction name="separator"/>
+    <addaction name="action_verze"/>
    </widget>
    <addaction name="menuInfo"/>
    <addaction name="menuNastaven"/>
@@ -279,6 +282,22 @@
    </property>
    <property name="text">
     <string>Nahradit mezery podtržítkem</string>
+   </property>
+  </action>
+  <action name="action_verze">
+   <property name="text">
+    <string>Verze:</string>
+   </property>
+   <property name="toolTip">
+    <string>Verze:</string>
+   </property>
+  </action>
+  <action name="actionAutomaticky_kontrolovat_verzi">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Automaticky kontrolovat verzi</string>
    </property>
   </action>
  </widget>

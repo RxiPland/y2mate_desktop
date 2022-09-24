@@ -12,7 +12,8 @@
 #include <QByteArray>
 #include <QFileDialog>
 #include <QTextCodec>
-#include <random>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -20,6 +21,9 @@ QString response = "", response_najit_formaty = "";     // různé proměnné pr
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
+string cesta_k_souboru = "";
+
+QString app_version = "v1.4.2";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -44,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("y2mate desktop - by RxiPland");
 
+    ui->action_verze->setText("Verze: " + app_version);
+
     ui->comboBox->setHidden(true);
     ui->comboBox_2->setHidden(true);
     ui->pushButton_2->setHidden(true);
@@ -63,7 +69,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusBar->addPermanentWidget(ui->label_4, 1);
     ui->statusBar->addPermanentWidget(ui->progressBar, 2);
 
-
     // načtení hodnoty automatické hledání názvu videí
     QFile file("nastaveni.txt");
 
@@ -78,14 +83,22 @@ MainWindow::MainWindow(QWidget *parent)
 
         QString hledat_nazev_videa = rows_nastaveni[0];
         QString nahradit_podtrzitkem = rows_nastaveni[1];
+        QString check_update = rows_nastaveni[2];
 
 
         ui->actionHledat_n_zev_videa->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
         ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));
+        ui->actionAutomaticky_kontrolovat_verzi->setChecked(check_update.contains("1"));
 
     } else{
         ui->actionHledat_n_zev_videa->setChecked(true); // defaultní hodnota true
         ui->actionNahradit_mezery_podtr_tkem->setChecked(false); // defaultní hodnota false
+        ui->actionAutomaticky_kontrolovat_verzi->setChecked(true); // defaultní hodnota true
+    }
+
+    // automatická kontrola verze
+    if (ui->actionAutomaticky_kontrolovat_verzi->isChecked()){
+        check_version(false);
     }
 
 }
@@ -93,6 +106,56 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::check_version(bool show_response=false){
+
+    QString api_url = "https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest";
+
+    QNetworkRequest request = QNetworkRequest(QUrl(api_url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+
+    QNetworkReply *reply = manager.get(request);
+
+    ui->label_3->setHidden(false);
+    ui->label_4->setHidden(true);
+    ui->label_3->setText("Kontroluji verzi");
+
+    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+
+    while (!reply->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    QString strReply = (QString)reply->readAll();
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
+    QJsonObject jsonObject = jsonResponse.object();
+
+    QString newest_version = jsonObject["tag_name"].toString();
+    QStringList current_version = (ui->action_verze->text()).split(" ");
+
+    if (newest_version != current_version.back()){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Informace o verzi | y2mate desktop");
+        msgBox.setText("Je dostupná novější verze: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové");
+        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
+        msgBox.addButton("Zrušit", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton()==pButtonYes) {
+            ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
+        }
+
+    } else{
+        if (show_response){
+            QMessageBox::information(this, "Informace o verzi", "Již máte nejnovější verzi ("+ newest_version + ")");
+        }
+    }
+
+    reply->deleteLater();
 }
 
 void MainWindow::get_headers(QString location)
@@ -168,6 +231,7 @@ void MainWindow::httpReadyRead()
     if (file){
         file->write(reply->readAll());
     }
+
 }
 
 void MainWindow::httpFinished()
@@ -180,8 +244,25 @@ void MainWindow::httpFinished()
         file->deleteLater();
         file.reset();
 
-        QMessageBox::information(this, "V pořádku", "Soubor byl úspěšně stažen.");
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("V pořádku");
+        msgBox.setText("Soubor byl úspěšně stažen.");
+        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
+        msgBox.addButton("Ok", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton()==pButtonYes) {
+
+            cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
+
+            wstring wide_string = wstring(cesta_k_souboru.begin(), cesta_k_souboru.end());
+            const wchar_t* command = wide_string.c_str();
+
+            ShellExecute(0, L"open", command, 0, 0, SW_RESTORE);
+        }
+
         nazev_souboru = "";
+        cesta_k_souboru = "";
 
         disable_widgets(false);
         on_pushButton_2_clicked();
@@ -227,6 +308,8 @@ void MainWindow::get(QString url, QString koncovka)
     QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + upraveny_nazev_souboru, koncovka);
 
     if (cesta != ""){
+
+        cesta_k_souboru = cesta.toLocal8Bit().constData();;
 
         ui->progressBar->setHidden(false);
 
@@ -906,6 +989,7 @@ void MainWindow::ulozit_nastaveni(){
 
     bool hledat_nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
     bool nahradit_podtrzitkem = ui->actionNahradit_mezery_podtr_tkem->isChecked();
+    bool check_update = ui->actionAutomaticky_kontrolovat_verzi->isChecked();
 
     QFile file("nastaveni.txt");
 
@@ -940,6 +1024,13 @@ void MainWindow::ulozit_nastaveni(){
                     out << "UNDERSCORE_REPLACE 0" << "\n";
                 }
 
+            } else if(i==2){ // AUTO_CHECK_UPDATE se nachází na třetím řádku
+                if (check_update){
+                    out << "AUTO_CHECK_UPDATE 1" << "\n";
+                } else {
+                    out << "AUTO_CHECK_UPDATE 0" << "\n";
+                }
+
 
             } else{
                 out << rows_nastaveni[i] << "\n";
@@ -961,6 +1052,12 @@ void MainWindow::ulozit_nastaveni(){
         } else {
             out << "UNDERSCORE_REPLACE 0" << "\n";
         }
+
+        if (check_update){
+            out << "AUTO_CHECK_UPDATE 1" << "\n";
+        } else {
+            out << "AUTO_CHECK_UPDATE 0" << "\n";
+        }
     }
 
     file.close();
@@ -977,3 +1074,12 @@ void MainWindow::on_actionNahradit_mezery_podtr_tkem_changed()
     ulozit_nastaveni();
 }
 
+void MainWindow::on_actionAutomaticky_kontrolovat_verzi_changed()
+{
+    ulozit_nastaveni();
+}
+
+void MainWindow::on_action_verze_triggered()
+{
+    check_version(true);
+}
