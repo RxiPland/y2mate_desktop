@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
 
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return;
     }
 
     ui->setupUi(this);
