@@ -8,9 +8,9 @@
 
 # Odkazy ke stažení
 
-- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.0/y2mate_setup.exe) exe (win64) ```md5: a5295baa15f6f90c8a043ca1b193a62e```
+- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.1/y2mate_setup.exe) exe (win64) ```md5: f231e7985ca2a797e02efb38a9b7a8aa```
 
-- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.0/y2mate.zip) (win64) ```md5: 5f24898cf1e2a687ca2b68e979b857b2```
+- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.1/y2mate.zip) (win64) ```md5: 230a6773318210de5d07e54676230963```
 
 # Náhled
 ![1](https://user-images.githubusercontent.com/82058894/191858533-40d9a5a3-0f61-4188-b9ca-4d0687dee033.png)
