@@ -87,8 +87,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
         ui->actionHledat_n_zev_videa->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
-        ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));
-        ui->actionAutomaticky_kontrolovat_verzi->setChecked(check_update.contains("1"));
+        ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
+        ui->actionAutomaticky_kontrolovat_verzi->setChecked(check_update.contains("1"));  // zapnutí bude automaticky kontrolovat novou verzi při startu
 
     } else{
         ui->actionHledat_n_zev_videa->setChecked(true); // defaultní hodnota true
@@ -110,9 +110,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::check_version(bool show_response=false){
 
-    QString api_url = "https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest";
+    QUrl api_url = QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest");
 
-    QNetworkRequest request = QNetworkRequest(QUrl(api_url));
+    QNetworkRequest request = QNetworkRequest(api_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
