@@ -21,9 +21,9 @@ QString response = "", response_najit_formaty = "";     // různé proměnné pr
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
-string cesta_k_souboru = "";
+QString cesta_k_souboru = "";  // úplná cesta k uloženému souboru
 
-QString app_version = "v1.5.1";
+QString app_version = "v1.5.2";  // aktuální verze programu
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -60,15 +60,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->label_3->setHidden(true);  // informace o postupu
     ui->label_4->setHidden(true);  // postup stahování
 
-    ui->progressBar->setHidden(true);
+    ui->progressBar->setHidden(true);  // progress bar stahování
     ui->progressBar->setValue(0);
 
     ui->horizontalSpacer->changeSize(250, 35);
     ui->verticalSpacer_2->changeSize(20, 45);
 
-    ui->statusBar->addPermanentWidget(ui->label_3, 1);
-    ui->statusBar->addPermanentWidget(ui->label_4, 1);
-    ui->statusBar->addPermanentWidget(ui->progressBar, 2);
+    ui->statusBar->addPermanentWidget(ui->label_3, 1);  // informace o requestu
+    ui->statusBar->addPermanentWidget(ui->label_4, 1);  // staženo mb z celkového počtu
+    ui->statusBar->addPermanentWidget(ui->progressBar, 2);  // progress bar stahování
 
     // načtení hodnoty automatické hledání názvu videí
     QFile file("nastaveni.txt");
@@ -86,6 +86,18 @@ MainWindow::MainWindow(QWidget *parent)
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
 
+        // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
+        if (hledat_nazev_videa == ""){
+            hledat_nazev_videa = "1";
+        }
+
+        if (nahradit_podtrzitkem == ""){
+            nahradit_podtrzitkem = "0";
+        }
+
+        if (check_update == ""){
+            check_update = "1";
+        }
 
         ui->actionHledat_n_zev_videa->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
         ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
@@ -110,6 +122,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::check_version(bool show_response=false){
+    // zkontrolovat verzi, jestli nebyla vydána nová
 
     QUrl api_url = QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest");
 
@@ -130,6 +143,7 @@ void MainWindow::check_version(bool show_response=false){
         qApp->processEvents();
     }
 
+    // zpracování response
     QString strReply = (QString)reply->readAll();
     QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
     QJsonObject jsonObject = jsonResponse.object();
@@ -237,6 +251,7 @@ void MainWindow::httpReadyRead()
 
 void MainWindow::httpFinished()
 {
+    // http request byl dokončen
 
     QFileInfo fi;
     if (file) {
@@ -253,13 +268,12 @@ void MainWindow::httpFinished()
         msgBox.exec();
 
         if (msgBox.clickedButton()==pButtonYes) {
+            // otevřít soubor
 
             cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
+            std::wstring command = cesta_k_souboru.toStdWString();
 
-            wstring wide_string = wstring(cesta_k_souboru.begin(), cesta_k_souboru.end());
-            const wchar_t* command = wide_string.c_str();
-
-            ShellExecute(0, L"open", command, 0, 0, SW_RESTORE);
+            ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
         }
 
         nazev_souboru = "";
@@ -293,6 +307,8 @@ std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
 
 void MainWindow::get(QString url, QString koncovka)
 {
+    // GET
+
     disable_widgets(true);
 
     QString upraveny_nazev_souboru = "";
@@ -306,11 +322,9 @@ void MainWindow::get(QString url, QString koncovka)
         upraveny_nazev_souboru = nazev_souboru;
     }
 
-    QString cesta = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + upraveny_nazev_souboru, koncovka);
+    cesta_k_souboru = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + upraveny_nazev_souboru, koncovka);
 
-    if (cesta != ""){
-
-        cesta_k_souboru = cesta.toLocal8Bit().constData();;
+    if (cesta_k_souboru != ""){
 
         ui->progressBar->setHidden(false);
 
@@ -318,9 +332,9 @@ void MainWindow::get(QString url, QString koncovka)
         ui->label_4->setHidden(false);
         ui->label_3->setText("Stahuji soubor");
 
-        file = openFileForWrite(cesta);
+        file = openFileForWrite(cesta_k_souboru);
         if (!file){
-            QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + cesta);
+            QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + cesta_k_souboru);
             return;
         }
 
@@ -340,6 +354,7 @@ void MainWindow::get(QString url, QString koncovka)
 
 void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 {
+    // POST
 
     QNetworkRequest request = QNetworkRequest(QUrl(location));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
@@ -381,6 +396,7 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 }
 
 QList<QString> najit_data(){
+    // najít data [_id, video_id]  z response
 
     QList<QString> udaje; // prvni: _id; druhy: video_id
 
@@ -409,6 +425,7 @@ QList<QString> najit_data(){
 }
 
 void MainWindow::get_nazev(){
+    // získat název videa
 
     QList<QString> udaje;
     udaje = najit_data();
@@ -461,6 +478,7 @@ void MainWindow::get_nazev(){
 }
 
 void MainWindow::on_pushButton_clicked(){
+    // pushButton je najít/stáhnout
 
     QString text_tlacitka = ui->pushButton->text();
     QString line_edit_text = ui->lineEdit->text();
@@ -978,14 +996,13 @@ void MainWindow::on_actiony2mate_com_triggered()
 void MainWindow::on_actionzdrojovy_kod_triggered()
 {
 
-    // zdrojový kód
+    // otevřít github se zdrojovým kódem
 
     ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
 
 }
 
 void MainWindow::ulozit_nastaveni(){
-
     // uloží nastavení do souboru
 
     bool hledat_nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
@@ -1082,5 +1099,5 @@ void MainWindow::on_actionAutomaticky_kontrolovat_verzi_changed()
 
 void MainWindow::on_action_verze_triggered()
 {
-    check_version(true);
+    check_version(true);  // argument true říká, že se má zobrazit okno pokud je verze stejná
 }
