@@ -3,12 +3,15 @@
 - Nenáročný program na stahování videí/hudby z youtube
 - Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
+#
+- Video kvalita maximálně 1080p
+- Kvalita zvuku maximálně 320kbps
 
 # Odkazy ke stažení
 
-- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.1/y2mate_setup.exe) exe (win64) ```md5: f231e7985ca2a797e02efb38a9b7a8aa```
+- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.2/y2mate_setup.exe) exe (win64) ```md5: 6c030881069564f5df97d96b499e15d7```
 
-- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.1/y2mate.zip) (win64) ```md5: 230a6773318210de5d07e54676230963```
+- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.5.2/y2mate.zip) (win64) ```md5: f93c22f05f3352fb28667017f607da73```
 
 # Náhled
 ![1](https://user-images.githubusercontent.com/82058894/191858533-40d9a5a3-0f61-4188-b9ca-4d0687dee033.png)
