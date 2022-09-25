@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     ui->setupUi(this);
-    setWindowTitle("y2mate desktop - by RxiPland");
+    setWindowTitle("y2mate desktop");
 
     ui->action_verze->setText("Verze: " + app_version);
 
@@ -151,7 +151,7 @@ void MainWindow::check_version(bool show_response=false){
     QString newest_version = jsonObject["tag_name"].toString();
     QStringList current_version = (ui->action_verze->text()).split(" ");
 
-    if (newest_version != current_version.back()){
+    if (newest_version != current_version.back() && newest_version != ""){
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Informace o verzi | y2mate desktop");
@@ -163,7 +163,10 @@ void MainWindow::check_version(bool show_response=false){
         if (msgBox.clickedButton()==pButtonYes) {
             ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
         }
-
+    } else if (newest_version == ""){
+        if (show_response){
+            QMessageBox::information(this, "Informace o verzi", "Nelze se připojit k internetu\nVaše verze: " + current_version.back());
+        }
     } else{
         if (show_response){
             QMessageBox::information(this, "Informace o verzi", "Již máte nejnovější verzi ("+ newest_version + ")");
@@ -293,7 +296,6 @@ void MainWindow::httpFinished()
         QFile::remove(fi.absoluteFilePath());
         return;
     }
-
 }
 
 std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
@@ -392,7 +394,6 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
         response = response_data;
     }
-
 }
 
 QList<QString> najit_data(){
@@ -469,7 +470,6 @@ void MainWindow::get_nazev(){
 
             odkaz_na_stazeni.replace("\\", "");
             get_headers(odkaz_na_stazeni);
-
         }
 
     } else {
