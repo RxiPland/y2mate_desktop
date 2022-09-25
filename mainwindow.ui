@@ -235,19 +235,10 @@
     </property>
     <addaction name="actiony2mate_com"/>
     <addaction name="actionzdrojovy_kod"/>
-   </widget>
-   <widget class="QMenu" name="menuNastaven">
-    <property name="title">
-     <string>Nastavení</string>
-    </property>
-    <addaction name="actionHledat_n_zev_videa"/>
-    <addaction name="actionNahradit_mezery_podtr_tkem"/>
-    <addaction name="actionAutomaticky_kontrolovat_verzi"/>
     <addaction name="separator"/>
-    <addaction name="action_verze"/>
+    <addaction name="actionNastaven"/>
    </widget>
    <addaction name="menuInfo"/>
-   <addaction name="menuNastaven"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actiony2mate_com">
@@ -268,36 +259,9 @@
     <string>zdrojový kód</string>
    </property>
   </action>
-  <action name="actionHledat_n_zev_videa">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="actionNastaven">
    <property name="text">
-    <string>Hledat název videa</string>
-   </property>
-  </action>
-  <action name="actionNahradit_mezery_podtr_tkem">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Nahradit mezery podtržítkem</string>
-   </property>
-  </action>
-  <action name="action_verze">
-   <property name="text">
-    <string>Verze:</string>
-   </property>
-   <property name="toolTip">
-    <string>Verze:</string>
-   </property>
-  </action>
-  <action name="actionAutomaticky_kontrolovat_verzi">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Automaticky kontrolovat verzi</string>
+    <string>Nastavení</string>
    </property>
   </action>
  </widget>

@@ -23,6 +23,10 @@ set(PROJECT_SOURCES
         ui_mainwindow.h
         mainwindow.ui
         resources.qrc
+        settings_dialog.h
+        settings_dialog.cpp
+        settings_dialog.ui
+        ui_settings_dialog.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "settings_dialog.h"
+
 #include <string>
 #include <QMessageBox>
 #include <stdio.h>
@@ -23,7 +25,8 @@ string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
 QString cesta_k_souboru = "";  // úplná cesta k uloženému souboru
 
-QString app_version = "v1.5.2";  // aktuální verze programu
+QString app_version = "v1.6.0";  // aktuální verze programu
+bool hodnoty_nastaveni[3] = {};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -48,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowTitle("y2mate desktop");
-
-    ui->action_verze->setText("Verze: " + app_version);
 
     ui->comboBox->setHidden(true);
     ui->comboBox_2->setHidden(true);
@@ -99,19 +100,20 @@ MainWindow::MainWindow(QWidget *parent)
             check_update = "1";
         }
 
-        ui->actionHledat_n_zev_videa->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
-        ui->actionNahradit_mezery_podtr_tkem->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
-        ui->actionAutomaticky_kontrolovat_verzi->setChecked(check_update.contains("1"));  // zapnutí bude automaticky kontrolovat novou verzi při startu
+        hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
+        hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
+        hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
 
     } else{
-        ui->actionHledat_n_zev_videa->setChecked(true); // defaultní hodnota true
-        ui->actionNahradit_mezery_podtr_tkem->setChecked(false); // defaultní hodnota false
-        ui->actionAutomaticky_kontrolovat_verzi->setChecked(true); // defaultní hodnota true
+
+        hodnoty_nastaveni[0] = true; // defaultní hodnota true
+        hodnoty_nastaveni[1] = false;  // defaultní hodnota false
+        hodnoty_nastaveni[2] = true; // defaultní hodnota true
     }
 
     // automatická kontrola verze
-    if (ui->actionAutomaticky_kontrolovat_verzi->isChecked()){
-        check_version(false);
+    if (hodnoty_nastaveni[2]){
+        check_version();
     }
 
 }
@@ -121,7 +123,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::check_version(bool show_response=false){
+void MainWindow::check_version(){
     // zkontrolovat verzi, jestli nebyla vydána nová
 
     QUrl api_url = QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest");
@@ -149,27 +151,18 @@ void MainWindow::check_version(bool show_response=false){
     QJsonObject jsonObject = jsonResponse.object();
 
     QString newest_version = jsonObject["tag_name"].toString();
-    QStringList current_version = (ui->action_verze->text()).split(" ");
 
-    if (newest_version != current_version.back() && newest_version != ""){
+    if (newest_version != app_version && newest_version != ""){
 
         QMessageBox msgBox;
-        msgBox.setWindowTitle("Informace o verzi | y2mate desktop");
-        msgBox.setText("Je dostupná novější verze: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové");
+        msgBox.setWindowTitle("Aktualizace");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ app_version  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
 
         if (msgBox.clickedButton()==pButtonYes) {
             ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
-        }
-    } else if (newest_version == ""){
-        if (show_response){
-            QMessageBox::information(this, "Informace o verzi", "Nelze se připojit k internetu\nVaše verze: " + current_version.back());
-        }
-    } else{
-        if (show_response){
-            QMessageBox::information(this, "Informace o verzi", "Již máte nejnovější verzi ("+ newest_version + ")");
         }
     }
 
@@ -314,7 +307,7 @@ void MainWindow::get(QString url, QString koncovka)
     disable_widgets(true);
 
     QString upraveny_nazev_souboru = "";
-    bool nahradit_podtrzitkem = ui->actionNahradit_mezery_podtr_tkem->isChecked();
+    bool nahradit_podtrzitkem = hodnoty_nastaveni[1];
 
     if (nahradit_podtrzitkem){
 
@@ -547,7 +540,7 @@ void MainWindow::on_pushButton_clicked(){
                     ui->label->setText("Délka videa: " + video_duration);
                 }
 
-                bool nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
+                bool nazev_videa = hodnoty_nastaveni[0];
 
                 if (nazev_videa){
 
@@ -1002,102 +995,10 @@ void MainWindow::on_actionzdrojovy_kod_triggered()
 
 }
 
-void MainWindow::ulozit_nastaveni(){
-    // uloží nastavení do souboru
-
-    bool hledat_nazev_videa = ui->actionHledat_n_zev_videa->isChecked();
-    bool nahradit_podtrzitkem = ui->actionNahradit_mezery_podtr_tkem->isChecked();
-    bool check_update = ui->actionAutomaticky_kontrolovat_verzi->isChecked();
-
-    QFile file("nastaveni.txt");
-
-    if(file.exists()){
-
-        file.open(QIODevice::ReadOnly);
-
-        QByteArray obsah = file.readAll();
-        file.close();
-
-        QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
-        QStringList rows_nastaveni = obsah_nastaveni.split("\r\n");
-
-        auto items_count = rows_nastaveni.size();
-
-        file.open(QIODevice::WriteOnly | QIODevice::Text);
-        QTextStream out(&file);
-
-        // zapsání změněné hodnoty do nastaveni.txt
-
-        for(int i=0; i < items_count; i++){
-            if (i==0){  // SEARCH_VIDEO_NAME se nachází na prvním řádku, zbytek se vypíše jak byl
-                if (hledat_nazev_videa){
-                    out << "SEARCH_VIDEO_NAME 1" << "\n";
-                } else {
-                    out << "SEARCH_VIDEO_NAME 0" << "\n";
-                }
-            } else if(i==1){ // UNDERSCORE_REPLACE se nachází na druhém řádku
-                if (nahradit_podtrzitkem){
-                    out << "UNDERSCORE_REPLACE 1" << "\n";
-                } else {
-                    out << "UNDERSCORE_REPLACE 0" << "\n";
-                }
-
-            } else if(i==2){ // AUTO_CHECK_UPDATE se nachází na třetím řádku
-                if (check_update){
-                    out << "AUTO_CHECK_UPDATE 1" << "\n";
-                } else {
-                    out << "AUTO_CHECK_UPDATE 0" << "\n";
-                }
-
-
-            } else{
-                out << rows_nastaveni[i] << "\n";
-            }
-        }
-
-    } else{
-        file.open(QIODevice::WriteOnly | QIODevice::Text);
-        QTextStream out(&file);
-
-        if (hledat_nazev_videa){
-            out << "SEARCH_VIDEO_NAME 1" << "\n";
-        } else {
-            out << "SEARCH_VIDEO_NAME 0" << "\n";
-        }
-
-        if (nahradit_podtrzitkem){
-            out << "UNDERSCORE_REPLACE 1" << "\n";
-        } else {
-            out << "UNDERSCORE_REPLACE 0" << "\n";
-        }
-
-        if (check_update){
-            out << "AUTO_CHECK_UPDATE 1" << "\n";
-        } else {
-            out << "AUTO_CHECK_UPDATE 0" << "\n";
-        }
-    }
-
-    file.close();
-}
-
-
-void MainWindow::on_actionHledat_n_zev_videa_changed()
+void MainWindow::on_actionNastaven_triggered()
 {
-    ulozit_nastaveni();
+    settings_dialog nastaveni_dialog;
+    nastaveni_dialog.setModal(true);
+    nastaveni_dialog.exec();
 }
 
-void MainWindow::on_actionNahradit_mezery_podtr_tkem_changed()
-{
-    ulozit_nastaveni();
-}
-
-void MainWindow::on_actionAutomaticky_kontrolovat_verzi_changed()
-{
-    ulozit_nastaveni();
-}
-
-void MainWindow::on_action_verze_triggered()
-{
-    check_version(true);  // argument true říká, že se má zobrazit okno pokud je verze stejná
-}

@@ -32,8 +32,10 @@ private slots:
     void disable_widgets(bool vypnout);
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_lineEdit_returnPressed();
+
     void on_actiony2mate_com_triggered();
     void on_actionzdrojovy_kod_triggered();
+    void on_actionNastaven_triggered();
 
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
 
@@ -43,13 +45,7 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
-    void check_version(bool show_response);
-    void ulozit_nastaveni();
-
-    void on_actionHledat_n_zev_videa_changed();
-    void on_actionNahradit_mezery_podtr_tkem_changed();
-    void on_actionAutomaticky_kontrolovat_verzi_changed();
-    void on_action_verze_triggered();
+    void check_version();
 
 private:
     Ui::MainWindow *ui;
