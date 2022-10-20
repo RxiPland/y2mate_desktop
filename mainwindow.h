@@ -25,6 +25,7 @@ public:
 public slots:
     void get(QString url, QString koncovka);
     void post(QString location, QByteArray data, int druh_promenne);
+    static void load_settings();
 
 private slots:
     void on_pushButton_clicked();
@@ -52,5 +53,6 @@ private:
     QNetworkAccessManager manager;
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply;
     std::unique_ptr<QFile> file;
+
 };
 #endif // MAINWINDOW_H

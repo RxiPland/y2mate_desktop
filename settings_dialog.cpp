@@ -1,5 +1,6 @@
 #include "settings_dialog.h"
 #include "ui_settings_dialog.h"
+#include "mainwindow.h"
 #include <QFile>
 #include <QTextCodec>
 #include <QJsonDocument>
@@ -7,7 +8,7 @@
 #include <QMessageBox>
 #include <windows.h>
 
-QString app_version_settings = "v1.6.0";  // aktuální verze programu
+QString app_version_settings = "v1.6.1";  // aktuální verze programu
 bool posledni_ulozene_nastaveni[3] = {};
 
 settings_dialog::settings_dialog(QWidget *parent) :
@@ -25,6 +26,8 @@ settings_dialog::settings_dialog(QWidget *parent) :
 
 settings_dialog::~settings_dialog()
 {
+    // načtení nastavení ze souboru (hlavní okno)
+    MainWindow::load_settings();
     delete ui;
 }
 
@@ -204,7 +207,12 @@ void settings_dialog::on_pushButton_4_clicked(){
                 }
 
             } else{
-                out << rows_nastaveni[i] << "\n";
+
+                if (i<items_count-1){
+                    out << rows_nastaveni[i] << "\n";
+                } else{
+                    out << rows_nastaveni[i];
+                }
             }
         }
 

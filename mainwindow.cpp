@@ -23,9 +23,9 @@ QString response = "", response_najit_formaty = "";     // různé proměnné pr
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
-QString cesta_k_souboru = "";  // úplná cesta k uloženému souboru
+QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 
-QString app_version = "v1.6.0";  // aktuální verze programu
+QString app_version = "v1.6.1";  // aktuální verze programu
 bool hodnoty_nastaveni[3] = {};
 
 MainWindow::MainWindow(QWidget *parent)
@@ -71,45 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusBar->addPermanentWidget(ui->label_4, 1);  // staženo mb z celkového počtu
     ui->statusBar->addPermanentWidget(ui->progressBar, 2);  // progress bar stahování
 
-    // načtení hodnoty automatické hledání názvu videí
-    QFile file("nastaveni.txt");
-
-    if (file.exists()){
-        file.open(QIODevice::ReadOnly);
-
-        QByteArray obsah = file.readAll();
-        file.close();
-
-        QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
-        QStringList rows_nastaveni = obsah_nastaveni.split("\r\n");
-
-        QString hledat_nazev_videa = rows_nastaveni[0];
-        QString nahradit_podtrzitkem = rows_nastaveni[1];
-        QString check_update = rows_nastaveni[2];
-
-        // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
-        if (hledat_nazev_videa == ""){
-            hledat_nazev_videa = "1";
-        }
-
-        if (nahradit_podtrzitkem == ""){
-            nahradit_podtrzitkem = "0";
-        }
-
-        if (check_update == ""){
-            check_update = "1";
-        }
-
-        hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
-        hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
-        hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
-
-    } else{
-
-        hodnoty_nastaveni[0] = true; // defaultní hodnota true
-        hodnoty_nastaveni[1] = false;  // defaultní hodnota false
-        hodnoty_nastaveni[2] = true; // defaultní hodnota true
-    }
+    // načtení nastavení ze souboru
+    MainWindow::load_settings();
 
     // automatická kontrola verze
     if (hodnoty_nastaveni[2]){
@@ -156,7 +119,7 @@ void MainWindow::check_version(){
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
-        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ app_version  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ app_version  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové!");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
@@ -273,7 +236,6 @@ void MainWindow::httpFinished()
         }
 
         nazev_souboru = "";
-        cesta_k_souboru = "";
 
         disable_widgets(false);
         on_pushButton_2_clicked();
@@ -304,10 +266,16 @@ void MainWindow::get(QString url, QString koncovka)
 {
     // GET
 
-    disable_widgets(true);
+    MainWindow::disable_widgets(true);
 
     QString upraveny_nazev_souboru = "";
     bool nahradit_podtrzitkem = hodnoty_nastaveni[1];
+
+    // odstranit mezeru na konci
+    if (nazev_souboru.endsWith(" ")){
+        int pos = nazev_souboru.lastIndexOf(QChar(' '));
+        nazev_souboru = nazev_souboru.left(pos);
+    }
 
     if (nahradit_podtrzitkem){
 
@@ -317,9 +285,15 @@ void MainWindow::get(QString url, QString koncovka)
         upraveny_nazev_souboru = nazev_souboru;
     }
 
-    cesta_k_souboru = QFileDialog::getSaveFileName(this, "Uložit soubor", "/" + upraveny_nazev_souboru, koncovka);
+    QStringList adresar_list = cesta_k_souboru.split("/");
+    adresar_list.pop_back();
+    QString adresar = adresar_list.join("/") + "/";
 
-    if (cesta_k_souboru != ""){
+    QString temp_cesta_k_souboru = QFileDialog::getSaveFileName(this, "Uložit soubor", adresar + upraveny_nazev_souboru, koncovka);
+
+    if (temp_cesta_k_souboru != ""){
+
+        cesta_k_souboru = temp_cesta_k_souboru;
 
         ui->progressBar->setHidden(false);
 
@@ -502,6 +476,8 @@ void MainWindow::on_pushButton_clicked(){
             // post request na získání informací o url
             // dostupné kvality u mp4/mp3, délka videa
 
+            ui->lineEdit->setClearButtonEnabled(false);
+
             QByteArray data;
 
             data.append("url=");
@@ -673,7 +649,7 @@ void MainWindow::on_pushButton_clicked(){
                     }
                     else if (response_str.find("Download") == string::npos) {
 
-                        QMessageBox::critical(this, "Chyba", "[kód 4] Nepovedlo se stáhnout mp3");
+                        QMessageBox::critical(this, "Chyba", "[kód 4] Nepovedlo se stáhnout mp3, zkuste to znovu");
 
                     }
                     else if (response != ""){
@@ -890,6 +866,48 @@ void MainWindow::on_pushButton_2_clicked()
 
     reply->deleteLater();
 
+}
+
+void MainWindow::load_settings(){
+    // načtení hodnoty automatické hledání názvu videí
+    QFile file("nastaveni.txt");
+
+    if (file.exists()){
+        file.open(QIODevice::ReadOnly);
+
+        QByteArray obsah = file.readAll();
+        file.close();
+
+        QString obsah_nastaveni = QTextCodec::codecForMib(106)->toUnicode(obsah);
+        QStringList rows_nastaveni = obsah_nastaveni.split("\r\n");
+
+        QString hledat_nazev_videa = rows_nastaveni[0];
+        QString nahradit_podtrzitkem = rows_nastaveni[1];
+        QString check_update = rows_nastaveni[2];
+
+        // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
+        if (hledat_nazev_videa == ""){
+            hledat_nazev_videa = "1";
+        }
+
+        if (nahradit_podtrzitkem == ""){
+            nahradit_podtrzitkem = "0";
+        }
+
+        if (check_update == ""){
+            check_update = "1";
+        }
+
+        hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
+        hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
+        hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
+
+    } else{
+
+        hodnoty_nastaveni[0] = true; // defaultní hodnota true
+        hodnoty_nastaveni[1] = false;  // defaultní hodnota false
+        hodnoty_nastaveni[2] = true; // defaultní hodnota true
+    }
 }
 
 void MainWindow::disable_widgets(bool vypnout){
