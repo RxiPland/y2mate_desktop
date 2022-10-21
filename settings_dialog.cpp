@@ -58,8 +58,8 @@ void settings_dialog::check_version(bool show_response=false){
     if (newest_version != current_version.back() && newest_version != ""){
 
         QMessageBox msgBox;
-        msgBox.setWindowTitle("Aktualizace");
-        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nNezapomeňte starou verzi manuálně odinstalovat před instalací nové");
+        msgBox.setWindowTitle("Nalezena nová aktualizace");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nPozn. Při instalaci nové verze se předchozí automaticky odstraní.");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
@@ -69,11 +69,11 @@ void settings_dialog::check_version(bool show_response=false){
         }
     } else if (newest_version == ""){
         if (show_response){
-            QMessageBox::information(this, "Aktualizace", "Nelze se připojit k internetu\nVaše verze: " + current_version.back());
+            QMessageBox::information(this, "Kontrola aktualizace", "Nelze se připojit k internetu\nVaše verze: " + current_version.back());
         }
     } else{
         if (show_response){
-            QMessageBox::information(this, "Aktualizace", "Již máte nejnovější verzi ("+ newest_version + ")");
+            QMessageBox::information(this, "Kontrola aktualizace", "Již máte nejnovější verzi ("+ newest_version + ")");
         }
     }
 
@@ -183,14 +183,13 @@ void settings_dialog::on_pushButton_4_clicked(){
         file.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file);
 
-        // zapsání změněné hodnoty do nastaveni.txt
-
+        // zapsání hodnot do nastaveni.txt
         for(int i=0; i < items_count; i++){
-            if (i==0){  // SEARCH_VIDEO_NAME se nachází na prvním řádku, zbytek se vypíše jak byl
+            if (i==0){  // REPLACE_VIDEO_NAME se nachází na prvním řádku
                 if (aktualni_nastaveni[0]){
-                    out << "SEARCH_VIDEO_NAME 1" << "\n";
+                    out << "REPLACE_VIDEO_NAME 1" << "\n";
                 } else {
-                    out << "SEARCH_VIDEO_NAME 0" << "\n";
+                    out << "REPLACE_VIDEO_NAME 0" << "\n";
                 }
             } else if(i==1){ // UNDERSCORE_REPLACE se nachází na druhém řádku
                 if (aktualni_nastaveni[1]){
@@ -221,9 +220,9 @@ void settings_dialog::on_pushButton_4_clicked(){
         QTextStream out(&file);
 
         if (aktualni_nastaveni[0]){
-            out << "SEARCH_VIDEO_NAME 1" << "\n";
+            out << "REPLACE_VIDEO_NAME 1" << "\n";
         } else {
-            out << "SEARCH_VIDEO_NAME 0" << "\n";
+            out << "REPLACE_VIDEO_NAME 0" << "\n";
         }
 
         if (aktualni_nastaveni[1]){
@@ -244,7 +243,6 @@ void settings_dialog::on_pushButton_4_clicked(){
 
     QMessageBox::information(this, "Oznámení", "Nastavení bylo úspěšně uloženo");
     close();
-
 }
 
 
@@ -293,7 +291,7 @@ void settings_dialog::on_pushButton_7_clicked()
 // nápovědy:
 void settings_dialog::on_pushButton_clicked()
 {
-    // hledat název videa
+    // nahrazení názvu videa hashem
     QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, název videa bude nahrazen náhodnými znaky při ukládání souboru.\n\nNapř. 62ef90b9f99cc56a238b457a.mp4");
 }
 
