@@ -206,11 +206,12 @@ void MainWindow::httpFinished()
         QMessageBox msgBox;
         msgBox.setWindowTitle("V pořádku");
         msgBox.setText("Soubor byl úspěšně stažen.");
-        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
-        msgBox.addButton("Ok", QMessageBox::NoRole);
+        QAbstractButton* pButtonYes = msgBox.addButton("Ok", QMessageBox::YesRole);
+        msgBox.addButton("Otevřít soubor", QMessageBox::NoRole);
         msgBox.exec();
 
-        if (msgBox.clickedButton()==pButtonYes) {
+        // musí se nerovnat
+        if (msgBox.clickedButton() != pButtonYes) {
             // otevřít soubor
 
             cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
@@ -666,7 +667,7 @@ void MainWindow::on_pushButton_clicked(){
                             if (reply_box == QMessageBox::Yes){
                                     QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                                     ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                                }
+                            }
                         }
 
                     }
@@ -677,7 +678,7 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
 
 
                 }else if(k_data_vid == "error"){
@@ -687,9 +688,8 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
                 }
-
                 else{
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 8] Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
@@ -697,9 +697,8 @@ void MainWindow::on_pushButton_clicked(){
                     if (reply_box == QMessageBox::Yes){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
-                        }
+                    }
                 }
-
 
             } else if (text_format == "mp4 (video)"){
 
