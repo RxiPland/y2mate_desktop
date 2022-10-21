@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -222,7 +222,7 @@ public:
         label_3->setText(QCoreApplication::translate("MainWindow", "Informace o stahov\303\241n\303\255", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "25.6 / 120.7", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "Zadejte URL videa", nullptr));
-        label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev: ", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "N\303\241zev videa:", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "D\303\251lka videa:", nullptr));
         comboBox->setItemText(0, QCoreApplication::translate("MainWindow", "<Vyberte form\303\241t>", nullptr));
         comboBox->setItemText(1, QCoreApplication::translate("MainWindow", "mp3 (pouze zvuk)", nullptr));

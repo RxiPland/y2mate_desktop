@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <windows.h>
 
-QString app_version_settings = "v1.6.1";  // aktuální verze programu
+QString app_version_settings = "v1.7.0";  // aktuální verze programu
 bool posledni_ulozene_nastaveni[3] = {};
 
 settings_dialog::settings_dialog(QWidget *parent) :
@@ -100,7 +100,7 @@ void settings_dialog::load_settings(){
 
         // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
         if (hledat_nazev_videa == ""){
-            hledat_nazev_videa = "1";
+            hledat_nazev_videa = "0";
         }
 
         if (nahradit_podtrzitkem == ""){
@@ -111,12 +111,12 @@ void settings_dialog::load_settings(){
             check_update = "1";
         }
 
-        ui->checkBox->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
+        ui->checkBox->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí nahradí název souboru hashem
         ui->checkBox_2->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         ui->checkBox_3->setChecked(check_update.contains("1"));  // zapnutí bude automaticky kontrolovat novou verzi při startu
 
     } else{
-        ui->checkBox->setChecked(true); // defaultní hodnota true
+        ui->checkBox->setChecked(false); // defaultní hodnota false
         ui->checkBox_2->setChecked(false); // defaultní hodnota false
         ui->checkBox_3->setChecked(true); // defaultní hodnota true
     }
@@ -252,7 +252,7 @@ void settings_dialog::on_pushButton_5_clicked()
 {
     // tlačítko defaultní nastavení
 
-    ui->checkBox->setChecked(true); // defaultní hodnota true
+    ui->checkBox->setChecked(false); // defaultní hodnota false
     ui->checkBox_2->setChecked(false); // defaultní hodnota false
     ui->checkBox_3->setChecked(true); // defaultní hodnota true
 
@@ -294,7 +294,7 @@ void settings_dialog::on_pushButton_7_clicked()
 void settings_dialog::on_pushButton_clicked()
 {
     // hledat název videa
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, při zmáčknutí tlačítka vyhledat se provede krok navíc, který stáhne video jako zvuk v nejnižší kvalitě (64kbps), aby se z headru získal název videa, který pak bude nabídnut při ukládání.\nPokud bude vypnuto, celý proces bude rychlejší, ale při ukládání staženého souboru se uživateli nabídne název s náhodnými znaky.\n\nPozn. Stažený zvuk je uložen v paměti RAM a po získání názvu je vymazán.");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, název videa bude nahrazen náhodnými znaky při ukládání souboru.\n\nNapř. 62ef90b9f99cc56a238b457a.mp4");
 }
 
 

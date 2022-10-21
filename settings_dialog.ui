@@ -43,7 +43,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Hledat název videa</string>
+          <string>Nahradit název videa náhodnými znaky</string>
          </property>
         </widget>
        </item>

@@ -64,7 +64,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Název: </string>
+         <string>Název videa:</string>
         </property>
        </widget>
       </item>

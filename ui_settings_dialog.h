@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settings_dialog.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -195,7 +195,7 @@ public:
     void retranslateUi(QDialog *settings_dialog)
     {
         settings_dialog->setWindowTitle(QCoreApplication::translate("settings_dialog", "Dialog", nullptr));
-        checkBox->setText(QCoreApplication::translate("settings_dialog", "Hledat n\303\241zev videa", nullptr));
+        checkBox->setText(QCoreApplication::translate("settings_dialog", "Nahradit n\303\241zev videa n\303\241hodn\303\275mi znaky", nullptr));
         pushButton_3->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
         pushButton_2->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
         checkBox_2->setText(QCoreApplication::translate("settings_dialog", "Nahradit mezery podtr\305\276\303\255tkama", nullptr));

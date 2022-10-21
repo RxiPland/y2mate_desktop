@@ -23,9 +23,10 @@ QString response = "", response_najit_formaty = "";     // různé proměnné pr
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 QString nazev_souboru = "";  // název yt videa
+QString nazev_souboru_hash = ""; // náhodný hash přijatý z requestu
 QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 
-QString app_version = "v1.6.1";  // aktuální verze programu
+QString app_version = "v1.7.0";  // aktuální verze programu
 bool hodnoty_nastaveni[3] = {};
 
 MainWindow::MainWindow(QWidget *parent)
@@ -134,65 +135,48 @@ void MainWindow::check_version(){
 
 void MainWindow::get_headers(QString location)
 {
-    // cancel download & read headers
+    // head request method & read headers
     // najde název souboru z headru a zapíše ho do globální proměnné
-
-    ui->progressBar->setHidden(false);
 
     QNetworkRequest request = QNetworkRequest(QUrl(location));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
-    QNetworkReply *reply = manager.get(request);
-
-    ui->label_3->setHidden(false);
-    ui->label_3->setText("Získávám název videa");
-
-    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+    QNetworkReply *reply = manager.head(request);
 
     while (!reply->isFinished())
     {
         qApp->processEvents();
     }
 
-    QList<QByteArray> headerlist = reply->rawHeaderList();
-    QByteArray header;
-
+    QString header = reply->header(QNetworkRequest::ContentDispositionHeader).toString();
     nazev_souboru = "error";
 
+    if(header.contains("filename")){
 
-    for (auto it = headerlist.cbegin(); it != headerlist.cend(); ++it)
-    {
-        header = reply->rawHeader(*it);
+        QRegExp rx("filename=\\\"(.+)\\\";");
+        int pos = rx.indexIn(header);
+        int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
-        QString headers_qstring = QTextCodec::codecForMib(106)->toUnicode(header);
+        if (pozice > -1) {
+            nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
+            nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
 
-        if(headers_qstring.contains("filename")){
-
-            QRegExp rx("filename=\\\"(.+)\\\";");
-            int pos = rx.indexIn(headers_qstring);
-            int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
-
-            if (pozice > -1) {
-                nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
-                nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
-
-                nazev_souboru.replace("y2mate.com - ", "");      // odebrání watermarku z názvu souboru
-                nazev_souboru.replace("  ", " ");
+            nazev_souboru.replace("y2mate.com - ", "");      // odebrání watermarku z názvu souboru
+            nazev_souboru.replace("  ", " ");
 
 
-                QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
-                QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
+            QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
+            QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
 
-                for (int i=0; i<6; i++){
-                    nazev_souboru.replace("_" + formaty_mp4[i], "");    // odebrání kvality z názvu souboru
-                    nazev_souboru.replace("_" + formaty_mp3[i], "");
-                }
-                break;
-            } else{
-                nazev_souboru = "[Nepodařilo se najít]";
+            for (int i=0; i<6; i++){
+                nazev_souboru.replace("_" + formaty_mp4[i], "");    // odebrání kvality z názvu souboru
+                nazev_souboru.replace("_" + formaty_mp3[i], "");
             }
+        } else{
+            nazev_souboru = "[Nepodařilo se najít]";
         }
     }
+
     reply->deleteLater();
 }
 
@@ -269,20 +253,29 @@ void MainWindow::get(QString url, QString koncovka)
     MainWindow::disable_widgets(true);
 
     QString upraveny_nazev_souboru = "";
-    bool nahradit_podtrzitkem = hodnoty_nastaveni[1];
 
-    // odstranit mezeru na konci
-    if (nazev_souboru.endsWith(" ")){
-        int pos = nazev_souboru.lastIndexOf(QChar(' '));
-        nazev_souboru = nazev_souboru.left(pos);
-    }
+    int nazev_videa_hash = hodnoty_nastaveni[0];
+    if (nazev_videa_hash){
 
-    if (nahradit_podtrzitkem){
+        // název bude nahrazen hashem
+        upraveny_nazev_souboru = nazev_souboru_hash;
 
-        upraveny_nazev_souboru = nazev_souboru;
-        upraveny_nazev_souboru.replace(" ", "_");
     } else{
-        upraveny_nazev_souboru = nazev_souboru;
+
+        // odstranit mezeru na konci
+        if (nazev_souboru.endsWith(" ")){
+            int pos = nazev_souboru.lastIndexOf(QChar(' '));
+            nazev_souboru = nazev_souboru.left(pos);
+        }
+
+        bool nahradit_podtrzitkem = hodnoty_nastaveni[1];
+        if (nahradit_podtrzitkem){
+            upraveny_nazev_souboru = nazev_souboru;
+            upraveny_nazev_souboru.replace(" ", "_");
+
+        } else{
+            upraveny_nazev_souboru = nazev_souboru;
+        }
     }
 
     QStringList adresar_list = cesta_k_souboru.split("/");
@@ -516,28 +509,19 @@ void MainWindow::on_pushButton_clicked(){
                     ui->label->setText("Délka videa: " + video_duration);
                 }
 
-                bool nazev_videa = hodnoty_nastaveni[0];
+                // získat název videa
+                get_nazev();
 
-                if (nazev_videa){
+                nazev_souboru.replace(".mp3", "");
+                nazev_souboru.replace(".mp4", "");
+                nazev_souboru.replace(".webm", "");
+                ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
 
-                    // pokud bude chtít uživatel najít skutečný název videa (trvá déle)
-                    get_nazev();
+                // získat náhodný hash
+                QList<QString> udaje;
+                udaje = najit_data();
+                nazev_souboru_hash = udaje[0];    // např. "62fd01c3f1a87588248b45ba"
 
-                    nazev_souboru.replace(".mp3", "");
-                    nazev_souboru.replace(".mp4", "");
-                    nazev_souboru.replace(".webm", "");
-                    ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
-
-                } else{
-                    // uživatel nechce hledat název videa
-                    // jako název souboru se dosadí _id hodnota z y2mate
-                    ui->label_2->setHidden(true);
-
-                    QList<QString> udaje;
-                    udaje = najit_data();
-
-                    nazev_souboru = udaje[0];    // např. "62fd01c3f1a87588248b45ba"
-                }
 
                 ui->pushButton->setText("Stáhnout");    // změna najít na stáhnout
                 ui->horizontalSpacer->changeSize(20, 35);   // tlačítko "stáhnout" se vyrovná s boxem s kvalitou
@@ -887,7 +871,7 @@ void MainWindow::load_settings(){
 
         // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
         if (hledat_nazev_videa == ""){
-            hledat_nazev_videa = "1";
+            hledat_nazev_videa = "0";
         }
 
         if (nahradit_podtrzitkem == ""){
@@ -898,13 +882,13 @@ void MainWindow::load_settings(){
             check_update = "1";
         }
 
-        hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí zvyšuje dobu procesu stahování videa (název souboru pak nemusí být automaticky hash)
+        hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí nahradí název souboru hashem
         hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
 
     } else{
 
-        hodnoty_nastaveni[0] = true; // defaultní hodnota true
+        hodnoty_nastaveni[0] = false; // defaultní hodnota false
         hodnoty_nastaveni[1] = false;  // defaultní hodnota false
         hodnoty_nastaveni[2] = true; // defaultní hodnota true
     }
