@@ -27,3 +27,4 @@
 - Verze knihovny: QT6
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
+- Pokud se soubor stáhne jako .webm - je chyba na straně y2mate.com
