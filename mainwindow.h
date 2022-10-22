@@ -47,7 +47,7 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
-    QStringList history_soubor(QString operace);
+    QStringList history_soubor(QString operace, QString data_k_ulozeni);
     void load_history();
     void check_version();
 

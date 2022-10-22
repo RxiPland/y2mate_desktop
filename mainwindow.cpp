@@ -75,6 +75,10 @@ MainWindow::MainWindow(QWidget *parent)
     // načtení nastavení ze souboru
     MainWindow::load_settings();
 
+    for(int i=0; i<10; i++){
+        MainWindow::history_soubor("save", "Cigarette Lighters - How They Were Invented & Why They Went Away! /;/ 6:24 /;/ https://www.youtube.com/watch?v=edrn_GKaxeo");
+    }
+
     // automatická kontrola verze
     if (hodnoty_nastaveni[2]){
         check_version();
@@ -88,12 +92,44 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QStringList MainWindow::history_soubor(QString operace){
+QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ulozeni=""){
+    // operace = save/delete/load
 
     QFile file("history.txt");
 
-    if(operace == "save"){
+    if(operace == "save" && data_k_ulozeni != ""){
         // uložit do souboru
+
+        if (file.exists()){
+            file.open(QIODevice::ReadOnly);
+
+            QByteArray obsah = file.readAll();
+            file.close();
+
+            QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
+            QStringList rows_history = obsah_souboru.split("\r\n");
+
+            int pocet_rows = rows_history.count();
+
+            for(int i=0; i < 5-pocet_rows; i++){
+                rows_history.append("");
+            }
+
+            file.open(QIODevice::WriteOnly | QIODevice::Text);
+            QTextStream out(&file);
+
+            for(int i=0; i<5; i++){
+                if (i==0){
+                    out << data_k_ulozeni << "\n";
+
+                } else{
+                    if (rows_history[i-1] != ""){
+                        out << rows_history[i-1] << "\n";
+                    }
+                }
+            }
+            file.close();
+        }
 
     }else if(operace == "delete"){
         // odstranit soubor
@@ -103,7 +139,7 @@ QStringList MainWindow::history_soubor(QString operace){
         }
 
     } else{
-        // získat data ze souboru
+        // získat data ze souboru (operace == "load")
 
         if (file.exists()){
             file.open(QIODevice::ReadOnly);
@@ -111,8 +147,10 @@ QStringList MainWindow::history_soubor(QString operace){
             QByteArray obsah = file.readAll();
             file.close();
 
-        }else{
-            // soubor neexistuje
+            QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
+            QStringList rows_history = obsah_souboru.split("\r\n");
+
+            return rows_history;
         }
     }
 
@@ -133,14 +171,7 @@ void MainWindow::load_history(){
             ui->actionSmazat_historii->setEnabled(true);
             ui->actionSmazat_historii->setText("Smazat historii");
 
-            file.open(QIODevice::ReadOnly);
-
-            QByteArray obsah = file.readAll();
-            file.close();
-
-            QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
-            QStringList rows = obsah_souboru.split("\r\n");
-
+            QStringList rows = MainWindow::history_soubor("load");
             int pocet_rows = rows.count();
 
             for(int i=0; i < 5-pocet_rows; i++){
@@ -265,6 +296,7 @@ void MainWindow::load_history(){
 
         }else{
 
+            // create blank txt
             file.open(QIODevice::WriteOnly | QIODevice::Text);
             file.close();
 
@@ -277,9 +309,6 @@ void MainWindow::load_history(){
             ui->actionSmazat_historii->setIconVisibleInMenu(true);
             ui->actionSmazat_historii->setEnabled(true);
             ui->actionSmazat_historii->setText("Smazat historii");
-
-
-
         }
 
     } else{
