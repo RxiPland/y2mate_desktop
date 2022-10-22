@@ -8,8 +8,8 @@
 #include <QMessageBox>
 #include <windows.h>
 
-QString app_version_settings = "v1.7.0";  // aktuální verze programu
-bool posledni_ulozene_nastaveni[3] = {};
+QString app_version_settings = "v1.7.1";  // aktuální verze programu
+bool posledni_ulozene_nastaveni[4] = {};  // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
 
 settings_dialog::settings_dialog(QWidget *parent) :
     QDialog(parent),
@@ -26,8 +26,6 @@ settings_dialog::settings_dialog(QWidget *parent) :
 
 settings_dialog::~settings_dialog()
 {
-    // načtení nastavení ze souboru (hlavní okno)
-    MainWindow::load_settings();
     delete ui;
 }
 
@@ -97,6 +95,7 @@ void settings_dialog::load_settings(){
         QString hledat_nazev_videa = rows_nastaveni[0];
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
+        QString zaznamenavat_historii = rows_nastaveni[3];
 
         // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
         if (hledat_nazev_videa == ""){
@@ -111,33 +110,42 @@ void settings_dialog::load_settings(){
             check_update = "1";
         }
 
+        if (zaznamenavat_historii == ""){
+            zaznamenavat_historii = "1";
+        }
+
+
         ui->checkBox->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí nahradí název souboru hashem
         ui->checkBox_2->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
-        ui->checkBox_3->setChecked(check_update.contains("1"));  // zapnutí bude automaticky kontrolovat novou verzi při startu
+        ui->checkBox_3->setChecked(check_update.contains("1"));   // zapnutí bude automaticky kontrolovat novou verzi při startu aplikace
+        ui->checkBox_4->setChecked(zaznamenavat_historii.contains("1"));  // zapnutí bude zaznamenávat historii
 
     } else{
         ui->checkBox->setChecked(false); // defaultní hodnota false
         ui->checkBox_2->setChecked(false); // defaultní hodnota false
         ui->checkBox_3->setChecked(true); // defaultní hodnota true
+        ui->checkBox_4->setChecked(true); // defaultní hodnota true
     }
 
     posledni_ulozene_nastaveni[0] = ui->checkBox->isChecked();
     posledni_ulozene_nastaveni[1] = ui->checkBox_2->isChecked();
     posledni_ulozene_nastaveni[2] = ui->checkBox_3->isChecked();
+    posledni_ulozene_nastaveni[3] = ui->checkBox_4->isChecked();
 }
 
 
 void settings_dialog::settings_changed(bool warning){
     // píše zda jsou neuložené změny
 
-    bool aktualni_nastaveni[3] = {};
+    bool aktualni_nastaveni[4] = {};
 
     aktualni_nastaveni[0] = ui->checkBox->isChecked();
     aktualni_nastaveni[1] = ui->checkBox_2->isChecked();
     aktualni_nastaveni[2] = ui->checkBox_3->isChecked();
+    aktualni_nastaveni[3] = ui->checkBox_4->isChecked();
 
     bool hodnoty_jsou_stejne = true;
-    for (int i=0; i<3; i++){
+    for (int i=0; i<4; i++){
         if (aktualni_nastaveni[i] != posledni_ulozene_nastaveni[i]){
             hodnoty_jsou_stejne = false;
             break;
@@ -160,11 +168,12 @@ void settings_dialog::settings_changed(bool warning){
 void settings_dialog::on_pushButton_4_clicked(){
     // uloží nastavení do souboru
 
-    bool aktualni_nastaveni[3] = {};
+    bool aktualni_nastaveni[4] = {};
 
     aktualni_nastaveni[0] = ui->checkBox->isChecked();
     aktualni_nastaveni[1] = ui->checkBox_2->isChecked();
     aktualni_nastaveni[2] = ui->checkBox_3->isChecked();
+    aktualni_nastaveni[3] = ui->checkBox_4->isChecked();
 
     QFile file("nastaveni.txt");
 
@@ -205,6 +214,13 @@ void settings_dialog::on_pushButton_4_clicked(){
                     out << "AUTO_CHECK_UPDATE 0" << "\n";
                 }
 
+            } else if(i==3){ // SAVE_HISTORY se nachází na čtvrtém řádku
+                if (aktualni_nastaveni[3]){
+                    out << "SAVE_HISTORY 1" << "\n";
+                } else {
+                    out << "SAVE_HISTORY 0" << "\n";
+                }
+
             } else{
 
                 if (i<items_count-1){
@@ -236,6 +252,12 @@ void settings_dialog::on_pushButton_4_clicked(){
         } else {
             out << "AUTO_CHECK_UPDATE 0" << "\n";
         }
+
+        if (aktualni_nastaveni[3]){
+            out << "SAVE_HISTORY 1" << "\n";
+        } else {
+            out << "SAVE_HISTORY 0" << "\n";
+        }
     }
 
     file.close();
@@ -253,6 +275,7 @@ void settings_dialog::on_pushButton_5_clicked()
     ui->checkBox->setChecked(false); // defaultní hodnota false
     ui->checkBox_2->setChecked(false); // defaultní hodnota false
     ui->checkBox_3->setChecked(true); // defaultní hodnota true
+    ui->checkBox_4->setChecked(true); // defaultní hodnota true
 
     QMessageBox::information(this, "Oznámení", "Bylo nastaveno defaultní nastavení, nezapomeňte uložit změny");
 
@@ -276,6 +299,11 @@ void settings_dialog::on_checkBox_2_stateChanged(int arg1)
 }
 
 void settings_dialog::on_checkBox_3_stateChanged(int arg1)
+{
+    settings_dialog::settings_changed(true);
+}
+
+void settings_dialog::on_checkBox_4_stateChanged(int arg1)
 {
     settings_dialog::settings_changed(true);
 }
@@ -308,5 +336,12 @@ void settings_dialog::on_pushButton_3_clicked()
 {
     // automatické zjišťování nové verze
     QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při spuštění aplikace automaticky zkontroluje, zda nevyšla nová verze programu. Kontrolovat aktualizace jde i manuálně.");
+
+}
+
+void settings_dialog::on_pushButton_8_clicked()
+{
+    // ukládání historie
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie hledaných videí.");
 
 }

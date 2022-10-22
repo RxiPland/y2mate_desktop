@@ -238,7 +238,65 @@
     <addaction name="separator"/>
     <addaction name="actionNastaven"/>
    </widget>
+   <widget class="QMenu" name="menuHistorie">
+    <property name="title">
+     <string>Historie</string>
+    </property>
+    <widget class="QMenu" name="menu1">
+     <property name="title">
+      <string>1.</string>
+     </property>
+     <addaction name="actionPou_t"/>
+     <addaction name="actionOtev_t"/>
+     <addaction name="separator"/>
+     <addaction name="actionD_lka"/>
+    </widget>
+    <widget class="QMenu" name="menu2">
+     <property name="title">
+      <string>2.</string>
+     </property>
+     <addaction name="actionPou_t_2"/>
+     <addaction name="actionOtev_t_2"/>
+     <addaction name="separator"/>
+     <addaction name="actionD_lka_2"/>
+    </widget>
+    <widget class="QMenu" name="menu3">
+     <property name="title">
+      <string>3.</string>
+     </property>
+     <addaction name="actionPou_t_3"/>
+     <addaction name="actionOtev_t_3"/>
+     <addaction name="separator"/>
+     <addaction name="actionD_lka_3"/>
+    </widget>
+    <widget class="QMenu" name="menu4">
+     <property name="title">
+      <string>4.</string>
+     </property>
+     <addaction name="actionPou_t_4"/>
+     <addaction name="actionOtev_t_4"/>
+     <addaction name="separator"/>
+     <addaction name="actionD_lka_4"/>
+    </widget>
+    <widget class="QMenu" name="menu5">
+     <property name="title">
+      <string>5.</string>
+     </property>
+     <addaction name="actionPou_t_5"/>
+     <addaction name="actionOtev_t_5"/>
+     <addaction name="separator"/>
+     <addaction name="actionD_lka_5"/>
+    </widget>
+    <addaction name="menu1"/>
+    <addaction name="menu2"/>
+    <addaction name="menu3"/>
+    <addaction name="menu4"/>
+    <addaction name="menu5"/>
+    <addaction name="separator"/>
+    <addaction name="actionSmazat_historii"/>
+   </widget>
    <addaction name="menuInfo"/>
+   <addaction name="menuHistorie"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actiony2mate_com">
@@ -262,6 +320,155 @@
   <action name="actionNastaven">
    <property name="text">
     <string>Nastavení</string>
+   </property>
+  </action>
+  <action name="actionSmazat_historii">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/delete.ico</normaloff>:/images/delete.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Smazat historii</string>
+   </property>
+  </action>
+  <action name="actionPou_t">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="actionPou_t_2">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="actionPou_t_3">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="actionPou_t_4">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="actionPou_t_5">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_nazev">
+   <property name="text">
+    <string>[nazev]</string>
+   </property>
+  </action>
+  <action name="action_delka">
+   <property name="text">
+    <string>[delka]</string>
+   </property>
+  </action>
+  <action name="action_nazev_2">
+   <property name="text">
+    <string>[nazev]</string>
+   </property>
+  </action>
+  <action name="action_delka_2">
+   <property name="text">
+    <string>[delka]</string>
+   </property>
+  </action>
+  <action name="action_nazev_3">
+   <property name="text">
+    <string>[nazev]</string>
+   </property>
+  </action>
+  <action name="action_delka_3">
+   <property name="text">
+    <string>[delka]</string>
+   </property>
+  </action>
+  <action name="action_nazev_4">
+   <property name="text">
+    <string>[nazev]</string>
+   </property>
+  </action>
+  <action name="action_delka_4">
+   <property name="text">
+    <string>[delka]</string>
+   </property>
+  </action>
+  <action name="action_nazev_5">
+   <property name="text">
+    <string>[nazev]</string>
+   </property>
+  </action>
+  <action name="action_delka_5">
+   <property name="text">
+    <string>[delka]</string>
+   </property>
+  </action>
+  <action name="actionOtev_t">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="actionOtev_t_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="actionOtev_t_3">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="actionOtev_t_4">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="actionOtev_t_5">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="actionD_lka">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="actionD_lka_2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="actionD_lka_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="actionD_lka_4">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="actionD_lka_5">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Délka:</string>
    </property>
   </action>
  </widget>

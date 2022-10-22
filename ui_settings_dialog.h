@@ -28,15 +28,18 @@ public:
     QVBoxLayout *verticalLayout_2;
     QVBoxLayout *verticalLayout;
     QGridLayout *gridLayout;
-    QSpacerItem *horizontalSpacer_2;
-    QCheckBox *checkBox;
-    QPushButton *pushButton_3;
-    QPushButton *pushButton_2;
-    QCheckBox *checkBox_2;
     QPushButton *pushButton;
-    QSpacerItem *horizontalSpacer_3;
-    QCheckBox *checkBox_3;
     QSpacerItem *horizontalSpacer;
+    QCheckBox *checkBox_2;
+    QCheckBox *checkBox_3;
+    QCheckBox *checkBox;
+    QPushButton *pushButton_2;
+    QSpacerItem *horizontalSpacer_3;
+    QSpacerItem *horizontalSpacer_2;
+    QPushButton *pushButton_3;
+    QCheckBox *checkBox_4;
+    QPushButton *pushButton_8;
+    QSpacerItem *horizontalSpacer_6;
     QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *pushButton_6;
@@ -53,72 +56,90 @@ public:
     {
         if (settings_dialog->objectName().isEmpty())
             settings_dialog->setObjectName(QString::fromUtf8("settings_dialog"));
-        settings_dialog->resize(450, 228);
+        settings_dialog->resize(450, 258);
         verticalLayout_2 = new QVBoxLayout(settings_dialog);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         gridLayout = new QGridLayout();
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
-        horizontalSpacer_2 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer_2, 1, 1, 1, 1);
-
-        checkBox = new QCheckBox(settings_dialog);
-        checkBox->setObjectName(QString::fromUtf8("checkBox"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(checkBox->sizePolicy().hasHeightForWidth());
-        checkBox->setSizePolicy(sizePolicy);
-
-        gridLayout->addWidget(checkBox, 0, 0, 1, 1);
-
-        pushButton_3 = new QPushButton(settings_dialog);
-        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
-        QSizePolicy sizePolicy1(QSizePolicy::Maximum, QSizePolicy::Fixed);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(pushButton_3->sizePolicy().hasHeightForWidth());
-        pushButton_3->setSizePolicy(sizePolicy1);
-
-        gridLayout->addWidget(pushButton_3, 2, 2, 1, 1);
-
-        pushButton_2 = new QPushButton(settings_dialog);
-        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
-        sizePolicy1.setHeightForWidth(pushButton_2->sizePolicy().hasHeightForWidth());
-        pushButton_2->setSizePolicy(sizePolicy1);
-
-        gridLayout->addWidget(pushButton_2, 1, 2, 1, 1);
-
-        checkBox_2 = new QCheckBox(settings_dialog);
-        checkBox_2->setObjectName(QString::fromUtf8("checkBox_2"));
-        sizePolicy.setHeightForWidth(checkBox_2->sizePolicy().hasHeightForWidth());
-        checkBox_2->setSizePolicy(sizePolicy);
-
-        gridLayout->addWidget(checkBox_2, 1, 0, 1, 1);
-
         pushButton = new QPushButton(settings_dialog);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
-        sizePolicy1.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
-        pushButton->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy);
 
         gridLayout->addWidget(pushButton, 0, 2, 1, 1);
-
-        horizontalSpacer_3 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer_3, 2, 1, 1, 1);
-
-        checkBox_3 = new QCheckBox(settings_dialog);
-        checkBox_3->setObjectName(QString::fromUtf8("checkBox_3"));
-        sizePolicy.setHeightForWidth(checkBox_3->sizePolicy().hasHeightForWidth());
-        checkBox_3->setSizePolicy(sizePolicy);
-
-        gridLayout->addWidget(checkBox_3, 2, 0, 1, 1);
 
         horizontalSpacer = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer, 0, 1, 1, 1);
+
+        checkBox_2 = new QCheckBox(settings_dialog);
+        checkBox_2->setObjectName(QString::fromUtf8("checkBox_2"));
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(checkBox_2->sizePolicy().hasHeightForWidth());
+        checkBox_2->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(checkBox_2, 1, 0, 1, 1);
+
+        checkBox_3 = new QCheckBox(settings_dialog);
+        checkBox_3->setObjectName(QString::fromUtf8("checkBox_3"));
+        sizePolicy1.setHeightForWidth(checkBox_3->sizePolicy().hasHeightForWidth());
+        checkBox_3->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(checkBox_3, 3, 0, 1, 1);
+
+        checkBox = new QCheckBox(settings_dialog);
+        checkBox->setObjectName(QString::fromUtf8("checkBox"));
+        sizePolicy1.setHeightForWidth(checkBox->sizePolicy().hasHeightForWidth());
+        checkBox->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(checkBox, 0, 0, 1, 1);
+
+        pushButton_2 = new QPushButton(settings_dialog);
+        pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
+        sizePolicy.setHeightForWidth(pushButton_2->sizePolicy().hasHeightForWidth());
+        pushButton_2->setSizePolicy(sizePolicy);
+
+        gridLayout->addWidget(pushButton_2, 1, 2, 1, 1);
+
+        horizontalSpacer_3 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_3, 3, 1, 1, 1);
+
+        horizontalSpacer_2 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_2, 1, 1, 1, 1);
+
+        pushButton_3 = new QPushButton(settings_dialog);
+        pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
+        sizePolicy.setHeightForWidth(pushButton_3->sizePolicy().hasHeightForWidth());
+        pushButton_3->setSizePolicy(sizePolicy);
+
+        gridLayout->addWidget(pushButton_3, 3, 2, 1, 1);
+
+        checkBox_4 = new QCheckBox(settings_dialog);
+        checkBox_4->setObjectName(QString::fromUtf8("checkBox_4"));
+        sizePolicy1.setHeightForWidth(checkBox_4->sizePolicy().hasHeightForWidth());
+        checkBox_4->setSizePolicy(sizePolicy1);
+
+        gridLayout->addWidget(checkBox_4, 2, 0, 1, 1);
+
+        pushButton_8 = new QPushButton(settings_dialog);
+        pushButton_8->setObjectName(QString::fromUtf8("pushButton_8"));
+        sizePolicy.setHeightForWidth(pushButton_8->sizePolicy().hasHeightForWidth());
+        pushButton_8->setSizePolicy(sizePolicy);
+
+        gridLayout->addWidget(pushButton_8, 2, 2, 1, 1);
+
+        horizontalSpacer_6 = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_6, 2, 1, 1, 1);
 
 
         verticalLayout->addLayout(gridLayout);
@@ -131,8 +152,8 @@ public:
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         pushButton_6 = new QPushButton(settings_dialog);
         pushButton_6->setObjectName(QString::fromUtf8("pushButton_6"));
-        sizePolicy.setHeightForWidth(pushButton_6->sizePolicy().hasHeightForWidth());
-        pushButton_6->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pushButton_6->sizePolicy().hasHeightForWidth());
+        pushButton_6->setSizePolicy(sizePolicy1);
         pushButton_6->setMinimumSize(QSize(0, 0));
 
         horizontalLayout_3->addWidget(pushButton_6);
@@ -195,12 +216,14 @@ public:
     void retranslateUi(QDialog *settings_dialog)
     {
         settings_dialog->setWindowTitle(QCoreApplication::translate("settings_dialog", "Dialog", nullptr));
-        checkBox->setText(QCoreApplication::translate("settings_dialog", "Nahradit n\303\241zev videa n\303\241hodn\303\275mi znaky", nullptr));
-        pushButton_3->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
-        pushButton_2->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
-        checkBox_2->setText(QCoreApplication::translate("settings_dialog", "Nahradit mezery podtr\305\276\303\255tkama", nullptr));
         pushButton->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
+        checkBox_2->setText(QCoreApplication::translate("settings_dialog", "Nahradit mezery podtr\305\276\303\255tkama", nullptr));
         checkBox_3->setText(QCoreApplication::translate("settings_dialog", "Automaticky kontrolovat novou verzi", nullptr));
+        checkBox->setText(QCoreApplication::translate("settings_dialog", "Nahradit n\303\241zev videa n\303\241hodn\303\275mi znaky", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
+        pushButton_3->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
+        checkBox_4->setText(QCoreApplication::translate("settings_dialog", "Zaznamen\303\241vat historii", nullptr));
+        pushButton_8->setText(QCoreApplication::translate("settings_dialog", "?", nullptr));
         pushButton_6->setText(QCoreApplication::translate("settings_dialog", "Zkontrolovat aktualizace", nullptr));
         label->setText(QCoreApplication::translate("settings_dialog", "verze:", nullptr));
         label_2->setText(QString());

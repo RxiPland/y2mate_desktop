@@ -46,6 +46,7 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
+    void load_history();
     void check_version();
 
 private:

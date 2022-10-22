@@ -26,8 +26,8 @@ QString nazev_souboru = "";  // název yt videa
 QString nazev_souboru_hash = ""; // náhodný hash přijatý z requestu
 QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 
-QString app_version = "v1.7.0";  // aktuální verze programu
-bool hodnoty_nastaveni[3] = {};
+QString app_version = "v1.7.1";  // aktuální verze programu
+bool hodnoty_nastaveni[4] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -80,11 +80,178 @@ MainWindow::MainWindow(QWidget *parent)
         check_version();
     }
 
+    MainWindow::load_history();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::load_history(){
+    // načíst posledně hledané videa ze souboru history.txt
+
+    if (hodnoty_nastaveni[3]){
+        // hodnoty_nastaveni[3] -> určuje, zda je historie povolena
+
+        QFile file("history.txt");
+
+        if (file.exists()){
+
+            ui->actionSmazat_historii->setIconVisibleInMenu(true);
+            ui->actionSmazat_historii->setEnabled(true);
+            ui->actionSmazat_historii->setText("Smazat historii");
+
+            file.open(QIODevice::ReadOnly);
+
+            QByteArray obsah = file.readAll();
+            file.close();
+
+            QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
+            QStringList rows = obsah_souboru.split("\r\n");
+
+            int pocet_rows = rows.count();
+
+            for(int i=0; i < 5-pocet_rows; i++){
+                rows.append("");
+            }
+
+            QStringList values;
+            // 1.
+            if (rows[0] != "" && rows[0].count(" /;/ ") == 2){
+                values = rows[0].split(" /;/ ");
+
+                ui->menu1->setTitle("1. " + values[0]);
+                ui->actionD_lka->setText("Délka: " + values[1]);
+
+                ui->actionPou_t->setVisible(true);
+                ui->actionOtev_t->setVisible(true);
+                ui->actionD_lka->setVisible(true);
+                ui->menu1->menuAction()->setVisible(true);
+
+            }else if (rows[0] != ""){
+                ui->menu1->setTitle("1. [Chyba v souboru s historií]");
+                ui->actionPou_t->setVisible(false);
+                ui->actionOtev_t->setVisible(false);
+                ui->actionD_lka->setVisible(false);
+                ui->menu1->menuAction()->setVisible(true);
+
+            }else{
+                ui->menu1->menuAction()->setVisible(false);
+            }
+
+            // 2.
+            if (rows[1] != "" && rows[1].count(" /;/ ") == 2){
+                values = rows[1].split(" /;/ ");
+
+                ui->menu2->setTitle("2. " + values[0]);
+                ui->actionD_lka_2->setText("Délka: " + values[1]);
+
+                ui->actionPou_t_2->setVisible(true);
+                ui->actionOtev_t_2->setVisible(true);
+                ui->actionD_lka_2->setVisible(true);
+                ui->menu2->menuAction()->setVisible(true);
+
+            }else if (rows[1] != ""){
+                ui->menu2->setTitle("2. [Chyba v souboru s historií]");
+                ui->actionPou_t_2->setVisible(false);
+                ui->actionOtev_t_2->setVisible(false);
+                ui->actionD_lka_2->setVisible(false);
+                ui->menu2->menuAction()->setVisible(true);
+
+            }else{
+                ui->menu2->menuAction()->setVisible(false);
+            }
+
+            // 2.
+            if (rows[2] != "" && rows[2].count(" /;/ ") == 2){
+                values = rows[2].split(" /;/ ");
+
+                ui->menu3->setTitle("3. " + values[0]);
+                ui->actionD_lka_3->setText("Délka: " + values[1]);
+
+                ui->actionPou_t_3->setVisible(true);
+                ui->actionOtev_t_3->setVisible(true);
+                ui->actionD_lka_3->setVisible(true);
+                ui->menu3->menuAction()->setVisible(true);
+
+            }else if (rows[2] != ""){
+                ui->menu3->setTitle("3. [Chyba v souboru s historií]");
+                ui->actionPou_t_3->setVisible(false);
+                ui->actionOtev_t_3->setVisible(false);
+                ui->actionD_lka_3->setVisible(false);
+                ui->menu3->menuAction()->setVisible(true);
+
+            }else{
+                ui->menu3->menuAction()->setVisible(false);
+            }
+
+            // 4.
+            if (rows[3] != "" && rows[3].count(" /;/ ") == 2){
+                values = rows[3].split(" /;/ ");
+
+                ui->menu4->setTitle("4. " + values[0]);
+                ui->actionD_lka_4->setText("Délka: " + values[1]);
+
+                ui->actionPou_t_4->setVisible(true);
+                ui->actionOtev_t_4->setVisible(true);
+                ui->actionD_lka_4->setVisible(true);
+                ui->menu4->menuAction()->setVisible(true);
+
+            }else if (rows[3] != ""){
+                ui->menu4->setTitle("4. [Chyba v souboru s historií]");
+                ui->actionPou_t_4->setVisible(false);
+                ui->actionOtev_t_4->setVisible(false);
+                ui->actionD_lka_4->setVisible(false);
+                ui->menu4->menuAction()->setVisible(true);
+
+            }else{
+                ui->menu4->menuAction()->setVisible(false);
+            }
+
+            // 5.
+            if (rows[4] != "" && rows[4].count(" /;/ ") == 2){
+                values = rows[4].split(" /;/ ");
+
+                ui->menu5->setTitle("5. " + values[0]);
+                ui->actionD_lka_5->setText("Délka: " + values[1]);
+
+                ui->actionPou_t_5->setVisible(true);
+                ui->actionOtev_t_5->setVisible(true);
+                ui->actionD_lka_5->setVisible(true);
+                ui->menu5->menuAction()->setVisible(true);
+
+            }else if (rows[4] != ""){
+                ui->menu5->setTitle("5. [Chyba v souboru s historií]");
+                ui->actionPou_t_5->setVisible(false);
+                ui->actionOtev_t_5->setVisible(false);
+                ui->actionD_lka_5->setVisible(false);
+                ui->menu5->menuAction()->setVisible(true);
+
+            }else{
+                ui->menu5->menuAction()->setVisible(false);
+            }
+
+        }else{
+
+            ui->menu1->menuAction()->setVisible(false);
+            ui->menu2->menuAction()->setVisible(false);
+            ui->menu3->menuAction()->setVisible(false);
+            ui->menu4->menuAction()->setVisible(false);
+            ui->menu5->menuAction()->setVisible(false);
+        }
+
+    } else{
+        ui->menu1->menuAction()->setVisible(false);
+        ui->menu2->menuAction()->setVisible(false);
+        ui->menu3->menuAction()->setVisible(false);
+        ui->menu4->menuAction()->setVisible(false);
+        ui->menu5->menuAction()->setVisible(false);
+
+        ui->actionSmazat_historii->setIconVisibleInMenu(false);
+        ui->actionSmazat_historii->setEnabled(false);
+        ui->actionSmazat_historii->setText("Historie není povolena");
+    }
 }
 
 void MainWindow::check_version(){
@@ -848,11 +1015,11 @@ void MainWindow::on_pushButton_2_clicked()
     nazev_souboru = "";
 
     reply->deleteLater();
-
 }
 
 void MainWindow::load_settings(){
     // načtení hodnoty automatické hledání názvu videí
+
     QFile file("nastaveni.txt");
 
     if (file.exists()){
@@ -867,6 +1034,7 @@ void MainWindow::load_settings(){
         QString hledat_nazev_videa = rows_nastaveni[0];
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
+        QString zaznamenavat_historii = rows_nastaveni[3];
 
         // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
         if (hledat_nazev_videa == ""){
@@ -881,15 +1049,22 @@ void MainWindow::load_settings(){
             check_update = "1";
         }
 
+        if (zaznamenavat_historii == ""){
+            zaznamenavat_historii = "1";
+        }
+
+
         hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí nahradí název souboru hashem
         hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
+        hodnoty_nastaveni[3] = zaznamenavat_historii.contains("1");  // zapnutí bude zaznamenávat historii
 
     } else{
 
         hodnoty_nastaveni[0] = false; // defaultní hodnota false
         hodnoty_nastaveni[1] = false;  // defaultní hodnota false
         hodnoty_nastaveni[2] = true; // defaultní hodnota true
+        hodnoty_nastaveni[3] = true; // defaultní hodnota true
     }
 }
 
@@ -1001,5 +1176,7 @@ void MainWindow::on_actionNastaven_triggered()
     settings_dialog nastaveni_dialog;
     nastaveni_dialog.setModal(true);
     nastaveni_dialog.exec();
-}
 
+    MainWindow::load_settings();  // načte nastavení ze souboru
+    MainWindow::load_history();  // načte historii
+}
