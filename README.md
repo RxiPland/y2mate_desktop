@@ -13,8 +13,9 @@
   - bitrate (kvalitu)
   - dvojité mezery
 - Aplikace je kompletně v češtině
-- Přehledné prostředí
+- Přehledné/jednoduché prostředí
 - Historie hledaných videí
+- Bez reklam
 
 # Odkazy ke stažení
 
