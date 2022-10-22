@@ -8,7 +8,10 @@
 - Kvalita zvuku maximálně 320kbps
 
 ### Výhody oproti webové verzi y2mate
-- Ukládaný soubor neobsahuje y2mate watermark a bitrate v názvu
+- Stažený soubor neobsahuje v názvu:
+  - y2mate watermark
+  - bitrate (kvalitu)
+  - dvojité mezery
 - Aplikace je kompletně v češtině
 - Přehledné prostředí
 - Historie hledaných videí
