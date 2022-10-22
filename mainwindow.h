@@ -37,6 +37,7 @@ private slots:
     void on_actiony2mate_com_triggered();
     void on_actionzdrojovy_kod_triggered();
     void on_actionNastaven_triggered();
+    void on_actionSmazat_historii_triggered();
 
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
 
@@ -46,8 +47,10 @@ private slots:
     void get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
 
+    QStringList history_soubor(QString operace);
     void load_history();
     void check_version();
+
 
 private:
     Ui::MainWindow *ui;

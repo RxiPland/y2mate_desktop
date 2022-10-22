@@ -88,6 +88,37 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+QStringList MainWindow::history_soubor(QString operace){
+
+    QFile file("history.txt");
+
+    if(operace == "save"){
+        // uložit do souboru
+
+    }else if(operace == "delete"){
+        // odstranit soubor
+
+        if (file.exists()){
+            file.remove();
+        }
+
+    } else{
+        // získat data ze souboru
+
+        if (file.exists()){
+            file.open(QIODevice::ReadOnly);
+
+            QByteArray obsah = file.readAll();
+            file.close();
+
+        }else{
+            // soubor neexistuje
+        }
+    }
+
+    return QStringList();
+}
+
 void MainWindow::load_history(){
     // načíst posledně hledané videa ze souboru history.txt
 
@@ -163,7 +194,7 @@ void MainWindow::load_history(){
                 ui->menu2->menuAction()->setVisible(false);
             }
 
-            // 2.
+            // 3.
             if (rows[2] != "" && rows[2].count(" /;/ ") == 2){
                 values = rows[2].split(" /;/ ");
 
@@ -234,11 +265,21 @@ void MainWindow::load_history(){
 
         }else{
 
+            file.open(QIODevice::WriteOnly | QIODevice::Text);
+            file.close();
+
             ui->menu1->menuAction()->setVisible(false);
             ui->menu2->menuAction()->setVisible(false);
             ui->menu3->menuAction()->setVisible(false);
             ui->menu4->menuAction()->setVisible(false);
             ui->menu5->menuAction()->setVisible(false);
+
+            ui->actionSmazat_historii->setIconVisibleInMenu(true);
+            ui->actionSmazat_historii->setEnabled(true);
+            ui->actionSmazat_historii->setText("Smazat historii");
+
+
+
         }
 
     } else{
@@ -1180,3 +1221,10 @@ void MainWindow::on_actionNastaven_triggered()
     MainWindow::load_settings();  // načte nastavení ze souboru
     MainWindow::load_history();  // načte historii
 }
+
+void MainWindow::on_actionSmazat_historii_triggered()
+{
+    MainWindow::history_soubor("delete");
+    MainWindow::load_history();  // aktualizuje historii
+}
+

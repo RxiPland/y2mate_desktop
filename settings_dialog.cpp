@@ -331,7 +331,6 @@ void settings_dialog::on_pushButton_2_clicked()
 
 }
 
-
 void settings_dialog::on_pushButton_3_clicked()
 {
     // automatické zjišťování nové verze
@@ -342,6 +341,6 @@ void settings_dialog::on_pushButton_3_clicked()
 void settings_dialog::on_pushButton_8_clicked()
 {
     // ukládání historie
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie hledaných videí.");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled hledaných videí.");
 
 }

@@ -307,6 +307,12 @@
    <property name="text">
     <string>y2mate.com</string>
    </property>
+   <property name="toolTip">
+    <string>y2mate.com</string>
+   </property>
+   <property name="whatsThis">
+    <string/>
+   </property>
   </action>
   <action name="actionzdrojovy_kod">
    <property name="icon">

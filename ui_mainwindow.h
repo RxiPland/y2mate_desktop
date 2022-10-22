@@ -349,6 +349,12 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         actiony2mate_com->setText(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
+#if QT_CONFIG(tooltip)
+        actiony2mate_com->setToolTip(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        actiony2mate_com->setWhatsThis(QString());
+#endif // QT_CONFIG(whatsthis)
         actionzdrojovy_kod->setText(QCoreApplication::translate("MainWindow", "zdrojov\303\275 k\303\263d", nullptr));
         actionNastaven->setText(QCoreApplication::translate("MainWindow", "Nastaven\303\255", nullptr));
         actionSmazat_historii->setText(QCoreApplication::translate("MainWindow", "Smazat historii", nullptr));
