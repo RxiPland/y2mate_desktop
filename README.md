@@ -14,7 +14,7 @@
   - dvojité mezery
 - Aplikace je kompletně v češtině
 - Přehledné/jednoduché prostředí
-- Historie hledaných videí
+- Historie stažených videí
 - Bez reklam
 
 # Odkazy ke stažení
