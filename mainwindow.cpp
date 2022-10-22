@@ -1129,14 +1129,12 @@ void MainWindow::load_settings(){
             zaznamenavat_historii = "1";
         }
 
-
         hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí nahradí název souboru hashem
         hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
         hodnoty_nastaveni[3] = zaznamenavat_historii.contains("1");  // zapnutí bude zaznamenávat historii
 
     } else{
-
         hodnoty_nastaveni[0] = false; // defaultní hodnota false
         hodnoty_nastaveni[1] = false;  // defaultní hodnota false
         hodnoty_nastaveni[2] = true; // defaultní hodnota true
