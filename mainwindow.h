@@ -50,7 +50,24 @@ private slots:
     QStringList history_soubor(QString operace, QString data_k_ulozeni);
     void load_history();
     void check_version();
+    void open_yt_video(int row_order);
+    void apply_yt_video(int row_order);
 
+    void on_actionOtev_t_triggered();
+    void on_actionOtev_t_2_triggered();
+    void on_actionOtev_t_3_triggered();
+    void on_actionOtev_t_4_triggered();
+    void on_actionOtev_t_5_triggered();
+
+    void on_actionPou_t_triggered();
+
+    void on_actionPou_t_2_triggered();
+
+    void on_actionPou_t_3_triggered();
+
+    void on_actionPou_t_4_triggered();
+
+    void on_actionPou_t_5_triggered();
 
 private:
     Ui::MainWindow *ui;

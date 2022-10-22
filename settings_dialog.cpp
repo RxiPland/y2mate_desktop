@@ -114,7 +114,6 @@ void settings_dialog::load_settings(){
             zaznamenavat_historii = "1";
         }
 
-
         ui->checkBox->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí nahradí název souboru hashem
         ui->checkBox_2->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         ui->checkBox_3->setChecked(check_update.contains("1"));   // zapnutí bude automaticky kontrolovat novou verzi při startu aplikace
@@ -341,6 +340,6 @@ void settings_dialog::on_pushButton_3_clicked()
 void settings_dialog::on_pushButton_8_clicked()
 {
     // ukládání historie
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled hledaných videí.");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled stažených videí.");
 
 }

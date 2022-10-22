@@ -22,9 +22,12 @@ using namespace std;
 QString response = "", response_najit_formaty = "";     // různé proměnné pro různé ukládání http responsů
 string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
 string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
+
 QString nazev_souboru = "";  // název yt videa
 QString nazev_souboru_hash = ""; // náhodný hash přijatý z requestu
 QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
+QString video_duration = "";  // délka videa xx:xx:xx
+QString yt_video_link = "";  // odkaz na youtube video
 
 QString app_version = "v1.7.1";  // aktuální verze programu
 bool hodnoty_nastaveni[4] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
@@ -74,10 +77,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // načtení nastavení ze souboru
     MainWindow::load_settings();
-
-    for(int i=0; i<10; i++){
-        MainWindow::history_soubor("save", "Cigarette Lighters - How They Were Invented & Why They Went Away! /;/ 6:24 /;/ https://www.youtube.com/watch?v=edrn_GKaxeo");
-    }
 
     // automatická kontrola verze
     if (hodnoty_nastaveni[2]){
@@ -158,7 +157,7 @@ QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ul
 }
 
 void MainWindow::load_history(){
-    // načíst posledně hledané videa ze souboru history.txt
+    // načíst posledně stažená videa ze souboru history.txt
 
     if (hodnoty_nastaveni[3]){
         // hodnoty_nastaveni[3] -> určuje, zda je historie povolena
@@ -434,7 +433,13 @@ void MainWindow::httpFinished()
     // http request byl dokončen
 
     QFileInfo fi;
-    if (file) {
+    if (file){
+
+        if (hodnoty_nastaveni[3]){
+            MainWindow::history_soubor("save", nazev_souboru + " /;/ " + video_duration + " /;/ " + yt_video_link);
+            MainWindow::load_history();
+        }
+
         fi.setFile(file->fileName());
         file->close();
         file->deleteLater();
@@ -458,6 +463,7 @@ void MainWindow::httpFinished()
         }
 
         nazev_souboru = "";
+        video_duration = "";
 
         disable_widgets(false);
         on_pushButton_2_clicked();
@@ -650,7 +656,7 @@ void MainWindow::get_nazev(){
         data.append("&");
         data.append("ftype=mp3");
         data.append("&");
-        data.append("fquality=64");
+        data.append("fquality=128");
 
         MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 3);     // post request na získání odkazu ke stažení
 
@@ -679,9 +685,9 @@ void MainWindow::on_pushButton_clicked(){
     // pushButton je najít/stáhnout
 
     QString text_tlacitka = ui->pushButton->text();
-    QString line_edit_text = ui->lineEdit->text();
+    yt_video_link = ui->lineEdit->text();
 
-    string video_url = line_edit_text.toLocal8Bit().constData();
+    string video_url = yt_video_link.toLocal8Bit().constData();
 
     ui->pushButton->setDisabled(true);
 
@@ -712,7 +718,7 @@ void MainWindow::on_pushButton_clicked(){
             QByteArray data;
 
             data.append("url=");
-            data.append(line_edit_text.toLocal8Bit());
+            data.append(video_url);
             data.append("&");
             data.append("q_auto=1");
             data.append("&");
@@ -742,7 +748,7 @@ void MainWindow::on_pushButton_clicked(){
                 int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
                 if (pozice > -1) {
-                    QString video_duration = rx.cap(1); // xx:xx:xx čas
+                    video_duration = rx.cap(1); // xx:xx:xx čas
 
                     ui->label->setText("Délka videa: " + video_duration);
                 }
@@ -1141,6 +1147,7 @@ void MainWindow::load_settings(){
 void MainWindow::disable_widgets(bool vypnout){
 
     // zakáže/povolí widgety
+    // většinou během downloadu
 
     ui->pushButton->setDisabled(vypnout);
     ui->pushButton_2->setDisabled(vypnout);
@@ -1148,6 +1155,39 @@ void MainWindow::disable_widgets(bool vypnout){
     ui->comboBox->setDisabled(vypnout);
     ui->comboBox_2->setDisabled(vypnout);
 
+    ui->actionPou_t->setDisabled(vypnout);
+    ui->actionPou_t_2->setDisabled(vypnout);
+    ui->actionPou_t_3->setDisabled(vypnout);
+    ui->actionPou_t_4->setDisabled(vypnout);
+    ui->actionPou_t_5->setDisabled(vypnout);
+}
+
+void MainWindow::open_yt_video(int row_order){
+    // search for yt video link
+
+    QStringList file_data = MainWindow::history_soubor("load");
+
+    QStringList values = file_data[row_order].split(" /;/ ");
+    QString odkaz = values[2];  // yt video link
+
+    ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
+}
+
+void MainWindow::apply_yt_video(int row_order){
+    // apply youtube video from history to search
+
+    // prepare GUI (reset)
+    MainWindow::on_pushButton_2_clicked();
+
+    QStringList file_data = MainWindow::history_soubor("load");
+    QStringList values = file_data[row_order].split(" /;/ ");
+    QString odkaz = values[2];  // yt video link
+
+    // set yt video link to lineEdit instead of user
+    ui->lineEdit->setText(odkaz);
+
+    // activate search function
+    MainWindow::on_pushButton_clicked();
 }
 
 
@@ -1178,7 +1218,6 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     }
     else if (arg1 == "mp4 (video)"){
         // načíst z proměnné nalezene_formaty_mp4
-
 
         QString aktualni_format = "";
 
@@ -1213,7 +1252,6 @@ void MainWindow::downloadProgress(qint64 ist, qint64 max)
         ui->progressBar->setHidden(true);
         ui->progressBar->setValue(0);
     }
-
 }
 
 
@@ -1229,7 +1267,7 @@ void MainWindow::on_actiony2mate_com_triggered()
     //system("start https://www.y2mate.com");
 
     ShellExecute(0, 0, L"https://www.y2mate.com", 0, 0, SW_HIDE);
-    }
+}
 
 
 void MainWindow::on_actionzdrojovy_kod_triggered()
@@ -1238,7 +1276,6 @@ void MainWindow::on_actionzdrojovy_kod_triggered()
     // otevřít github se zdrojovým kódem
 
     ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
-
 }
 
 void MainWindow::on_actionNastaven_triggered()
@@ -1253,7 +1290,72 @@ void MainWindow::on_actionNastaven_triggered()
 
 void MainWindow::on_actionSmazat_historii_triggered()
 {
-    MainWindow::history_soubor("delete");
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Vymazat historii");
+    msgBox.setText("Opravdu chcete smazat historii?");
+    QAbstractButton* pButtonYes = msgBox.addButton("Smazat", QMessageBox::YesRole);
+    msgBox.addButton("Zrušit", QMessageBox::NoRole);
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == pButtonYes) {
+
+        MainWindow::history_soubor("delete");
+    }
+
     MainWindow::load_history();  // aktualizuje historii
+}
+
+
+// open youtube video link functions
+void MainWindow::on_actionOtev_t_triggered()
+{
+    MainWindow::open_yt_video(0);
+}
+
+void MainWindow::on_actionOtev_t_2_triggered()
+{
+    MainWindow::open_yt_video(1);
+}
+
+void MainWindow::on_actionOtev_t_3_triggered()
+{
+    MainWindow::open_yt_video(2);
+}
+
+void MainWindow::on_actionOtev_t_4_triggered()
+{
+    MainWindow::open_yt_video(3);
+}
+
+void MainWindow::on_actionOtev_t_5_triggered()
+{
+    MainWindow::open_yt_video(4);
+}
+
+
+// apply button functions in history tab
+void MainWindow::on_actionPou_t_triggered()
+{
+    MainWindow::apply_yt_video(0);
+}
+
+void MainWindow::on_actionPou_t_2_triggered()
+{
+    MainWindow::apply_yt_video(1);
+}
+
+void MainWindow::on_actionPou_t_3_triggered()
+{
+    MainWindow::apply_yt_video(2);
+}
+
+void MainWindow::on_actionPou_t_4_triggered()
+{
+    MainWindow::apply_yt_video(3);
+}
+
+void MainWindow::on_actionPou_t_5_triggered()
+{
+    MainWindow::apply_yt_video(4);
 }
 
