@@ -7,6 +7,12 @@
 - Video kvalita maximálně 1080p
 - Kvalita zvuku maximálně 320kbps
 
+### Výhody oproti webové verzi y2mate
+- Ukládaný soubor neobsahuje y2mate watermark a bitrate v názvu
+- Aplikace je kompletně v češtině
+- Přehledné prostředí
+- Historie hledaných videí
+
 # Odkazy ke stažení
 
 - [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.7.0/y2mate_setup.exe) exe (win64) ```md5: 94374b980c775c99d69d36debbf9b4d2```
