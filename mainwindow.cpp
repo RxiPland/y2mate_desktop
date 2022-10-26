@@ -29,7 +29,7 @@ QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 QString video_duration = "";  // délka videa xx:xx:xx
 QString yt_video_link = "";  // odkaz na youtube video
 
-QString app_version = "v1.7.1";  // aktuální verze programu
+QString app_version = "v1.7.2";  // aktuální verze programu
 bool hodnoty_nastaveni[4] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
 
 MainWindow::MainWindow(QWidget *parent)
@@ -114,20 +114,24 @@ QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ul
                 rows_history.append("");
             }
 
-            file.open(QIODevice::WriteOnly | QIODevice::Text);
-            QTextStream out(&file);
+            // do not write if the previous search in history is equal to this search
+            if (data_k_ulozeni != rows_history[0]){
 
-            for(int i=0; i<5; i++){
-                if (i==0){
-                    out << data_k_ulozeni << "\n";
+                file.open(QIODevice::WriteOnly | QIODevice::Text);
+                QTextStream out(&file);
 
-                } else{
-                    if (rows_history[i-1] != ""){
-                        out << rows_history[i-1] << "\n";
+                for(int i=0; i<5; i++){
+                    if (i==0){
+                        out << data_k_ulozeni << "\n";
+
+                    } else{
+                        if (rows_history[i-1] != ""){
+                            out << rows_history[i-1] << "\n";
+                        }
                     }
                 }
+                file.close();
             }
-            file.close();
         }
 
     }else if(operace == "delete"){
@@ -157,7 +161,7 @@ QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ul
 }
 
 void MainWindow::load_history(){
-    // načíst posledně stažená videa ze souboru history.txt
+    // načíst posledně hledaná videa ze souboru history.txt
 
     if (hodnoty_nastaveni[3]){
         // hodnoty_nastaveni[3] -> určuje, zda je historie povolena
@@ -373,6 +377,7 @@ void MainWindow::get_headers(QString location)
 {
     // head request method & read headers
     // najde název souboru z headru a zapíše ho do globální proměnné
+    // parametr location je URL k souboru na y2mate
 
     QNetworkRequest request = QNetworkRequest(QUrl(location));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
@@ -385,7 +390,7 @@ void MainWindow::get_headers(QString location)
     }
 
     QString header = reply->header(QNetworkRequest::ContentDispositionHeader).toString();
-    nazev_souboru = "error";
+    nazev_souboru = "[Název nenalezen]";
 
     if(header.contains("filename")){
 
@@ -397,8 +402,8 @@ void MainWindow::get_headers(QString location)
             nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
             nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
 
-            nazev_souboru.replace("y2mate.com - ", "");      // odebrání watermarku z názvu souboru
-            nazev_souboru.replace("  ", " ");
+            nazev_souboru.replace("y2mate.com - ", "");      // remove watermarku from video name
+            nazev_souboru.replace("  ", " ");   // remove double spaces
 
 
             QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
@@ -408,11 +413,10 @@ void MainWindow::get_headers(QString location)
                 nazev_souboru.replace("_" + formaty_mp4[i], "");    // odebrání kvality z názvu souboru
                 nazev_souboru.replace("_" + formaty_mp3[i], "");
             }
-        } else{
-            nazev_souboru = "[Nepodařilo se najít]";
         }
     }
 
+    // free memory space
     reply->deleteLater();
 }
 
@@ -435,10 +439,13 @@ void MainWindow::httpFinished()
     QFileInfo fi;
     if (file){
 
+        // save "downloaded" video to history
+        /*
         if (hodnoty_nastaveni[3]){
             MainWindow::history_soubor("save", nazev_souboru + " /;/ " + video_duration + " /;/ " + yt_video_link);
             MainWindow::load_history();
         }
+        */
 
         fi.setFile(file->fileName());
         file->close();
@@ -473,7 +480,6 @@ void MainWindow::httpFinished()
     const QString &errorString = reply->errorString();
 
     reply->deleteLater();
-    reply.reset();
 
     if (error != QNetworkReply::NoError) {
         QFile::remove(fi.absoluteFilePath());
@@ -631,6 +637,7 @@ QList<QString> najit_data(){
 
 void MainWindow::get_nazev(){
     // získat název videa
+    // volá se funkce get_headers()
 
     QList<QString> udaje;
     udaje = najit_data();
@@ -730,12 +737,13 @@ void MainWindow::on_pushButton_clicked(){
 
             if (response_najit_formaty == "error"){
                 QMessageBox::critical(this, "Chyba", "[kód 1] Problém v post requestu!");
+                ui->lineEdit->setClearButtonEnabled(true);
 
             }
             else if (response_str.find("Video not found") != string::npos) {
 
                 QMessageBox::critical(this, "Chyba", "Video pod tímto odkazem neexistuje!");
-
+                ui->lineEdit->setClearButtonEnabled(true);
             }
             else if (response_najit_formaty != ""){
 
@@ -805,10 +813,15 @@ void MainWindow::on_pushButton_clicked(){
                     }
                 }
 
+                // save searched video to history
+                if (hodnoty_nastaveni[3]){
+                    MainWindow::history_soubor("save", nazev_souboru + " /;/ " + video_duration + " /;/ " + yt_video_link);
+                    MainWindow::load_history();
+                 }
+
             } else{
-
                 QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
-
+                ui->lineEdit->setClearButtonEnabled(true);
             }
         }
 
@@ -898,7 +911,6 @@ void MainWindow::on_pushButton_clicked(){
                             odkaz_na_stazeni.replace("\\", "");
 
                             //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
-
                             MainWindow::get(odkaz_na_stazeni, "Zvukový soubor (*.mp3)");
 
                             return;
@@ -1009,7 +1021,6 @@ void MainWindow::on_pushButton_clicked(){
 
                         if (pozice > -1) {
                             odkaz_na_stazeni = rx.cap(1); // download link (https://)
-
                         }
 
                         if (odkaz_na_stazeni != "error"){
@@ -1061,6 +1072,7 @@ void MainWindow::on_pushButton_clicked(){
         }
     }
 
+    // enable widgets after requests
     disable_widgets(false);
 }
 

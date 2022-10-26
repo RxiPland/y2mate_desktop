@@ -110,11 +110,14 @@ public:
         actionzdrojovy_kod->setIcon(icon1);
         actionNastaven = new QAction(MainWindow);
         actionNastaven->setObjectName(QString::fromUtf8("actionNastaven"));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        actionNastaven->setIcon(icon2);
         actionSmazat_historii = new QAction(MainWindow);
         actionSmazat_historii->setObjectName(QString::fromUtf8("actionSmazat_historii"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/delete.ico"), QSize(), QIcon::Normal, QIcon::Off);
-        actionSmazat_historii->setIcon(icon2);
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/images/delete.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSmazat_historii->setIcon(icon3);
         actionPou_t = new QAction(MainWindow);
         actionPou_t->setObjectName(QString::fromUtf8("actionPou_t"));
         actionPou_t_2 = new QAction(MainWindow);

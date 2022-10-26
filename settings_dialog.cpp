@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <windows.h>
 
-QString app_version_settings = "v1.7.1";  // aktuální verze programu
+QString app_version_settings = "v1.7.2";  // aktuální verze programu
 bool posledni_ulozene_nastaveni[4] = {};  // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
 
 settings_dialog::settings_dialog(QWidget *parent) :
@@ -17,6 +17,7 @@ settings_dialog::settings_dialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle("Nastavení");
+    setWindowIcon(QIcon(":/images/settings.ico"));
 
     ui->label->setText("Aktuální verze: " + app_version_settings);
 
@@ -340,6 +341,6 @@ void settings_dialog::on_pushButton_3_clicked()
 void settings_dialog::on_pushButton_8_clicked()
 {
     // ukládání historie
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled stažených videí.");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled hledaných videí.");
 
 }
