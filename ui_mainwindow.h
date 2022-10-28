@@ -70,15 +70,14 @@ public:
     QLineEdit *lineEdit;
     QLabel *label_2;
     QLabel *label;
+    QSpacerItem *verticalSpacer_7;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_2;
-    QSpacerItem *verticalSpacer;
     QComboBox *comboBox;
     QSpacerItem *verticalSpacer_5;
     QComboBox *comboBox_2;
     QSpacerItem *horizontalSpacer;
     QVBoxLayout *verticalLayout_4;
-    QSpacerItem *verticalSpacer_2;
     QPushButton *pushButton;
     QSpacerItem *verticalSpacer_6;
     QPushButton *pushButton_2;
@@ -97,7 +96,8 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(495, 293);
+        MainWindow->resize(495, 330);
+        MainWindow->setTabShape(QTabWidget::Triangular);
         actiony2mate_com = new QAction(MainWindow);
         actiony2mate_com->setObjectName(QString::fromUtf8("actiony2mate_com"));
         QIcon icon;
@@ -215,14 +215,14 @@ public:
 
         verticalLayout->addWidget(label);
 
+        verticalSpacer_7 = new QSpacerItem(20, 30, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+
+        verticalLayout->addItem(verticalSpacer_7);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         verticalLayout_2 = new QVBoxLayout();
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_2->addItem(verticalSpacer);
-
         comboBox = new QComboBox(centralwidget);
         comboBox->addItem(QString());
         comboBox->addItem(QString());
@@ -231,7 +231,7 @@ public:
 
         verticalLayout_2->addWidget(comboBox);
 
-        verticalSpacer_5 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer_5 = new QSpacerItem(20, 7, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout_2->addItem(verticalSpacer_5);
 
@@ -250,10 +250,6 @@ public:
 
         verticalLayout_4 = new QVBoxLayout();
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        verticalLayout_4->addItem(verticalSpacer_2);
-
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName(QString::fromUtf8("pushButton"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
@@ -264,7 +260,7 @@ public:
 
         verticalLayout_4->addWidget(pushButton);
 
-        verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer_6 = new QSpacerItem(20, 7, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout_4->addItem(verticalSpacer_6);
 
@@ -350,7 +346,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "y2mate - desktop", nullptr));
         actiony2mate_com->setText(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));
 #if QT_CONFIG(tooltip)
         actiony2mate_com->setToolTip(QCoreApplication::translate("MainWindow", "y2mate.com", nullptr));

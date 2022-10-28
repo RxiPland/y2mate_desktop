@@ -28,9 +28,10 @@ QString nazev_souboru_hash = ""; // náhodný hash přijatý z requestu
 QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 QString video_duration = "";  // délka videa xx:xx:xx
 QString yt_video_link = "";  // odkaz na youtube video
+QString last_location_path = "/"; // poslední cesta uloženého souboru
 
-QString app_version = "v1.7.2";  // aktuální verze programu
-bool hodnoty_nastaveni[4] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY}
+QString app_version = "v1.7.3";  // aktuální verze programu
+bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -54,7 +55,8 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     ui->setupUi(this);
-    setWindowTitle("y2mate desktop");
+    this->setWindowTitle("y2mate desktop");
+    this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
     ui->comboBox->setHidden(true);
     ui->comboBox_2->setHidden(true);
@@ -69,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->progressBar->setValue(0);
 
     ui->horizontalSpacer->changeSize(250, 35);
-    ui->verticalSpacer_2->changeSize(20, 45);
 
     ui->statusBar->addPermanentWidget(ui->label_3, 1);  // informace o requestu
     ui->statusBar->addPermanentWidget(ui->label_4, 1);  // staženo mb z celkového počtu
@@ -94,16 +95,16 @@ MainWindow::~MainWindow()
 QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ulozeni=""){
     // operace = save/delete/load
 
-    QFile file("history.txt");
+    QFile file_history("history.txt");
 
     if(operace == "save" && data_k_ulozeni != ""){
         // uložit do souboru
 
-        if (file.exists()){
-            file.open(QIODevice::ReadOnly);
+        if (file_history.exists()){
+            file_history.open(QIODevice::ReadOnly);
 
-            QByteArray obsah = file.readAll();
-            file.close();
+            QByteArray obsah = file_history.readAll();
+            file_history.close();
 
             QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
             QStringList rows_history = obsah_souboru.split("\r\n");
@@ -117,8 +118,8 @@ QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ul
             // do not write if the previous search in history is equal to this search
             if (data_k_ulozeni != rows_history[0]){
 
-                file.open(QIODevice::WriteOnly | QIODevice::Text);
-                QTextStream out(&file);
+                file_history.open(QIODevice::WriteOnly | QIODevice::Text);
+                QTextStream out(&file_history);
 
                 for(int i=0; i<5; i++){
                     if (i==0){
@@ -130,25 +131,25 @@ QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ul
                         }
                     }
                 }
-                file.close();
+                file_history.close();
             }
         }
 
     }else if(operace == "delete"){
         // odstranit soubor
 
-        if (file.exists()){
-            file.remove();
+        if (file_history.exists()){
+            file_history.remove();
         }
 
     } else{
         // získat data ze souboru (operace == "load")
 
-        if (file.exists()){
-            file.open(QIODevice::ReadOnly);
+        if (file_history.exists()){
+            file_history.open(QIODevice::ReadOnly);
 
-            QByteArray obsah = file.readAll();
-            file.close();
+            QByteArray obsah = file_history.readAll();
+            file_history.close();
 
             QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
             QStringList rows_history = obsah_souboru.split("\r\n");
@@ -166,9 +167,9 @@ void MainWindow::load_history(){
     if (hodnoty_nastaveni[3]){
         // hodnoty_nastaveni[3] -> určuje, zda je historie povolena
 
-        QFile file("history.txt");
+        QFile file_history("history.txt");
 
-        if (file.exists()){
+        if (file_history.exists()){
 
             ui->actionSmazat_historii->setIconVisibleInMenu(true);
             ui->actionSmazat_historii->setEnabled(true);
@@ -300,8 +301,8 @@ void MainWindow::load_history(){
         }else{
 
             // create blank txt
-            file.open(QIODevice::WriteOnly | QIODevice::Text);
-            file.close();
+            file_history.open(QIODevice::WriteOnly | QIODevice::Text);
+            file_history.close();
 
             ui->menu1->menuAction()->setVisible(false);
             ui->menu2->menuAction()->setVisible(false);
@@ -336,21 +337,21 @@ void MainWindow::check_version(){
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
-    QNetworkReply *reply = manager.get(request);
+    QNetworkReply *reply_check = manager.get(request);
 
     ui->label_3->setHidden(false);
     ui->label_4->setHidden(true);
     ui->label_3->setText("Kontroluji verzi");
 
-    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+    connect(reply_check, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
 
-    while (!reply->isFinished())
+    while (!reply_check->isFinished())
     {
         qApp->processEvents();
     }
 
     // zpracování response
-    QString strReply = (QString)reply->readAll();
+    QString strReply = (QString)reply_check->readAll();
     QJsonDocument jsonResponse = QJsonDocument::fromJson(strReply.toUtf8());
     QJsonObject jsonObject = jsonResponse.object();
 
@@ -360,7 +361,7 @@ void MainWindow::check_version(){
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
-        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ app_version  +"\n\nPozn. Při instalaci nové verze se předchozí automaticky odstraní.");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: " + app_version  +"\n\nPozn. Při instalaci nové verze se předchozí automaticky odstraní.");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
@@ -370,7 +371,8 @@ void MainWindow::check_version(){
         }
     }
 
-    reply->deleteLater();
+    reply_check->reset();
+    reply_check->deleteLater();
 }
 
 void MainWindow::get_headers(QString location)
@@ -382,14 +384,14 @@ void MainWindow::get_headers(QString location)
     QNetworkRequest request = QNetworkRequest(QUrl(location));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
-    QNetworkReply *reply = manager.head(request);
+    QNetworkReply *reply_headers = manager.head(request);
 
-    while (!reply->isFinished())
+    while (!reply_headers->isFinished())
     {
         qApp->processEvents();
     }
 
-    QString header = reply->header(QNetworkRequest::ContentDispositionHeader).toString();
+    QString header = reply_headers->header(QNetworkRequest::ContentDispositionHeader).toString();
     nazev_souboru = "[Název nenalezen]";
 
     if(header.contains("filename")){
@@ -417,7 +419,8 @@ void MainWindow::get_headers(QString location)
     }
 
     // free memory space
-    reply->deleteLater();
+    reply_headers->reset();
+    reply_headers->deleteLater();
 }
 
 void MainWindow::httpReadyRead()
@@ -429,7 +432,6 @@ void MainWindow::httpReadyRead()
     if (file){
         file->write(reply->readAll());
     }
-
 }
 
 void MainWindow::httpFinished()
@@ -479,6 +481,7 @@ void MainWindow::httpFinished()
     QNetworkReply::NetworkError error = reply->error();
     const QString &errorString = reply->errorString();
 
+    reply.reset();
     reply->deleteLater();
 
     if (error != QNetworkReply::NoError) {
@@ -528,15 +531,12 @@ void MainWindow::get(QString url, QString koncovka)
         }
     }
 
-    QStringList adresar_list = cesta_k_souboru.split("/");
-    adresar_list.pop_back();
-    QString adresar = adresar_list.join("/") + "/";
-
-    QString temp_cesta_k_souboru = QFileDialog::getSaveFileName(this, "Uložit soubor", adresar + upraveny_nazev_souboru, koncovka);
+    QString temp_cesta_k_souboru = QFileDialog::getSaveFileName(this, "Uložit soubor", last_location_path + upraveny_nazev_souboru, koncovka);
 
     if (temp_cesta_k_souboru != ""){
 
         cesta_k_souboru = temp_cesta_k_souboru;
+        MainWindow::save_last_path();
 
         ui->progressBar->setHidden(false);
 
@@ -553,6 +553,7 @@ void MainWindow::get(QString url, QString koncovka)
         QNetworkRequest request = QNetworkRequest(QUrl(url));
         request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
+        reply.reset();
         reply.reset(manager.get(request));
 
         connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
@@ -572,7 +573,7 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
-    QNetworkReply *reply = manager.post(request, data);
+    QNetworkReply *reply_post = manager.post(request, data);
 
     ui->progressBar->setHidden(false);
     ui->label_3->setHidden(false);
@@ -587,15 +588,14 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
         ui->label_3->setText("Získávám název videa");
     }
 
-    connect(reply, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+    connect(reply_post, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
 
-    while (!reply->isFinished())
+    while (!reply_post->isFinished())
     {
         qApp->processEvents();
     }
 
-    QString response_data = reply->readAll();
-    reply->deleteLater();
+    QString response_data = reply_post->readAll();
 
     if (druh_promenne == 1){
         response_najit_formaty = response_data;
@@ -604,6 +604,9 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
         response = response_data;
     }
+
+    reply_post->reset();
+    reply_post->deleteLater();
 }
 
 QList<QString> najit_data(){
@@ -878,11 +881,8 @@ void MainWindow::on_pushButton_clicked(){
 
                     data.append(splitted_kvalita[0].toLocal8Bit());
 
-
                     MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
-
                     string response_str = response.toLocal8Bit().constData();
-
 
                     if (response == "error"){
                         QMessageBox::critical(this, "Chyba", "[kód 3] Problém v post requestu!");
@@ -1097,16 +1097,13 @@ void MainWindow::on_pushButton_2_clicked()
     ui->comboBox_2->setCurrentIndex(0);
 
     ui->horizontalSpacer->changeSize(250, 35);
-    ui->verticalSpacer_2->changeSize(20, 45);
 
     response = "";
     nazev_souboru = "";
-
-    reply->deleteLater();
 }
 
 void MainWindow::load_settings(){
-    // načtení hodnoty automatické hledání názvu videí
+    // načtení hodnoty nastavení do hodnoty_nastaveni[]
 
     QFile file("nastaveni.txt");
 
@@ -1123,6 +1120,24 @@ void MainWindow::load_settings(){
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
         QString zaznamenavat_historii = rows_nastaveni[3];
+
+        QString last_location = rows_nastaveni[4];
+
+        if (rows_nastaveni[4].contains(" /;/ ")){
+            QStringList last_location_row = rows_nastaveni[4].split(" /;/ ");
+            last_location = last_location_row[0];
+
+            last_location_path = last_location_row[1];
+
+            if (last_location_path == "" || last_location_path == " "){
+
+                last_location_path = "/";
+            }
+
+        } else{
+            last_location_path = "/";
+        }
+
 
         // defaultní hodnoty, pokud budou řádky prázdné (např. při přechodu ze starší verze na novou)
         if (hledat_nazev_videa == ""){
@@ -1141,16 +1156,22 @@ void MainWindow::load_settings(){
             zaznamenavat_historii = "1";
         }
 
+        if (last_location == ""){
+            last_location = "1";
+        }
+
         hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí nahradí název souboru hashem
         hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
         hodnoty_nastaveni[3] = zaznamenavat_historii.contains("1");  // zapnutí bude zaznamenávat historii
+        hodnoty_nastaveni[4] = last_location.contains("1");  // zapnutí bude otevírat ukládací dialog v této cestě
 
     } else{
         hodnoty_nastaveni[0] = false; // defaultní hodnota false
         hodnoty_nastaveni[1] = false;  // defaultní hodnota false
         hodnoty_nastaveni[2] = true; // defaultní hodnota true
         hodnoty_nastaveni[3] = true; // defaultní hodnota true
+        hodnoty_nastaveni[4] = true; // defaultní hodnota true
     }
 }
 
@@ -1187,6 +1208,7 @@ void MainWindow::apply_yt_video(int row_order){
     // apply youtube video from history to search
 
     // prepare GUI (reset)
+    MainWindow::disable_widgets(false);
     MainWindow::on_pushButton_2_clicked();
 
     QStringList file_data = MainWindow::history_soubor("load");
@@ -1263,6 +1285,51 @@ void MainWindow::downloadProgress(qint64 ist, qint64 max)
         ui->progressBar->setValue(0);
     }
 }
+
+void MainWindow::save_last_path(){
+
+    // pokud je povoleno
+    if(hodnoty_nastaveni[4] && cesta_k_souboru != ""){
+
+        QFile file("nastaveni.txt");
+
+        if (file.exists()){
+            file.open(QIODevice::ReadOnly);
+
+            QByteArray obsah = file.readAll();
+            file.close();
+
+            QString obsah_souboru = QTextCodec::codecForMib(106)->toUnicode(obsah);
+            QStringList rows_settings = obsah_souboru.split("\r\n");
+
+            int pocet_rows = rows_settings.count();
+
+            for(int i=0; i < 6-pocet_rows; i++){
+                rows_settings.append("");
+            }
+
+            QStringList adresar_list = cesta_k_souboru.split("/");
+            adresar_list.pop_back();
+            last_location_path = adresar_list.join("/") + "/";
+
+            file.open(QIODevice::WriteOnly | QIODevice::Text);
+            QTextStream out(&file);
+
+            for(int i=0; i < pocet_rows; i++){
+                if (i==4){
+                    out << "LAST_LOCATION 1" << " /;/ "  << last_location_path << "\n";
+
+                } else{
+                    if(rows_settings[i] != ""){
+                        out << rows_settings[i] << "\n";
+                    }
+                }
+            }
+            file.close();
+        }
+    }
+}
+
 
 
 void MainWindow::on_lineEdit_returnPressed()

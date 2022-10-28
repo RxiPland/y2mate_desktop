@@ -52,6 +52,7 @@ private slots:
     void check_version();
     void open_yt_video(int row_order);
     void apply_yt_video(int row_order);
+    void save_last_path();
 
     // open videos in browser
     void on_actionOtev_t_triggered();
