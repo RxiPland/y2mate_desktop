@@ -9,10 +9,10 @@
 #include <QFileDialog>
 #include <windows.h>
 
-QString app_version_settings = "v1.7.3";  // aktuální verze programu
+QString app_version_settings = "";  // aktuální verze programu (doplní se pomocí funkce set_version(); )
 QString last_location_path_settings = "/";
 bool posledni_ulozene_nastaveni[5] = {};  // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
-bool path_changed = false;
+bool path_changed = false;  // pokud se nastaví nová cesta, bude true
 
 settings_dialog::settings_dialog(QWidget *parent) :
     QDialog(parent),
@@ -22,15 +22,21 @@ settings_dialog::settings_dialog(QWidget *parent) :
     setWindowTitle("Nastavení");
     setWindowIcon(QIcon(":/images/settings.ico"));
 
-    ui->label->setText("Aktuální verze: " + app_version_settings);
-
     settings_dialog::load_settings();
     settings_dialog::settings_changed(false);  // vyresetuje výstražný label o neuložených změnách
+
+    ui->pushButton_6->setDefault(true);
 }
 
 settings_dialog::~settings_dialog()
 {
     delete ui;
+}
+
+void settings_dialog::set_version(QString version){
+
+    ui->label->setText("Aktuální verze: " + version);
+    app_version_settings = version;
 }
 
 void settings_dialog::check_version(bool show_response=false){
@@ -375,7 +381,7 @@ void settings_dialog::on_checkBox_5_stateChanged(int arg1)
 void settings_dialog::on_pushButton_7_clicked()
 {
     // tlačítko zrušit
-    close();
+    this->close();
 }
 
 

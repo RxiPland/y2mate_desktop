@@ -13,26 +13,37 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/images/appicon.rc")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
+        resources.qrc
         main.cpp
+
         mainwindow.cpp
         mainwindow.h
         ui_mainwindow.h
-        mainwindow.ui
-        resources.qrc
+
         settings_dialog.h
         settings_dialog.cpp
-        settings_dialog.ui
         ui_settings_dialog.h
+
+        edit_video.h
+        edit_video.cpp
+        ui_edit_video.h
+
+        mainwindow.ui
+        edit_video.ui
+        settings_dialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(y2mate
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        ${APP_ICON_RESOURCE_WINDOWS}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET y2mate APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

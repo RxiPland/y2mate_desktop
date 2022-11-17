@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void store_window_parameters(int left=0, int top=0);
 
 public slots:
     void get(QString url, QString koncovka);
@@ -33,6 +34,7 @@ private slots:
     void disable_widgets(bool vypnout);
     void on_comboBox_currentTextChanged(const QString &arg1);
     void on_lineEdit_returnPressed();
+    void center_window();
 
     void on_actiony2mate_com_triggered();
     void on_actionzdrojovy_kod_triggered();

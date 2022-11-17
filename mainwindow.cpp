@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settings_dialog.h"
+#include "edit_video.h"
 
 #include <string>
 #include <QMessageBox>
@@ -20,8 +21,8 @@
 using namespace std;
 
 QString response = "", response_najit_formaty = "";     // různé proměnné pro různé ukládání http responsů
-string nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
-string nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
+QString nalezene_formaty_mp3[6] = {"nic", "nic", "nic", "nic", "nic", "nic"}; // zde se přepíše "nic" nalezenými formáty (128kbps, 192kbps, ...)
+QString nalezene_formaty_mp4[6] = {"nic", "nic", "nic", "nic", "nic", "nic"};
 
 QString nazev_souboru = "";  // název yt videa
 QString nazev_souboru_hash = ""; // náhodný hash přijatý z requestu
@@ -30,8 +31,10 @@ QString video_duration = "";  // délka videa xx:xx:xx
 QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
 
-QString app_version = "v1.7.3";  // aktuální verze programu
+QString app_version = "v1.8.0";  // actual version of app
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
+bool downloading_ffmpeg = false;
+int window_parameters[2] = {0, 0};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -58,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setWindowTitle("y2mate desktop");
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
+    ui->lineEdit->setFocus();
+
     ui->comboBox->setHidden(true);
     ui->comboBox_2->setHidden(true);
     ui->pushButton_2->setHidden(true);
@@ -81,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // automatická kontrola verze
     if (hodnoty_nastaveni[2]){
-        check_version();
+        MainWindow::check_version();
     }
 
     MainWindow::load_history();
@@ -90,6 +95,17 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::store_window_parameters(int left, int top){
+
+    window_parameters[0] = left;
+    window_parameters[1] = top;
+}
+
+void MainWindow::center_window(){
+
+    move(window_parameters[0], window_parameters[1]);
 }
 
 QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ulozeni=""){
@@ -454,28 +470,126 @@ void MainWindow::httpFinished()
         file->deleteLater();
         file.reset();
 
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("V pořádku");
-        msgBox.setText("Soubor byl úspěšně stažen.");
-        QAbstractButton* pButtonYes = msgBox.addButton("Ok", QMessageBox::YesRole);
-        msgBox.addButton("Otevřít soubor", QMessageBox::NoRole);
-        msgBox.exec();
+        QStringList list_dir_path = cesta_k_souboru.split("/");
+        list_dir_path.pop_back();
+        QString dir_path = list_dir_path.join("\\") + "\\";
 
-        // musí se nerovnat
-        if (msgBox.clickedButton() != pButtonYes) {
-            // otevřít soubor
+        if (!downloading_ffmpeg){
 
-            cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
-            std::wstring command = cesta_k_souboru.toStdWString();
+            disable_widgets(false);
 
-            ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("V pořádku");
+            msgBox.setText("Soubor byl úspěšně stažen.");
+            msgBox.addButton("Ok", QMessageBox::YesRole);
+            QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::NoRole);
+            QAbstractButton* pButtonEdit = msgBox.addButton("Upravit video", QMessageBox::NoRole);
+            msgBox.exec();
+
+
+            if (msgBox.clickedButton() == pButtonOpen) {
+                // otevřít soubor
+
+                cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
+                std::wstring command = cesta_k_souboru.toStdWString();
+
+                ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
+
+            } else if(msgBox.clickedButton() == pButtonEdit){
+
+                QFile file_settings("tools/ffmpeg.exe");
+
+                if (!file_settings.exists()){
+                    // ffmpeg doesn't exist
+
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("ffmpeg");
+                    msgBox.setText("ffmpeg.exe neexistuje! Je potřeba ho stáhnout");
+                    QAbstractButton* pButtonDownload = msgBox.addButton("Stáhnout", QMessageBox::YesRole);
+                    msgBox.addButton("Ukončit úpravu videa", QMessageBox::NoRole);
+                    msgBox.exec();
+
+
+                    if (msgBox.clickedButton() == pButtonDownload) {
+                        // download ffmpeg to tools/ffmpeg.exe
+
+                        MainWindow::disable_widgets(true);
+
+                        ui->progressBar->setHidden(false);
+
+                        ui->label_3->setHidden(false);
+                        ui->label_4->setHidden(false);
+                        ui->label_3->setText("Stahuji ffmpeg.exe");
+
+
+                        std::system("mkdir tools");
+
+                        file = openFileForWrite("tools/ffmpeg.exe");
+                        if (!file){
+                            QMessageBox::critical(this, "Problém", "Nastal problém při vytváření souboru.\n\n" + cesta_k_souboru);
+                            return;
+                        }
+
+                        QNetworkRequest request = QNetworkRequest(QUrl("file:///C:/hackovani/ffmpeg/ffmpeg.exe"));
+
+                        //QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
+                        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+
+                        reply.reset();
+                        reply.reset(manager.get(request));
+
+                        downloading_ffmpeg = true;
+
+                        connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
+                        connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
+                        connect(reply.get(), &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+
+                        return;
+                    }
+
+                } else{
+
+                    QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
+
+                    edit_video edit_dialog;
+                    edit_dialog.set_info(nazev_souboru + koncovka, video_duration, dir_path);
+                    edit_dialog.setModal(true);
+                    this->hide();
+                    edit_dialog.exec();
+
+                    MainWindow::center_window();
+                    this->show();
+                }
+            }
+
+        } else {
+            // open edit video window after ffmpeg download
+
+            downloading_ffmpeg = false;
+
+            QFile file_settings("tools/ffmpeg.exe");
+
+            if (file_settings.exists()){
+
+                QMessageBox::about(this, "V pořádku", "ffmpeg.exe byl úspěšně stažen. Můžete začít upravovat videa.");
+
+                QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
+
+                edit_video edit_dialog;
+                edit_dialog.set_info(nazev_souboru + koncovka, video_duration, dir_path);
+                edit_dialog.setModal(true);
+                this->hide();
+                edit_dialog.exec();
+
+                MainWindow::center_window();
+                this->show();
+
+            } else{
+
+                QMessageBox::about(this, "Chyba", "ffmpeg.exe se nepodařilo stáhnout!\n\nMožné chyby:\n1) Internet není dostupný\n2) github.com není dostupný");
+
+            }
         }
-
-        nazev_souboru = "";
-        video_duration = "";
-
-        disable_widgets(false);
-        on_pushButton_2_clicked();
     }
 
     QNetworkReply::NetworkError error = reply->error();
@@ -486,7 +600,16 @@ void MainWindow::httpFinished()
 
     if (error != QNetworkReply::NoError) {
         QFile::remove(fi.absoluteFilePath());
-        return;
+    }
+
+
+    if(!downloading_ffmpeg){
+
+        nazev_souboru = "";
+        video_duration = "";
+
+        disable_widgets(false);
+        on_pushButton_2_clicked();
     }
 }
 
@@ -736,14 +859,12 @@ void MainWindow::on_pushButton_clicked(){
 
             MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data, 1);     // post request na získání informací o videu
 
-            string response_str = response_najit_formaty.toLocal8Bit().constData();
-
             if (response_najit_formaty == "error"){
+
                 QMessageBox::critical(this, "Chyba", "[kód 1] Problém v post requestu!");
                 ui->lineEdit->setClearButtonEnabled(true);
-
             }
-            else if (response_str.find("Video not found") != string::npos) {
+            else if (response_najit_formaty.contains("Video not found")) {
 
                 QMessageBox::critical(this, "Chyba", "Video pod tímto odkazem neexistuje!");
                 ui->lineEdit->setClearButtonEnabled(true);
@@ -794,24 +915,24 @@ void MainWindow::on_pushButton_clicked(){
 
                 // najít dostupné formáty (z response)
 
-                string formaty_mp3[] = {"320 kbps", "256 kbps", "192 kbps", "128 kbps", "96 kbps", "64 kbps"};
+                QString formaty_mp3[] = {"320 kbps", "256 kbps", "192 kbps", "128 kbps", "96 kbps", "64 kbps"};
 
                 for (int i=0; i<6; i++){
 
-                    if (response_str.find(formaty_mp3[i]) != string::npos) {
+                    if (response_najit_formaty.contains(formaty_mp3[i])){
                         if (formaty_mp3[i] == "128 kbps"){
-                            nalezene_formaty_mp3[i] = formaty_mp3[i] + " (Standart)";
+                            nalezene_formaty_mp3[i] = formaty_mp3[i] + " (Standard)";
                         } else {
                             nalezene_formaty_mp3[i] = formaty_mp3[i];
                         }
                     }
                 }
 
-                string formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
+                QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
 
                 for (int i=0; i<6; i++){
 
-                    if (response_str.find(formaty_mp4[i]) != string::npos) {
+                    if (response_najit_formaty.contains(formaty_mp4[i])) {
                         nalezene_formaty_mp4[i] = formaty_mp4[i];
                     }
                 }
@@ -882,13 +1003,13 @@ void MainWindow::on_pushButton_clicked(){
                     data.append(splitted_kvalita[0].toLocal8Bit());
 
                     MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
-                    string response_str = response.toLocal8Bit().constData();
 
                     if (response == "error"){
                         QMessageBox::critical(this, "Chyba", "[kód 3] Problém v post requestu!");
 
                     }
-                    else if (response_str.find("Download") == string::npos) {
+                    // negace
+                    else if (!response.contains("Download")) {
 
                         QMessageBox::critical(this, "Chyba", "[kód 4] Nepovedlo se stáhnout mp3, zkuste to znovu");
 
@@ -992,20 +1113,16 @@ void MainWindow::on_pushButton_clicked(){
 
                     MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
 
-
-                    string response_str = response.toLocal8Bit().constData();
-
-
                     if (response == "error"){
                         QMessageBox::critical(this, "Chyba", "[kód 9] Problém v post requestu!");
 
                     }
-                    else if (response_str.find("Refresh to try again") != string::npos) {
+                    else if (response.contains("Refresh to try again")){
 
                         QMessageBox::critical(this, "Chyba", "[kód 10] Nepovedlo se stáhnout mp4, zkuste to zachvíli.");
 
                     }
-                    else if (response_str.find("Download") == string::npos) {
+                    else if (!response.contains("Download")){
 
                         QMessageBox::critical(this, "Chyba", "[kód 11] Nepovedlo se stáhnout mp4");
 
@@ -1090,6 +1207,12 @@ void MainWindow::on_pushButton_2_clicked()
     ui->label->clear();
     ui->label_2->setHidden(true);
     ui->label_2->clear();
+
+    ui->label_3->setHidden(true);
+    ui->label_4->setHidden(true);
+
+    ui->progressBar->setHidden(true);
+    ui->progressBar->setValue(0);
 
     ui->comboBox->setHidden(true);
     ui->comboBox->setCurrentIndex(0);
@@ -1234,15 +1357,11 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     if (arg1 == "mp3 (pouze zvuk)"){
         // načíst z proměnné nalezene_formaty_mp3
 
-        QString aktualni_format = "";
-
         for (int i=0; i<6; i++){
 
-            aktualni_format = QString::fromStdString(nalezene_formaty_mp3[i]);
+            if (nalezene_formaty_mp3[i] != "nic"){
 
-            if (aktualni_format != "nic"){
-
-                ui->comboBox_2->addItem(aktualni_format);
+                ui->comboBox_2->addItem(nalezene_formaty_mp3[i]);
             }
         }
 
@@ -1251,15 +1370,11 @@ void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
     else if (arg1 == "mp4 (video)"){
         // načíst z proměnné nalezene_formaty_mp4
 
-        QString aktualni_format = "";
-
         for (int i=0; i<6; i++){
 
-            aktualni_format = QString::fromStdString(nalezene_formaty_mp4[i]);
+            if (nalezene_formaty_mp4[i] != "nic"){
 
-            if (aktualni_format != "nic"){
-
-                ui->comboBox_2->addItem(aktualni_format);
+                ui->comboBox_2->addItem(nalezene_formaty_mp4[i]);
             }
         }
 
@@ -1359,7 +1474,12 @@ void MainWindow::on_actionNastaven_triggered()
 {
     settings_dialog nastaveni_dialog;
     nastaveni_dialog.setModal(true);
+    nastaveni_dialog.set_version(app_version);
+    this->hide();
     nastaveni_dialog.exec();
+
+    MainWindow::center_window();
+    this->show();
 
     MainWindow::load_settings();  // načte nastavení ze souboru
     MainWindow::load_history();  // načte historii
