@@ -530,9 +530,7 @@ void MainWindow::httpFinished()
                             return;
                         }
 
-                        QNetworkRequest request = QNetworkRequest(QUrl("file:///C:/hackovani/ffmpeg/ffmpeg.exe"));
-
-                        //QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
+                        QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
                         request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
                         reply.reset();
@@ -551,8 +549,12 @@ void MainWindow::httpFinished()
 
                     QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
 
+                    QStringList video_name_list = cesta_k_souboru.split("/").back().split(".");
+                    video_name_list.pop_back();
+                    QString video_name = video_name_list.join(".");
+
                     edit_video edit_dialog;
-                    edit_dialog.set_info(nazev_souboru + koncovka, video_duration, dir_path);
+                    edit_dialog.set_info(video_name + koncovka, video_duration, dir_path);
                     edit_dialog.setModal(true);
                     this->hide();
                     edit_dialog.exec();
@@ -575,8 +577,12 @@ void MainWindow::httpFinished()
 
                 QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
 
+                QStringList video_name_list = cesta_k_souboru.split("/").back().split(".");
+                video_name_list.pop_back();
+                QString video_name = video_name_list.join(".");
+
                 edit_video edit_dialog;
-                edit_dialog.set_info(nazev_souboru + koncovka, video_duration, dir_path);
+                edit_dialog.set_info(video_name + koncovka, video_duration, dir_path);
                 edit_dialog.setModal(true);
                 this->hide();
                 edit_dialog.exec();

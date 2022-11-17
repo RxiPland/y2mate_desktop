@@ -105,7 +105,11 @@ void edit_video::on_pushButton_3_clicked()
     bool start_changed = compare_arrays(time_start, time_start_default);
     bool end_changed = compare_arrays(time_end, video_length);
 
+    ULONG_PTR ret;
     std::wstring command;
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Úprava videa");
 
     if(start_changed || end_changed){
         // convert using ffmpeg.exe
@@ -116,7 +120,14 @@ void edit_video::on_pushButton_3_clicked()
 
         // convert renamed file to new one
         command = ("/C ffmpeg/ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_OLD_FILE" + file_extension + "\" " + "-vn -y -hide_banner -loglevel error -c:a copy \"" + dir_path + video_name + file_extension + "\"").toStdWString();
-        ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
+        ret = reinterpret_cast<ULONG_PTR>(ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE));
+
+        if(ret>32){
+            msgBox.setText("Soubor byl úspěšně překonvertován pomocí ffmpeg.exe");
+
+        } else{
+            msgBox.setText("Nastala chyba!\n\nShellExecute() response kód: " + QString::number(ret));
+        }
 
         // delete renamed file
         command = ("/C del \"" + dir_path + name + "THIS_IS_OLD_FILE" + file_extension + "\"").toStdWString();
@@ -125,10 +136,50 @@ void edit_video::on_pushButton_3_clicked()
     } else if(name_changed){
         // only rename
 
-        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + file_extension + "\"").toStdWString();
-        HINSTANCE res = ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
+        // dodělat if(exists()){
+        QFile new_name_path(dir_path + name + file_extension);
 
+        if(new_name_path.exists()){
+
+            QMessageBox msgBoxExists;
+            msgBoxExists.setWindowTitle("Nový název");
+            msgBoxExists.setText("Soubor s tímto názvem již existuje. Starý soubor se automaticky odstraní!");
+            msgBoxExists.addButton("Ok", QMessageBox::YesRole);
+            QAbstractButton* pButtonCancel = msgBoxExists.addButton("Zrušit", QMessageBox::NoRole);
+            msgBoxExists.exec();
+
+            if (msgBoxExists.clickedButton() == pButtonCancel) {
+
+                return;
+            }
+        }
+
+        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + file_extension + "\"").toStdWString();
+        ret = reinterpret_cast<ULONG_PTR>(ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE));
+
+        if(ret>32){
+            msgBox.setText("Soubor byl úspěšně přejmenován");
+
+        } else{
+            msgBox.setText("Nastala chyba!\n\nShellExecute() response kód: " + QString::number(ret));
+        }
+
+    } else{
+
+        msgBox.setText("Nebyly provedeny žádné změny");
     }
 
-    //edit_video::on_pushButton_clicked();
+    msgBox.addButton("Ok", QMessageBox::YesRole);
+    QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == pButtonOpen) {
+
+        QString cesta_k_souboru = "\"" + dir_path + name + file_extension + "\"";
+        std::wstring command = cesta_k_souboru.toStdWString();
+
+        ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
+    }
+
+    edit_video::on_pushButton_clicked();
 }
