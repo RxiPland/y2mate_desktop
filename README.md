@@ -3,6 +3,7 @@
 - Nenáročný program na stahování videí/hudby z youtube
 - Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
+- Možnost si sestříhat délku videa
 #
 - Video kvalita maximálně 1080p
 - Kvalita zvuku maximálně 320kbps
