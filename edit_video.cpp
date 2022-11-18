@@ -62,8 +62,22 @@ void edit_video::set_info(QString name, QString length, QString path){
 
     ui->timeEdit->setMaximumTime(QTime(video_length[0], video_length[1], video_length[2]));
     ui->timeEdit_2->setMaximumTime(QTime(video_length[0], video_length[1], video_length[2]));
+    ui->comboBox->setCurrentText(file_extension);
 
     edit_video::on_pushButton_2_clicked();
+}
+
+void edit_video::disable_widgets(bool disable){
+
+    ui->lineEdit->setDisabled(disable);
+    ui->timeEdit->setDisabled(disable);
+    ui->timeEdit_2->setDisabled(disable);
+
+    ui->pushButton->setDisabled(disable);
+    ui->pushButton_2->setDisabled(disable);
+    ui->pushButton_3->setDisabled(disable);
+
+    ui->comboBox->setDisabled(disable);
 }
 
 void edit_video::on_pushButton_2_clicked()
@@ -86,7 +100,10 @@ void edit_video::on_pushButton_3_clicked()
     // start convert button
     // ffmpeg -i "NÁZEV+X" -vn -y -hide_banner -loglevel error -c:a copy "NÁZEV-X"
 
+    edit_video::disable_widgets(true);
+
     QString name = ui->lineEdit->text();
+    QString filetype = ui->comboBox->currentText();
 
     QTime qtime_start = ui->timeEdit->time();
 
@@ -107,6 +124,7 @@ void edit_video::on_pushButton_3_clicked()
     bool name_changed = name != video_name;
     bool start_changed = compare_arrays(time_start, time_start_default);
     bool end_changed = compare_arrays(time_end, video_length);
+    bool filetype_changed = filetype != file_extension;
 
     ULONG_PTR ret;
     std::wstring command;
@@ -114,8 +132,8 @@ void edit_video::on_pushButton_3_clicked()
     QMessageBox msgBox;
     msgBox.setWindowTitle("Úprava videa");
 
-    if(start_changed || end_changed){
-        // convert using ffmpeg.exe
+    if((start_changed || end_changed) && !filetype_changed){
+        // cut time, without changing file type format
 
         // rename file
         command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
@@ -123,15 +141,75 @@ void edit_video::on_pushButton_3_clicked()
 
         // convert renamed file & delete
         QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
-        command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + dir_path + name + file_extension + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
-        ret = reinterpret_cast<ULONG_PTR>(ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE));
+        command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + dir_path + name + filetype + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
 
-        if(ret>32){
-            msgBox.setText("Soubor byl úspěšně překonvertován pomocí ffmpeg.exe");
+
+        SHELLEXECUTEINFO ShExecInfo ={0};
+        ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+        ShExecInfo.fMask = SEE_MASK_INVOKEIDLIST ;
+        ShExecInfo.hwnd = NULL;
+        ShExecInfo.lpVerb = L"open";
+        ShExecInfo.lpFile = L"cmd.exe";
+        ShExecInfo.lpParameters = command.c_str();
+        ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+        ShExecInfo.nShow = SW_HIDE;
+        ShExecInfo.hInstApp = NULL;
+        auto ret = ShellExecuteEx(&ShExecInfo);
+        WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+        CloseHandle(ShExecInfo.hProcess);
+
+        if(ret==1){
+            msgBox.setText("Čas videa byl úspěšně upraven");
 
         } else{
-            msgBox.setText("Nastala chyba!\n\nShellExecute() response kód: " + QString::number(ret));
+            msgBox.setText("Nastala chyba!\n\nShellExecuteEx() response kód: " + QString::number(ret));
         }
+
+
+    } else if(start_changed || end_changed || filetype_changed){
+        // cut time AND convert to different file type
+
+        // rename file
+        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
+        ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
+
+        // convert renamed file & delete
+        QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
+
+        if(filetype == ".ogg"){
+
+            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -vn -crf 20 -codec:a libvorbis -hide_banner -loglevel error \"" + dir_path + name + filetype + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
+
+        }else if(filetype == ".wav"){
+
+            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -vn -crf 20 -acodec pcm_s16le -hide_banner -loglevel error \"" + dir_path + name + filetype + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
+
+        }else {
+
+            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -vn -crf 20 -c:a libmp3lame -hide_banner -loglevel error \"" + dir_path + name + filetype + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
+        }
+
+        SHELLEXECUTEINFO ShExecInfo ={0};
+        ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+        ShExecInfo.fMask = SEE_MASK_INVOKEIDLIST ;
+        ShExecInfo.hwnd = NULL;
+        ShExecInfo.lpVerb = L"open";
+        ShExecInfo.lpFile = L"cmd.exe";
+        ShExecInfo.lpParameters = command.c_str();
+        ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+        ShExecInfo.nShow = SW_HIDE;
+        ShExecInfo.hInstApp = NULL;
+        auto ret = ShellExecuteEx(&ShExecInfo);
+        WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+        CloseHandle(ShExecInfo.hProcess);
+
+        if(ret==1){
+            msgBox.setText("Soubor byl úspěšně překonvertován");
+
+        } else{
+            msgBox.setText("Nastala chyba!\n\nShellExecuteEx() response kód: " + QString::number(ret));
+        }
+
 
     } else if(name_changed){
         // only rename
@@ -175,7 +253,7 @@ void edit_video::on_pushButton_3_clicked()
 
     if (msgBox.clickedButton() == pButtonOpen) {
 
-        QString cesta_k_souboru = "\"" + dir_path + name + file_extension + "\"";
+        QString cesta_k_souboru = "\"" + dir_path + name + filetype + "\"";
         std::wstring command = cesta_k_souboru.toStdWString();
 
         ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);

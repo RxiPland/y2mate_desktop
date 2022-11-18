@@ -26,6 +26,19 @@ settings_dialog::settings_dialog(QWidget *parent) :
     settings_dialog::settings_changed(false);  // vyresetuje výstražný label o neuložených změnách
 
     ui->pushButton_6->setDefault(true);
+
+    QFile ffmpeg_path("tools/ffmpeg.exe");
+
+    if(ffmpeg_path.exists()){
+        ui->label_3->setText("FFmpeg je stažený.");
+        ui->label_3->setStyleSheet("QLabel { color : green; }");
+        ui->pushButton_11->setDisabled(false);
+
+    } else{
+        ui->label_3->setText("FFmpeg není stažený!");
+        ui->label_3->setStyleSheet("QLabel { color : red; }");
+        ui->pushButton_11->setDisabled(true);
+    }
 }
 
 settings_dialog::~settings_dialog()
@@ -421,6 +434,19 @@ void settings_dialog::on_pushButton_9_clicked()
 
 }
 
+void settings_dialog::on_pushButton_12_clicked()
+{
+    // FFmpeg
+    QFileInfo ffmpeg("tools/ffmpeg.exe");
+    QString ffmpeg_message="";
+
+    if(ffmpeg.exists()){
+        ffmpeg_message = "<br><br>Aktuální lokace: " + ffmpeg.absoluteFilePath();
+    }
+
+    QMessageBox::information(this, "Nápověda", "<a href=\"https://ffmpeg.org/\">FFmpeg</a> je nástroj pro manipulaci s video/zvukovými soubory.<br><br>Pokud nepracuje správně, můžete FFmpeg odstranit a při další úpravě videa může být stažen znovu." + ffmpeg_message);
+}
+
 void settings_dialog::on_pushButton_10_clicked()
 {
     // nastavení lokace
@@ -469,6 +495,24 @@ void settings_dialog::on_pushButton_10_clicked()
             QMessageBox::information(this, "Nápověda", "Cesta byla nastavena, nezapomeňte uložit změny.");
         }
     }
+}
 
+void settings_dialog::on_pushButton_11_clicked()
+{
+    // delete ffmpeg
+
+    QDir dir("tools");
+    bool succes = dir.removeRecursively();
+
+    if(succes){
+        QMessageBox::information(this, "FFmpeg", "FFmpeg.exe byl úspěšně odstraněn. Lze ho stáhnout při příští úpravě videa.");
+        ui->label_3->setText("FFmpeg není stažený!");
+        ui->label_3->setStyleSheet("QLabel { color : red; }");
+        ui->pushButton_11->setDisabled(true);
+
+    } else{
+        QMessageBox::information(this, "FFmpeg", "Chyba! Nepodařilo se vymazat FFmpeg.exe");
+        ui->pushButton_11->setDisabled(false);
+    }
 }
 

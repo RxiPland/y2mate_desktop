@@ -19,8 +19,9 @@ public:
 private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_clicked();
-
     void on_pushButton_3_clicked();
+
+    void disable_widgets(bool disable);
 
 private:
     Ui::edit_video *ui;

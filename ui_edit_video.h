@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
@@ -25,12 +26,17 @@ QT_BEGIN_NAMESPACE
 class Ui_edit_video
 {
 public:
-    QVBoxLayout *verticalLayout_5;
+    QVBoxLayout *verticalLayout_6;
     QVBoxLayout *verticalLayout_4;
+    QHBoxLayout *horizontalLayout_3;
     QVBoxLayout *verticalLayout_3;
     QLabel *label_3;
     QLineEdit *lineEdit;
     QSpacerItem *verticalSpacer_2;
+    QVBoxLayout *verticalLayout_5;
+    QSpacerItem *verticalSpacer_5;
+    QComboBox *comboBox;
+    QSpacerItem *verticalSpacer_4;
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
@@ -49,11 +55,13 @@ public:
     {
         if (edit_video->objectName().isEmpty())
             edit_video->setObjectName(QString::fromUtf8("edit_video"));
-        edit_video->resize(431, 205);
-        verticalLayout_5 = new QVBoxLayout(edit_video);
-        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        edit_video->resize(408, 207);
+        verticalLayout_6 = new QVBoxLayout(edit_video);
+        verticalLayout_6->setObjectName(QString::fromUtf8("verticalLayout_6"));
         verticalLayout_4 = new QVBoxLayout();
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         verticalLayout_3 = new QVBoxLayout();
         verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
         label_3 = new QLabel(edit_video);
@@ -73,7 +81,32 @@ public:
         verticalLayout_3->addItem(verticalSpacer_2);
 
 
-        verticalLayout_4->addLayout(verticalLayout_3);
+        horizontalLayout_3->addLayout(verticalLayout_3);
+
+        verticalLayout_5 = new QVBoxLayout();
+        verticalLayout_5->setObjectName(QString::fromUtf8("verticalLayout_5"));
+        verticalSpacer_5 = new QSpacerItem(20, 22, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout_5->addItem(verticalSpacer_5);
+
+        comboBox = new QComboBox(edit_video);
+        comboBox->addItem(QString());
+        comboBox->addItem(QString());
+        comboBox->addItem(QString());
+        comboBox->addItem(QString());
+        comboBox->setObjectName(QString::fromUtf8("comboBox"));
+
+        verticalLayout_5->addWidget(comboBox);
+
+        verticalSpacer_4 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout_5->addItem(verticalSpacer_4);
+
+
+        horizontalLayout_3->addLayout(verticalLayout_5);
+
+
+        verticalLayout_4->addLayout(horizontalLayout_3);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -144,7 +177,7 @@ public:
         verticalLayout_4->addLayout(horizontalLayout);
 
 
-        verticalLayout_5->addLayout(verticalLayout_4);
+        verticalLayout_6->addLayout(verticalLayout_4);
 
 
         retranslateUi(edit_video);
@@ -157,12 +190,17 @@ public:
         edit_video->setWindowTitle(QCoreApplication::translate("edit_video", "y2mate - \303\272prava videa", nullptr));
         label_3->setText(QCoreApplication::translate("edit_video", "N\303\241zev:", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("edit_video", "N\303\241zev videa", nullptr));
+        comboBox->setItemText(0, QCoreApplication::translate("edit_video", ".mp4", nullptr));
+        comboBox->setItemText(1, QCoreApplication::translate("edit_video", ".mp3", nullptr));
+        comboBox->setItemText(2, QCoreApplication::translate("edit_video", ".wav", nullptr));
+        comboBox->setItemText(3, QCoreApplication::translate("edit_video", ".ogg", nullptr));
+
         label->setText(QCoreApplication::translate("edit_video", "Za\304\215\303\241tek:", nullptr));
         timeEdit->setDisplayFormat(QCoreApplication::translate("edit_video", "HH:mm:ss", nullptr));
         label_2->setText(QCoreApplication::translate("edit_video", "Konec:", nullptr));
         timeEdit_2->setDisplayFormat(QCoreApplication::translate("edit_video", "HH:mm:ss", nullptr));
         pushButton_2->setText(QCoreApplication::translate("edit_video", "Reset hodnot", nullptr));
-        pushButton->setText(QCoreApplication::translate("edit_video", "Zru\305\241it \303\272pravu", nullptr));
+        pushButton->setText(QCoreApplication::translate("edit_video", "Odej\303\255t", nullptr));
         pushButton_3->setText(QCoreApplication::translate("edit_video", "Potvrdit", nullptr));
     } // retranslateUi
 
