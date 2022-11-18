@@ -444,7 +444,7 @@ void settings_dialog::on_pushButton_12_clicked()
         ffmpeg_message = "<br><br>Aktuální lokace: " + ffmpeg.absoluteFilePath();
     }
 
-    QMessageBox::information(this, "Nápověda", "<a href=\"https://ffmpeg.org/\">FFmpeg</a> je nástroj pro manipulaci s video/zvukovými soubory.<br><br>Pokud nepracuje správně, můžete FFmpeg odstranit a při další úpravě videa může být stažen znovu." + ffmpeg_message);
+    QMessageBox::information(this, "Nápověda", "<a href=\"https://ffmpeg.org/\">FFmpeg</a> je nástroj pro manipulaci s video/zvukovými soubory.<br><br>Pokud nepracuje správně, můžete FFmpeg odstranit a při další úpravě videa může být stažen znovu. <br><br>Jak stáhnout FFmpeg? Jednoduše si stáhnout nějaké video a vybrat možnost 'upravit video'. Když program zjistí, že FFmpeg neexistuje, nabídne možnost stažení." + ffmpeg_message);
 }
 
 void settings_dialog::on_pushButton_10_clicked()
