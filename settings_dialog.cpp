@@ -67,7 +67,7 @@ void settings_dialog::check_version(bool show_response=false){
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Nalezena nová aktualizace");
-        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nPozn. Při instalaci nové verze se předchozí automaticky odstraní.");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newest_version + "\nVaše verze: "+ current_version.back()  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();

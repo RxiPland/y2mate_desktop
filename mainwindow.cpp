@@ -504,9 +504,9 @@ void MainWindow::httpFinished()
 
                     QMessageBox msgBox;
                     msgBox.setWindowTitle("ffmpeg");
-                    msgBox.setText("ffmpeg.exe neexistuje! Je potřeba ho stáhnout");
+                    msgBox.setText("Nepodařilo se najít FFmpeg!\nKliknutím na stáhnout se automaticky vloží do složky s programem");
                     QAbstractButton* pButtonDownload = msgBox.addButton("Stáhnout", QMessageBox::YesRole);
-                    msgBox.addButton("Ukončit úpravu videa", QMessageBox::NoRole);
+                    msgBox.addButton("Zrušit úpravu videa", QMessageBox::NoRole);
                     msgBox.exec();
 
 
@@ -573,7 +573,7 @@ void MainWindow::httpFinished()
 
             if (file_settings.exists()){
 
-                QMessageBox::about(this, "V pořádku", "ffmpeg.exe byl úspěšně stažen. Můžete začít upravovat videa.");
+                QMessageBox::about(this, "V pořádku", "FFmpeg byl úspěšně stažen. Nyní můžete začít upravovat videa.");
 
                 QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
 
@@ -1470,7 +1470,6 @@ void MainWindow::on_actiony2mate_com_triggered()
 
 void MainWindow::on_actionzdrojovy_kod_triggered()
 {
-
     // otevřít github se zdrojovým kódem
 
     ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
@@ -1478,6 +1477,8 @@ void MainWindow::on_actionzdrojovy_kod_triggered()
 
 void MainWindow::on_actionNastaven_triggered()
 {
+    // open settings window
+
     settings_dialog nastaveni_dialog;
     nastaveni_dialog.setModal(true);
     nastaveni_dialog.set_version(app_version);
@@ -1561,4 +1562,3 @@ void MainWindow::on_actionPou_t_5_triggered()
 {
     MainWindow::apply_yt_video(4);
 }
-

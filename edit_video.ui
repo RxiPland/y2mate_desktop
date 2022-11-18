@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>y2mate - úprava videa</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
@@ -157,7 +157,7 @@
          <item>
           <widget class="QPushButton" name="pushButton">
            <property name="text">
-            <string>Zrušit</string>
+            <string>Zrušit úpravu</string>
            </property>
           </widget>
          </item>

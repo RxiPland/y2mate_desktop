@@ -154,7 +154,7 @@ public:
 
     void retranslateUi(QDialog *edit_video)
     {
-        edit_video->setWindowTitle(QCoreApplication::translate("edit_video", "Dialog", nullptr));
+        edit_video->setWindowTitle(QCoreApplication::translate("edit_video", "y2mate - \303\272prava videa", nullptr));
         label_3->setText(QCoreApplication::translate("edit_video", "N\303\241zev:", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("edit_video", "N\303\241zev videa", nullptr));
         label->setText(QCoreApplication::translate("edit_video", "Za\304\215\303\241tek:", nullptr));
@@ -162,7 +162,7 @@ public:
         label_2->setText(QCoreApplication::translate("edit_video", "Konec:", nullptr));
         timeEdit_2->setDisplayFormat(QCoreApplication::translate("edit_video", "HH:mm:ss", nullptr));
         pushButton_2->setText(QCoreApplication::translate("edit_video", "Reset hodnot", nullptr));
-        pushButton->setText(QCoreApplication::translate("edit_video", "Zru\305\241it", nullptr));
+        pushButton->setText(QCoreApplication::translate("edit_video", "Zru\305\241it \303\272pravu", nullptr));
         pushButton_3->setText(QCoreApplication::translate("edit_video", "Potvrdit", nullptr));
     } // retranslateUi
 
