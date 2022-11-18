@@ -12,6 +12,7 @@
   - y2mate watermark
   - bitrate (kvalitu)
   - dvojité mezery
+- Možnost upravit videu čas začátku a konce ([FFmpeg](https://ffmpeg.org/))
 - Aplikace je kompletně v češtině
 - Přehledné/jednoduché prostředí
 - Historie hledaných videí
