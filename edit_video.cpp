@@ -3,12 +3,13 @@
 #include <QFile>
 #include <QMessageBox>
 #include <windows.h>
-#include <iostream>
+#include <QDir>
 
-QString video_name;
-QString file_extension;
-QString dir_path = "/";
-int video_length[3] = {0,0,0};
+QString video_name;   // video name without file extension
+QString file_extension;   // file extension with dot
+QString dir_path = "/";   // path of downloaded video
+int video_length[3] = {0,0,0};  // hours:minutes:seconds
+
 
 edit_video::edit_video(QWidget *parent) :
     QDialog(parent),
@@ -25,8 +26,7 @@ edit_video::~edit_video()
 }
 
 bool compare_arrays(int first[3], int second[3]){
-    //only for 3-item arrays
-
+    //comparing only 3-item arrays
 
     for(int i=0; i<3; i++){
 
@@ -41,6 +41,7 @@ bool compare_arrays(int first[3], int second[3]){
 }
 
 void edit_video::set_info(QString name, QString length, QString path){
+    //save info about downloaded file
 
     dir_path = path;
 
@@ -75,12 +76,14 @@ void edit_video::on_pushButton_2_clicked()
 
 void edit_video::on_pushButton_clicked()
 {
+    // exit window
     this->close();
 }
 
 
 void edit_video::on_pushButton_3_clicked()
 {
+    // start convert button
     // ffmpeg -i "NÁZEV+X" -vn -y -hide_banner -loglevel error -c:a copy "NÁZEV-X"
 
     QString name = ui->lineEdit->text();
@@ -115,11 +118,12 @@ void edit_video::on_pushButton_3_clicked()
         // convert using ffmpeg.exe
 
         // rename file
-        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + dir_path + name + "THIS_IS_OLD_FILE" + file_extension + "\"").toStdWString();
+        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
         ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
 
-        // convert renamed file to new one
-        command = ("/C ffmpeg/ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_OLD_FILE" + file_extension + "\" " + "-vn -y -hide_banner -loglevel error -c:a copy \"" + dir_path + video_name + file_extension + "\"").toStdWString();
+        // convert renamed file & delete
+        QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
+        command = ("/C ffmpeg.exe -i \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + dir_path + name + file_extension + "\" & del \"" + dir_path + name + "THIS_IS_TEMP_FILE" + file_extension + "\"").toStdWString();
         ret = reinterpret_cast<ULONG_PTR>(ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE));
 
         if(ret>32){
@@ -129,14 +133,9 @@ void edit_video::on_pushButton_3_clicked()
             msgBox.setText("Nastala chyba!\n\nShellExecute() response kód: " + QString::number(ret));
         }
 
-        // delete renamed file
-        command = ("/C del \"" + dir_path + name + "THIS_IS_OLD_FILE" + file_extension + "\"").toStdWString();
-        ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
-
     } else if(name_changed){
         // only rename
 
-        // dodělat if(exists()){
         QFile new_name_path(dir_path + name + file_extension);
 
         if(new_name_path.exists()){
@@ -169,6 +168,7 @@ void edit_video::on_pushButton_3_clicked()
         msgBox.setText("Nebyly provedeny žádné změny");
     }
 
+    // ask user to open new file or skip
     msgBox.addButton("Ok", QMessageBox::YesRole);
     QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
     msgBox.exec();
