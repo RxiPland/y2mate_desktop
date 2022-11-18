@@ -14,6 +14,7 @@
   - bitrate (kvalitu)
   - dvojité mezery
 - Možnost upravit videu čas začátku a konce ([FFmpeg](https://ffmpeg.org/))
+- Konverze do OGG nebo WAV
 - Aplikace je kompletně v češtině
 - Přehledné/jednoduché prostředí
 - Historie hledaných videí
