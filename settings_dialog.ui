@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>486</width>
-    <height>330</height>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,28 +18,58 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="checkBox_5">
+       <item row="3" column="1">
+        <widget class="QPushButton" name="pushButton_10">
          <property name="text">
-          <string>Poslední lokace</string>
+          <string>Nastavit</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="3" column="2">
+        <widget class="QPushButton" name="pushButton_9">
+         <property name="text">
+          <string>?</string>
          </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="checkBox_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>20</height>
-          </size>
+         <property name="text">
+          <string>Zaznamenávat historii</string>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>?</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="checkBox_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Automaticky kontrolovat novou verzi</string>
+         </property>
+        </widget>
        </item>
        <item row="2" column="2">
         <widget class="QPushButton" name="pushButton_8">
@@ -51,6 +81,13 @@
          </property>
          <property name="text">
           <string>?</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="checkBox_5">
+         <property name="text">
+          <string>Poslední lokace</string>
          </property>
         </widget>
        </item>
@@ -67,7 +104,36 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="checkBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Nahradit název videa náhodnými znaky</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>10</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="5" column="1">
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -112,28 +178,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QPushButton" name="pushButton_9">
-         <property name="text">
-          <string>?</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>?</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <spacer name="horizontalSpacer_2">
+       <item row="2" column="1">
+        <spacer name="horizontalSpacer_6">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
@@ -148,47 +194,8 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="checkBox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Nahradit název videa náhodnými znaky</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="checkBox_4">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Zaznamenávat historii</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="checkBox_3">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>Automaticky kontrolovat novou verzi</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_2">
+       <item row="5" column="2">
+        <widget class="QPushButton" name="pushButton_3">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -200,10 +207,81 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="pushButton_10">
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Nastavit</string>
+          <string>Vyberte vámi nejčastěji stahovaný formát:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="comboBox">
+         <item>
+          <property name="text">
+           <string>1080p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>720p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>480p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>360p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>240p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>144p</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>320 kbps</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>256 kbps</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>192 kbps</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>128 kbps</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>96 kbps</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>64 kbps</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QPushButton" name="pushButton_13">
+         <property name="text">
+          <string>?</string>
          </property>
         </widget>
        </item>

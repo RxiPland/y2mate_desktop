@@ -294,8 +294,15 @@
     <addaction name="separator"/>
     <addaction name="actionSmazat_historii"/>
    </widget>
+   <widget class="QMenu" name="menuUpravit_video">
+    <property name="title">
+     <string>Úprava videa</string>
+    </property>
+    <addaction name="actionOtev_t_soubor"/>
+   </widget>
    <addaction name="menuInfo"/>
    <addaction name="menuHistorie"/>
+   <addaction name="menuUpravit_video"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actiony2mate_com">
@@ -478,6 +485,15 @@
    </property>
    <property name="text">
     <string>Délka:</string>
+   </property>
+  </action>
+  <action name="actionOtev_t_soubor">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/open_file.ico</normaloff>:/images/open_file.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Otevřít soubor</string>
    </property>
   </action>
  </widget>

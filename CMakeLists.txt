@@ -30,13 +30,13 @@ set(PROJECT_SOURCES
         settings_dialog.cpp
         ui_settings_dialog.h
 
-        edit_video.h
-        edit_video.cpp
-        ui_edit_video.h
+        editvideowindow.h
+        editvideowindow.cpp
+        ui_editvideowindow.h
 
         mainwindow.ui
-        edit_video.ui
         settings_dialog.ui
+        editvideowindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

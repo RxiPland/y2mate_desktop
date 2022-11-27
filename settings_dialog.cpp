@@ -11,6 +11,7 @@
 
 QString app_version_settings = "";  // aktuální verze programu (doplní se pomocí funkce set_version(); )
 QString last_location_path_settings = "/";
+QString video_quality = "";
 bool posledni_ulozene_nastaveni[5] = {};  // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool path_changed = false;  // pokud se nastaví nová cesta, bude true
 
@@ -25,7 +26,7 @@ settings_dialog::settings_dialog(QWidget *parent) :
     settings_dialog::load_settings();
     settings_dialog::settings_changed(false);  // vyresetuje výstražný label o neuložených změnách
 
-    ui->pushButton_6->setDefault(true);
+    ui->pushButton_4->setDefault(true);
 
     QFile ffmpeg_path("tools/ffmpeg.exe");
 
@@ -120,8 +121,8 @@ void settings_dialog::load_settings(){
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
         QString zaznamenavat_historii = rows_nastaveni[3];
-
         QString last_location = rows_nastaveni[4];
+        video_quality = rows_nastaveni[5].split(" /;/ ").back();
 
         if (rows_nastaveni[4].contains(" /;/ ")){
             QStringList last_location_row = rows_nastaveni[4].split(" /;/ ");
@@ -160,11 +161,16 @@ void settings_dialog::load_settings(){
             last_location = "1";
         }
 
+        if(video_quality == ""){
+            video_quality = "128 kbps";
+        }
+
         ui->checkBox->setChecked(hledat_nazev_videa.contains("1"));   // zapnutí nahradí název souboru hashem
         ui->checkBox_2->setChecked(nahradit_podtrzitkem.contains("1"));  // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         ui->checkBox_3->setChecked(check_update.contains("1"));   // zapnutí bude automaticky kontrolovat novou verzi při startu aplikace
         ui->checkBox_4->setChecked(zaznamenavat_historii.contains("1"));  // zapnutí bude zaznamenávat historii
         ui->checkBox_5->setChecked(last_location.contains("1"));  // zapnutí bude otevírat ukládací dialog v této cestě
+        ui->comboBox->setCurrentText(video_quality);
 
     } else{
         ui->checkBox->setChecked(false); // defaultní hodnota false
@@ -172,6 +178,7 @@ void settings_dialog::load_settings(){
         ui->checkBox_3->setChecked(true); // defaultní hodnota true
         ui->checkBox_4->setChecked(true); // defaultní hodnota true
         ui->checkBox_5->setChecked(true); // defaultní hodnota true
+        ui->comboBox->setCurrentText("128 kbps");
     }
 
     posledni_ulozene_nastaveni[0] = ui->checkBox->isChecked();
@@ -185,6 +192,15 @@ void settings_dialog::load_settings(){
 void settings_dialog::settings_changed(bool warning){
     // píše zda jsou neuložené změny
     // bool warning (zda se má text zbarvit dočervena)
+
+    QFile file_settings("nastaveni.txt");
+
+    if (!file_settings.exists() && video_quality == ""){
+
+        ui->label_2->setText("Soubor s nastavením neexistuje. Uložte nastavení pro vytvoření souboru.");
+        ui->label_2->setStyleSheet("QLabel { color : red; }");
+        return;
+    }
 
     bool aktualni_nastaveni[5] = {};
 
@@ -202,7 +218,13 @@ void settings_dialog::settings_changed(bool warning){
         }
     }
 
-    if ((warning && !hodnoty_jsou_stejne) || path_changed){
+    bool quality_changed = false;
+
+    if(video_quality != ui->comboBox->currentText()){
+        quality_changed = true;
+    }
+
+    if ((warning && !hodnoty_jsou_stejne) || path_changed || quality_changed){
         ui->label_2->setText("Nastavení není uloženo");
         ui->label_2->setStyleSheet("QLabel { color : red; }");
     } else{
@@ -225,6 +247,8 @@ void settings_dialog::on_pushButton_4_clicked(){
     aktualni_nastaveni[3] = ui->checkBox_4->isChecked();
     aktualni_nastaveni[4] = ui->checkBox_5->isChecked();
 
+    video_quality = ui->comboBox->currentText();
+
     QFile file_settings("nastaveni.txt");
 
     if(file_settings.exists()){
@@ -240,7 +264,7 @@ void settings_dialog::on_pushButton_4_clicked(){
         file_settings.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&file_settings);
 
-        int items_count = sizeof(aktualni_nastaveni);
+        int items_count = sizeof(aktualni_nastaveni)+1;  //+1 because of VIDEO_QUALITY, which is not in bool array
 
         // zapsání hodnot do nastaveni.txt
         for(int i=0; i < items_count; i++){
@@ -278,15 +302,15 @@ void settings_dialog::on_pushButton_4_clicked(){
                     out << "LAST_LOCATION 0" << " /;/ " << last_location_path_settings << "\n";
                 }
 
+            } else if(i==5){ // LAST_LOCATION se nachází na šestém řádku
+                if (video_quality != ""){
+                    out << "VIDEO_QUALITY 1" << " /;/ " << video_quality << "\n";
+                } else {
+                    out << "VIDEO_QUALITY 1" << " /;/ " << "128 kbps" << "\n";
+                }
+
             } else{
 
-                /*
-                if (i<items_count-1){
-                    out << rows_nastaveni[i] << "\n";
-                } else{
-                    out << rows_nastaveni[i];
-                }
-                */
                 if (rows_nastaveni[i] != "\n"){
                     out << rows_nastaveni[i] << "\n";
                 }
@@ -326,6 +350,12 @@ void settings_dialog::on_pushButton_4_clicked(){
         } else {
             out << "LAST_LOCATION 0" << " /;/ " << last_location_path_settings << "\n";
         }
+
+        if (video_quality != ""){
+            out << "VIDEO_QUALITY 1" << " /;/ " << video_quality << "\n";
+        } else {
+            out << "VIDEO_QUALITY 1" << " /;/ " << "128 kbps" << "\n";
+        }
     }
 
     file_settings.close();
@@ -346,6 +376,8 @@ void settings_dialog::on_pushButton_5_clicked()
     ui->checkBox_3->setChecked(true); // defaultní hodnota true
     ui->checkBox_4->setChecked(true); // defaultní hodnota true
     ui->checkBox_5->setChecked(true); // defaultní hodnota true
+
+    ui->comboBox->setCurrentText("128 kbps"); // defaultní kvalita je 128kbps
 
     QMessageBox::information(this, "Oznámení", "Bylo nastaveno defaultní nastavení, nezapomeňte uložit změny");
 
@@ -430,7 +462,7 @@ void settings_dialog::on_pushButton_8_clicked()
 void settings_dialog::on_pushButton_9_clicked()
 {
     // poslední lokace
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, dialog s ukládáním souboru se otevře do naposledy stahované lokace.\n\nPo zakázání lze nastavit vlastní (defaultní) lokaci.\n\nAktuální: " + last_location_path_settings);
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, dialog s ukládáním souboru se otevře do naposledy stahované lokace. Pro fungování musí existovat soubor s nastavením (vytvoří se při uložení)\n\nPo zakázání lze nastavit vlastní (defaultní) lokaci.\n\nAktuální: " + last_location_path_settings);
 
 }
 
@@ -514,5 +546,16 @@ void settings_dialog::on_pushButton_11_clicked()
         QMessageBox::information(this, "FFmpeg", "Chyba! Nepodařilo se vymazat FFmpeg.exe");
         ui->pushButton_11->setDisabled(false);
     }
+}
+
+void settings_dialog::on_pushButton_13_clicked()
+{
+    QMessageBox::information(this, "Nápověda", "Při zjišťování názvu videa je vyslán požadavek na y2mate.com s určitou kvalitou.\n\nVybráním nejčastěji stahované kvality lze proces stahování výrazně zrychlit, protože y2mate.com nemusí připravovat další soubor s jinou kvalitou, pokud se chystáte stáhnout totožnou kvalitu.");
+}
+
+
+void settings_dialog::on_comboBox_currentTextChanged(const QString &arg1)
+{
+    settings_dialog::settings_changed(true);
 }
 

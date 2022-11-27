@@ -70,6 +70,8 @@ private slots:
     void on_actionPou_t_4_triggered();
     void on_actionPou_t_5_triggered();
 
+    void on_actionOtev_t_soubor_triggered();
+
 private:
     Ui::MainWindow *ui;
     QNetworkAccessManager manager;

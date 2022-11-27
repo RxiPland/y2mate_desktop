@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settings_dialog.h"
-#include "edit_video.h"
+#include "editvideowindow.h"
 
 #include <string>
 #include <QMessageBox>
@@ -30,10 +30,12 @@ QString cesta_k_souboru = "/";  // úplná cesta k uloženému souboru
 QString video_duration = "";  // délka videa xx:xx:xx
 QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
+QString selected_video_quality = "128 kbps";
 
-QString app_version = "v1.8.0";  // actual version of app
+QString app_version = "v1.8.1";  // actual version of app
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool downloading_ffmpeg = false;
+bool downloading_ffmpeg_menubar = false;
 int window_parameters[2] = {0, 0};
 
 MainWindow::MainWindow(QWidget *parent)
@@ -81,6 +83,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusBar->addPermanentWidget(ui->label_4, 1);  // staženo mb z celkového počtu
     ui->statusBar->addPermanentWidget(ui->progressBar, 2);  // progress bar stahování
 
+    ui->label_4->clear();
+
     // načtení nastavení ze souboru
     MainWindow::load_settings();
 
@@ -105,7 +109,7 @@ void MainWindow::store_window_parameters(int left, int top){
 
 void MainWindow::center_window(){
 
-    move(window_parameters[0], window_parameters[1]);
+    this->move(window_parameters[0], window_parameters[1]);
 }
 
 QStringList MainWindow::history_soubor(QString operace="load", QString data_k_ulozeni=""){
@@ -423,7 +427,6 @@ void MainWindow::get_headers(QString location)
             nazev_souboru.replace("y2mate.com - ", "");      // remove watermarku from video name
             nazev_souboru.replace("  ", " ");   // remove double spaces
 
-
             QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
             QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
 
@@ -553,11 +556,16 @@ void MainWindow::httpFinished()
                     video_name_list.pop_back();
                     QString video_name = video_name_list.join(".");
 
-                    edit_video edit_dialog;
-                    edit_dialog.set_info(video_name + koncovka, video_duration, dir_path);
-                    edit_dialog.setModal(true);
+                    EditVideoWindow edit_window;
+                    edit_window.set_info(video_name + koncovka, video_duration, dir_path);
                     this->hide();
-                    edit_dialog.exec();
+                    edit_window.show();
+
+                    // wait until edit_window is closed
+                    while (!edit_window.isHidden())
+                    {
+                        qApp->processEvents();
+                    }
 
                     MainWindow::center_window();
                     this->show();
@@ -575,25 +583,36 @@ void MainWindow::httpFinished()
 
                 QMessageBox::about(this, "V pořádku", "FFmpeg byl úspěšně stažen. Nyní můžete začít upravovat videa.");
 
-                QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
+                if(!downloading_ffmpeg_menubar){
 
-                QStringList video_name_list = cesta_k_souboru.split("/").back().split(".");
-                video_name_list.pop_back();
-                QString video_name = video_name_list.join(".");
+                    QString koncovka = "." + (ui->comboBox->currentText()).split(" ")[0];
 
-                edit_video edit_dialog;
-                edit_dialog.set_info(video_name + koncovka, video_duration, dir_path);
-                edit_dialog.setModal(true);
-                this->hide();
-                edit_dialog.exec();
+                    QStringList video_name_list = cesta_k_souboru.split("/").back().split(".");
+                    video_name_list.pop_back();
+                    QString video_name = video_name_list.join(".");
 
-                MainWindow::center_window();
-                this->show();
+                    EditVideoWindow edit_window;
+                    edit_window.set_info(video_name + koncovka, video_duration, dir_path);
+                    this->hide();
+                    edit_window.show();
+
+                    // wait until edit_window is closed
+                    while (!edit_window.isHidden())
+                    {
+                        qApp->processEvents();
+                    }
+
+                    MainWindow::center_window();
+                    this->show();
+
+                } else {
+
+                    downloading_ffmpeg_menubar = false;
+                }
 
             } else{
 
                 QMessageBox::about(this, "Chyba", "ffmpeg.exe se nepodařilo stáhnout!\n\nMožné chyby:\n1) Internet není dostupný\n2) github.com není dostupný");
-
             }
         }
     }
@@ -771,6 +790,17 @@ void MainWindow::get_nazev(){
     // získat název videa
     // volá se funkce get_headers()
 
+    QString video_quality_post;
+
+    if(!(response_najit_formaty.contains(selected_video_quality) || response_najit_formaty.contains(selected_video_quality))){
+
+        QMessageBox::information(this, "Oznámení", "Nepovedlo se najít video s vámi přednastavenou kvalitou \"" + selected_video_quality + "\" a tudíž pro hledání názvu bude použita defaultní 128 kbps");
+        video_quality_post = "128 kbps";
+
+    } else{
+        video_quality_post = selected_video_quality;
+    }
+
     QList<QString> udaje;
     udaje = najit_data();
 
@@ -784,20 +814,38 @@ void MainWindow::get_nazev(){
         data.append("type=youtube");
         data.append("&");
         data.append("_id=");
-        data.append(_id.toLocal8Bit());
+        data.append(_id.toStdString());
         data.append("&");
         data.append("v_id=");
-        data.append(k_data_vid.toLocal8Bit());
+        data.append(k_data_vid.toStdString());
         data.append("&");
         data.append("ajax=1");
         data.append("&");
         data.append("token=");
         data.append("&");
-        data.append("ftype=mp3");
-        data.append("&");
-        data.append("fquality=128");
 
-        MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 3);     // post request na získání odkazu ke stažení
+        std::string quality_int;
+
+        if(video_quality_post.contains("kbps")){
+
+            quality_int = video_quality_post.replace(" kbps", "").toStdString();
+
+            data.append("ftype=mp3");
+            data.append("&");
+            data.append("fquality=" + quality_int);
+
+            MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
+
+        } else if(video_quality_post.back() == 'p'){
+
+            quality_int = video_quality_post.replace("p", "").toStdString();
+
+            data.append("ftype=mp4");
+            data.append("&");
+            data.append("fquality=" + quality_int);
+
+            MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
+        }
 
         QRegExp rx("href=\\\\\\\"(.+)\\\\\\\" rel=");
         int pos = rx.indexIn(response);
@@ -826,19 +874,17 @@ void MainWindow::on_pushButton_clicked(){
     QString text_tlacitka = ui->pushButton->text();
     yt_video_link = ui->lineEdit->text();
 
-    string video_url = yt_video_link.toLocal8Bit().constData();
-
-    ui->pushButton->setDisabled(true);
+    disable_widgets(true);
 
     if (text_tlacitka == "Najít"){
 
-        string prvky[] = {"http", "://", "youtu"};
+        QStringList prvky = {"http", "://", "youtu"};
         bool chyba_url = false;
 
         // kontrola správnosti url
         for (int i=0; i<3; i++){
 
-            if (video_url.find(prvky[i]) == string::npos) {
+            if (!yt_video_link.contains(prvky[i])) {
 
                 QMessageBox::critical(this, "Problém", "Zadejte kompletní URL adresu\n\nPříklady:\n1. https://www.youtube.com/watch?v=DMtFhACPnTY\n2. https://youtu.be/DMtFhACPnTY");
 
@@ -847,7 +893,7 @@ void MainWindow::on_pushButton_clicked(){
             }
         }
 
-        if (chyba_url != true){
+        if (chyba_url == false){
 
             // post request na získání informací o url
             // dostupné kvality u mp4/mp3, délka videa
@@ -857,7 +903,7 @@ void MainWindow::on_pushButton_clicked(){
             QByteArray data;
 
             data.append("url=");
-            data.append(video_url);
+            data.append(yt_video_link.toStdString());
             data.append("&");
             data.append("q_auto=1");
             data.append("&");
@@ -890,20 +936,6 @@ void MainWindow::on_pushButton_clicked(){
 
                     ui->label->setText("Délka videa: " + video_duration);
                 }
-
-                // získat název videa
-                get_nazev();
-
-                nazev_souboru.replace(".mp3", "");
-                nazev_souboru.replace(".mp4", "");
-                nazev_souboru.replace(".webm", "");
-                ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
-
-                // získat náhodný hash
-                QList<QString> udaje;
-                udaje = najit_data();
-                nazev_souboru_hash = udaje[0];    // např. "62fd01c3f1a87588248b45ba"
-
 
                 ui->pushButton->setText("Stáhnout");    // změna najít na stáhnout
                 ui->horizontalSpacer->changeSize(20, 35);   // tlačítko "stáhnout" se vyrovná s boxem s kvalitou
@@ -943,11 +975,25 @@ void MainWindow::on_pushButton_clicked(){
                     }
                 }
 
+                // získat název videa
+                get_nazev();
+
+                nazev_souboru.replace(".mp3", "");
+                nazev_souboru.replace(".mp4", "");
+                nazev_souboru.replace(".webm", "");
+                ui->label_2->setText("Název videa: " + nazev_souboru);    // název videa do labelu
+
+                // získat náhodný hash
+                QList<QString> udaje;
+                udaje = najit_data();
+                nazev_souboru_hash = udaje[0];    // např. "62fd01c3f1a87588248b45ba"
+
+
                 // save searched video to history
                 if (hodnoty_nastaveni[3]){
                     MainWindow::history_soubor("save", nazev_souboru + " /;/ " + video_duration + " /;/ " + yt_video_link);
                     MainWindow::load_history();
-                 }
+                }
 
             } else{
                 QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
@@ -1006,7 +1052,7 @@ void MainWindow::on_pushButton_clicked(){
 
                     QStringList splitted_kvalita = text_kvalita.split(" ");
 
-                    data.append(splitted_kvalita[0].toLocal8Bit());
+                    data.append(splitted_kvalita[0].toStdString());
 
                     MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
 
@@ -1115,7 +1161,7 @@ void MainWindow::on_pushButton_clicked(){
 
                     QStringList splitted_kvalita = text_kvalita.split("p");
 
-                    data.append(splitted_kvalita[0].toLocal8Bit());
+                    data.append(splitted_kvalita[0].toStdString());
 
                     MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
 
@@ -1249,8 +1295,9 @@ void MainWindow::load_settings(){
         QString nahradit_podtrzitkem = rows_nastaveni[1];
         QString check_update = rows_nastaveni[2];
         QString zaznamenavat_historii = rows_nastaveni[3];
-
         QString last_location = rows_nastaveni[4];
+        selected_video_quality = rows_nastaveni[5].split(" /;/ ").back();
+
 
         if (rows_nastaveni[4].contains(" /;/ ")){
             QStringList last_location_row = rows_nastaveni[4].split(" /;/ ");
@@ -1289,6 +1336,10 @@ void MainWindow::load_settings(){
             last_location = "1";
         }
 
+        if(selected_video_quality == ""){
+            selected_video_quality = "128 kbps";
+        }
+
         hodnoty_nastaveni[0] = hledat_nazev_videa.contains("1");  // zapnutí nahradí název souboru hashem
         hodnoty_nastaveni[1] = nahradit_podtrzitkem.contains("1");   // zapnutí nahrazuje mezery podtržítkama v názvu souboru při ukládání
         hodnoty_nastaveni[2] = check_update.contains("1");   // zapnutí bude automaticky kontrolovat novou verzi při startu
@@ -1312,6 +1363,8 @@ void MainWindow::disable_widgets(bool vypnout){
     ui->pushButton->setDisabled(vypnout);
     ui->pushButton_2->setDisabled(vypnout);
 
+    ui->lineEdit->setDisabled(vypnout);
+
     ui->comboBox->setDisabled(vypnout);
     ui->comboBox_2->setDisabled(vypnout);
 
@@ -1320,6 +1373,8 @@ void MainWindow::disable_widgets(bool vypnout){
     ui->actionPou_t_3->setDisabled(vypnout);
     ui->actionPou_t_4->setDisabled(vypnout);
     ui->actionPou_t_5->setDisabled(vypnout);
+
+    ui->actionOtev_t_soubor->setDisabled(vypnout);
 }
 
 void MainWindow::open_yt_video(int row_order){
@@ -1402,6 +1457,8 @@ void MainWindow::downloadProgress(qint64 ist, qint64 max)
     if(max == ist){
         ui->label_3->setHidden(true);
         ui->label_4->setHidden(true);
+        ui->label_3->clear();
+        ui->label_4->clear();
         ui->progressBar->setHidden(true);
         ui->progressBar->setValue(0);
     }
@@ -1562,3 +1619,166 @@ void MainWindow::on_actionPou_t_5_triggered()
 {
     MainWindow::apply_yt_video(4);
 }
+
+void MainWindow::on_actionOtev_t_soubor_triggered()
+{
+
+    QFile file_settings("tools/ffmpeg.exe");
+
+    if (!file_settings.exists()){
+        // ffmpeg doesn't exist
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("ffmpeg");
+        msgBox.setText("Nepodařilo se najít FFmpeg!\nKliknutím na stáhnout se automaticky vloží do složky s programem");
+        QAbstractButton* pButtonDownload = msgBox.addButton("Stáhnout", QMessageBox::YesRole);
+        msgBox.addButton("Zrušit úpravu videa", QMessageBox::NoRole);
+        msgBox.exec();
+
+
+        if (msgBox.clickedButton() == pButtonDownload) {
+            // download ffmpeg to tools/ffmpeg.exe
+
+            MainWindow::disable_widgets(true);
+
+            ui->progressBar->setHidden(false);
+
+            ui->label_3->setHidden(false);
+            ui->label_4->setHidden(false);
+            ui->label_3->setText("Stahuji ffmpeg.exe");
+
+
+            std::system("mkdir tools");
+
+            file = openFileForWrite("tools/ffmpeg.exe");
+            if (!file){
+                QMessageBox::critical(this, "Problém", "Nastal problém při vytváření souboru.\n\n" + cesta_k_souboru);
+                return;
+            }
+
+            QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
+            request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+
+            reply.reset();
+            reply.reset(manager.get(request));
+
+            downloading_ffmpeg = true;
+            downloading_ffmpeg_menubar = true;
+
+            connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
+            connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
+            connect(reply.get(), &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+
+            while(downloading_ffmpeg){
+                qApp->processEvents();
+            }
+
+            downloading_ffmpeg_menubar = false;
+
+            MainWindow::disable_widgets(false);
+            return;
+        }
+
+    } else{
+
+        std::wstring command;
+
+        QString temp_cesta_k_souboru = QFileDialog::getOpenFileName(this, "Otevřít soubor", last_location_path, "Soubory (*.mp4 *.mp3 *.wav *.ogg)");
+
+        if (temp_cesta_k_souboru != ""){
+
+            if(!temp_cesta_k_souboru.contains(".")){
+
+                QMessageBox::warning(this, "Nastala chyba", "Vyberte soubor s koncovkou!");
+                return;
+            }
+
+            QStringList list_dir_path = temp_cesta_k_souboru.split("/");
+            list_dir_path.pop_back();
+            QString dir_path = list_dir_path.join("\\") + "\\";
+
+            MainWindow::disable_widgets(true);
+
+            QString koncovka;
+            koncovka = "." + temp_cesta_k_souboru.split(".").back();
+
+            QStringList video_name_list = temp_cesta_k_souboru.split("/").back().split(".");
+            video_name_list.pop_back();
+            QString video_name = video_name_list.join(".");
+
+            // get duration
+            command = ("/C ffmpeg.exe -i \"" + temp_cesta_k_souboru + "\" > ffmpeg_output_temp.txt 2>&1").toStdWString();
+
+            SHELLEXECUTEINFO ShExecInfo = {0};
+            ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+            ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+            ShExecInfo.hwnd = NULL;
+            ShExecInfo.lpVerb = L"open";
+            ShExecInfo.lpFile = L"cmd.exe";
+            ShExecInfo.lpParameters = command.c_str();
+            ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+            ShExecInfo.nShow = SW_HIDE;
+            ShExecInfo.hInstApp = NULL;
+
+            ShellExecuteEx(&ShExecInfo);
+            WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+            CloseHandle(ShExecInfo.hProcess);
+
+            QFile output_file("tools/ffmpeg_output_temp.txt");
+            QString video_duration_file;
+
+            if (output_file.exists()){
+                output_file.open(QIODevice::ReadOnly);
+
+                QByteArray obsah_byte = output_file.readAll();
+                output_file.close();
+
+                QString obsah = QTextCodec::codecForMib(106)->toUnicode(obsah_byte);
+
+                QRegExp rx("Duration: (..:..:..)");
+                int pos = rx.indexIn(obsah);
+                int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
+
+                if (pozice > -1) {
+                    video_duration_file = rx.cap(1); // xx:xx:xx time
+
+                } else{
+                    QMessageBox::warning(this, "Nastala chyba", "FFmpeg.exe nebyl schopen najít délku videa!\n\nUjistěte se, že se jedná o zvukový/video soubor, nebo zda nebyl poškozen!\n\nNebo zkuste odstranit FFmpeg.exe v nastavení.");
+                    MainWindow::disable_widgets(false);
+
+                    return;
+                }
+
+            }else{
+                // not exists
+                QMessageBox::warning(this, "Nastala chyba", "ffmpeg_output_temp.txt nebyl nalezen!");
+                MainWindow::disable_widgets(false);
+
+                return;
+            }
+
+            // delete temp output file
+            command = L"/C del \"ffmpeg_output_temp.txt\"";
+            ShellExecute(0, L"open", L"cmd.exe", command.c_str(), (QDir::currentPath()+ "/tools").toStdWString().c_str(), SW_HIDE);
+
+
+            // open editvideo window
+            EditVideoWindow edit_window;
+            edit_window.set_info(video_name + koncovka, video_duration_file, dir_path);
+            this->hide();
+            edit_window.show();
+            QMessageBox::information(this, "Oznámení", "Původní soubory budou po konverzi nenávratně přepsány! (lze dočasně vypnout v možnostech)");
+
+            // wait until edit_window is closed
+            while (!edit_window.isHidden())
+            {
+                qApp->processEvents();
+            }
+
+            MainWindow::disable_widgets(false);
+            MainWindow::center_window();
+            this->show();
+        }
+    }
+}
+
