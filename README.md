@@ -27,13 +27,13 @@
 - [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/y2mate.zip) (win64) ```md5: fe40fe29995fdbe2458a86a970f19197```
 
 # Náhled
-![1](https://user-images.githubusercontent.com/82058894/198419676-acdc73e0-9a34-467e-b4d2-7be3fc5de40e.png)
+![1](https://user-images.githubusercontent.com/82058894/204152592-f25fbae1-a79a-48af-96fa-79e3bd0e8a24.png)
 ##
-![2](https://user-images.githubusercontent.com/82058894/198419690-752736d8-5b31-4596-bab3-70f91ecbdd07.png)
+![2](https://user-images.githubusercontent.com/82058894/204152598-60c0d116-b849-42d8-a469-3ae018f6c3b8.png)
 ##
-![3](https://user-images.githubusercontent.com/82058894/202700249-bad83c53-10bc-493c-b9b2-fb33771e2cbc.png)
+![3](https://user-images.githubusercontent.com/82058894/204152600-84f66721-0a96-40a1-8405-3c0c4021cf37.png)
 ##
-![4](https://user-images.githubusercontent.com/82058894/202700294-26342c9d-8dd7-42e1-9753-0335c01d0b9e.png)
+![4](https://user-images.githubusercontent.com/82058894/204152607-2d485d01-b905-4cea-ba9d-3cfb4ee1ec6a.png)
 
 # Poznámky
 
@@ -41,5 +41,4 @@
 - Verze knihovny: QT6
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
-- Pokud se soubor stáhne jako .webm, je chyba pouze v pojmenování, nikoliv formátu
 - FFmpeg.exe je stahován z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/tools/ffmpeg.exe)
