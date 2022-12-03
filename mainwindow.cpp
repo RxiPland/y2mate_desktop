@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "settings_dialog.h"
 #include "editvideowindow.h"
+#include "sleepthread.h"
 
 #include <string>
 #include <QMessageBox>
@@ -17,6 +18,7 @@
 #include <QTextCodec>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <qthread.h>
 
 using namespace std;
 
@@ -32,7 +34,7 @@ QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
-QString app_version = "v1.8.1";  // actual version of app
+QString app_version = "v1.8.2";  // actual version of app
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool downloading_ffmpeg = false;
 bool downloading_ffmpeg_menubar = false;
@@ -46,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Problém | y2mate desktop - by RxiPland");
-        msgBox.setText("Verze OpenSSL není platná!<br>Bez ní program nemůže přistupovat na zabezpečené weby s protokolem HTTPs<br><br>Nainstalování verze \"" + QSslSocket::sslLibraryBuildVersionString() + "\" nebo velmi podobné problém opraví<br>Odkaz na stažení: <a href=\"https://www.filehorse.com/download-openssl-64\">https://www.filehorse.com/download-openssl-64</a><br><br>Před stažením je důležité označit správnou verzi!<br>Vaše aktuální nainstalovaná verze: \"" + QSslSocket::sslLibraryVersionString() + "\"");
+        msgBox.setText("Verze OpenSSL není platná!<br>Bez ní program nemůže přistupovat na zabezpečené weby s protokolem HTTPs<br><br>Nainstalování verze \"" + QSslSocket::sslLibraryBuildVersionString() + "\", nebo velmi podobné, problém opraví<br>Odkaz na stažení: <a href=\"https://www.filehorse.com/download-openssl-64\">https://www.filehorse.com/download-openssl-64</a><br><br>Před stažením je důležité označit správnou verzi!<br>Vaše aktuální nainstalovaná verze: \"" + QSslSocket::sslLibraryVersionString() + "\"");
         QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
         msgBox.addButton("Odejít", QMessageBox::NoRole);
         msgBox.exec();
@@ -401,7 +403,8 @@ void MainWindow::get_headers(QString location)
     // najde název souboru z headru a zapíše ho do globální proměnné
     // parametr location je URL k souboru na y2mate
 
-    QNetworkRequest request = QNetworkRequest(QUrl(location));
+    QNetworkRequest request;
+    request.setUrl(QUrl(location));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
     QNetworkReply *reply_headers = manager.head(request);
@@ -409,6 +412,18 @@ void MainWindow::get_headers(QString location)
     while (!reply_headers->isFinished())
     {
         qApp->processEvents();
+    }
+
+    // url is not working -> replace https with http
+    if (reply_headers->error() != QNetworkReply::NoError){
+
+        request.setUrl(QUrl(location.replace("https", "http")));
+        reply_headers = manager.head(request);
+
+        while (!reply_headers->isFinished())
+        {
+            qApp->processEvents();
+        }
     }
 
     QString header = reply_headers->header(QNetworkRequest::ContentDispositionHeader).toString();
@@ -647,6 +662,47 @@ std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
     return file;
 }
 
+QString MainWindow::strip(QString string_a){
+
+    // remove whitespaces at beggining & at end
+
+    int i;
+    QString temp_string;
+    QString final_string;
+
+    bool whitespace_lock = false;
+
+    // from beggining
+    for(i=0; i<string_a.length(); i++){
+
+        if(string_a[i] != ' ' && !whitespace_lock){
+            whitespace_lock = true;
+            temp_string.append(string_a[i]);
+
+        } else if(whitespace_lock){
+            temp_string.append(string_a[i]);
+        }
+    }
+
+    whitespace_lock = false;
+
+    // from end
+    for(i=temp_string.length()-1; i>=0; i--){
+
+        if(temp_string[i] != ' ' && !whitespace_lock){
+            whitespace_lock = true;
+            final_string.append(temp_string[i]);
+
+        } else if(whitespace_lock){
+            final_string.append(temp_string[i]);
+        }
+    }
+
+    std::reverse(final_string.begin(), final_string.end());
+
+    return final_string;
+}
+
 void MainWindow::get(QString url, QString koncovka)
 {
     // GET
@@ -698,8 +754,23 @@ void MainWindow::get(QString url, QString koncovka)
             return;
         }
 
-        QNetworkRequest request = QNetworkRequest(QUrl(url));
-        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+        QNetworkRequest request;
+        request.setUrl(QUrl(url));
+        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");    
+
+        // check if url is working
+        QNetworkReply *reply_headers = manager.head(request);
+
+        while (!reply_headers->isFinished())
+        {
+            qApp->processEvents();
+        }
+
+        // url is not working -> replace https with http
+        if(reply_headers->error() != QNetworkReply::NoError){
+
+            request.setUrl(QUrl(url.replace("https", "http")));
+        }
 
         reply.reset();
         reply.reset(manager.get(request));
@@ -707,8 +778,8 @@ void MainWindow::get(QString url, QString koncovka)
         connect(reply.get(), &QNetworkReply::finished, this, &MainWindow::httpFinished);
         connect(reply.get(), &QIODevice::readyRead, this, &MainWindow::httpReadyRead);
         connect(reply.get(), &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
-    } else {
 
+    } else {
         disable_widgets(false);
     }
 }
@@ -717,14 +788,28 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 {
     // POST
 
-    QNetworkRequest request = QNetworkRequest(QUrl(location));
+    QNetworkRequest request;
+    request.setUrl(QUrl(location));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
 
-    QNetworkReply *reply_post = manager.post(request, data);
+    // check if url is working
+    QNetworkReply *reply_headers = manager.head(request);
 
-    ui->progressBar->setHidden(false);
-    ui->label_3->setHidden(false);
+    while (!reply_headers->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    // url is not working -> replace https with http
+    if(reply_headers->error() != QNetworkReply::NoError){
+
+        request.setUrl(QUrl(location.replace("https", "http")));
+    }
+    reply_headers->reset();
+    reply_headers->deleteLater();
+
+    QNetworkReply *reply_post = manager.post(request, data);
 
     if (druh_promenne == 1){
         ui->label_3->setText("Hledám dostupné formáty");
@@ -734,9 +819,19 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
 
     } else if (druh_promenne == 3){
         ui->label_3->setText("Získávám název videa");
+
+    } else if (druh_promenne == 4){
+        ui->label_3->setText("Čekám na y2mate [10s]");
+    }
+
+    ui->label_3->setHidden(false);
+
+    if (druh_promenne != 4){
+        ui->progressBar->setHidden(false);
     }
 
     connect(reply_post, &QNetworkReply::downloadProgress,this, &MainWindow::downloadProgress);
+
 
     while (!reply_post->isFinished())
     {
@@ -748,13 +843,26 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
     if (druh_promenne == 1){
         response_najit_formaty = response_data;
 
-    } else if (druh_promenne == 2 || druh_promenne == 3){
+    } else if (druh_promenne == 2 || druh_promenne == 3 || druh_promenne == 4){
 
         response = response_data;
     }
 
     reply_post->reset();
     reply_post->deleteLater();
+}
+
+bool MainWindow::checkdone_y2mate(QString url, QByteArray post_data){
+    // when y2mate returns: it may take a few minutes
+
+    MainWindow::post(url, post_data, 4);
+
+    if(response.contains("it may take a few minutes")){
+        return true;
+
+    } else{
+        return false;
+    }
 }
 
 QList<QString> najit_data(){
@@ -786,9 +894,10 @@ QList<QString> najit_data(){
     return udaje; // [_id, video_id]
 }
 
-void MainWindow::get_nazev(){
-    // získat název videa
-    // volá se funkce get_headers()
+bool MainWindow::get_nazev(){
+    // get video name
+    // using function get_headers()
+    // return true, if y2mate response is: it may take a few minutes
 
     QString video_quality_post;
 
@@ -814,10 +923,10 @@ void MainWindow::get_nazev(){
         data.append("type=youtube");
         data.append("&");
         data.append("_id=");
-        data.append(_id.toStdString());
+        data.append(QUrl::toPercentEncoding(_id).toStdString());
         data.append("&");
         data.append("v_id=");
-        data.append(k_data_vid.toStdString());
+        data.append(QUrl::toPercentEncoding(k_data_vid).toStdString());
         data.append("&");
         data.append("ajax=1");
         data.append("&");
@@ -845,27 +954,47 @@ void MainWindow::get_nazev(){
             data.append("fquality=" + quality_int);
 
             MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
+
+        } else{
+            QMessageBox::warning(this, "Chyba", "video_quality_post není \'p\' ani \'kbps\' !");
+            return false;
         }
 
         QRegExp rx("href=\\\\\\\"(.+)\\\\\\\" rel=");
         int pos = rx.indexIn(response);
         int pozice = pos;   // nebude fungovat pokud se proměnná pos nevyužije
 
-        QString odkaz_na_stazeni = "error";
+        if (response.contains("it may take a few minutes")){
 
+            ui->label_3->setText("Čekám na y2mate [10s]");
+            ui->label_3->setHidden(false);
+            return true;
+        }
+
+        QString odkaz_na_stazeni = "error";
         if (pozice > -1) {
             odkaz_na_stazeni = rx.cap(1); // download link (https://)
         }
+
 
         if (odkaz_na_stazeni != "error"){
 
             odkaz_na_stazeni.replace("\\", "");
             get_headers(odkaz_na_stazeni);
+
+            if (nazev_souboru == ""){
+                QMessageBox::critical(this, "Chyba", "Název se napoprvé nepodařilo získat. Program to zkusí znovu.");
+                get_headers(odkaz_na_stazeni);
+            }
         }
 
     } else {
-        nazev_souboru = "[Nepodařilo se najít]";
+        nazev_souboru = "[Název nenalezen]";
     }
+
+    nazev_souboru = MainWindow::strip(nazev_souboru);  // remove whitespaces from both sides of string
+
+    return false;
 }
 
 void MainWindow::on_pushButton_clicked(){
@@ -903,13 +1032,14 @@ void MainWindow::on_pushButton_clicked(){
             QByteArray data;
 
             data.append("url=");
-            data.append(yt_video_link.toStdString());
+            data.append(QUrl::toPercentEncoding(yt_video_link).toStdString());
             data.append("&");
             data.append("q_auto=1");
             data.append("&");
             data.append("ajax=1");
 
             MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data, 1);     // post request na získání informací o videu
+
 
             if (response_najit_formaty == "error"){
 
@@ -976,7 +1106,17 @@ void MainWindow::on_pushButton_clicked(){
                 }
 
                 // získat název videa
-                get_nazev();
+                while(MainWindow::get_nazev()){
+
+                    SleepThread sleep_thread;
+                    sleep_thread.sleep_time = 10;
+                    sleep_thread.start();
+
+                    while(sleep_thread.isRunning()){
+
+                        qApp->processEvents();
+                    }
+                }
 
                 nazev_souboru.replace(".mp3", "");
                 nazev_souboru.replace(".mp4", "");
@@ -996,7 +1136,10 @@ void MainWindow::on_pushButton_clicked(){
                 }
 
             } else{
-                QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolutje připojení k síti");
+
+                qInfo() << response_najit_formaty;
+
+                QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolujte připojení k síti");
                 ui->lineEdit->setClearButtonEnabled(true);
             }
         }
@@ -1037,10 +1180,10 @@ void MainWindow::on_pushButton_clicked(){
                     data.append("type=youtube");
                     data.append("&");
                     data.append("_id=");
-                    data.append(_id.toLocal8Bit());
+                    data.append(QUrl::toPercentEncoding(_id).toStdString());
                     data.append("&");
                     data.append("v_id=");
-                    data.append(k_data_vid.toLocal8Bit());
+                    data.append(QUrl::toPercentEncoding(k_data_vid).toStdString());
                     data.append("&");
                     data.append("ajax=1");
                     data.append("&");
@@ -1051,22 +1194,40 @@ void MainWindow::on_pushButton_clicked(){
                     data.append("fquality=");
 
                     QStringList splitted_kvalita = text_kvalita.split(" ");
-
                     data.append(splitted_kvalita[0].toStdString());
 
                     MainWindow::post("https://www.y2mate.com/mates/mp3Convert", data, 2);     // post request na získání odkazu ke stažení
 
+                    bool error = false;
+
                     if (response == "error"){
                         QMessageBox::critical(this, "Chyba", "[kód 3] Problém v post requestu!");
+                        error = true;
 
-                    }
-                    // negace
-                    else if (!response.contains("Download")) {
+                    } else if(response.contains("it may take a few minutes")){
+                        // y2mate response: it may take a few minutes
+
+                        while(MainWindow::checkdone_y2mate("https://www.y2mate.com/mates/mp3Convert", data)){
+
+                            SleepThread sleep_thread;
+                            sleep_thread.sleep_time = 10;
+                            sleep_thread.start();
+
+                            while(sleep_thread.isRunning()){
+
+                                qApp->processEvents();
+                            }
+                        }
+
+                    } else if (!response.contains("Download")) {
+                        // negace
 
                         QMessageBox::critical(this, "Chyba", "[kód 4] Nepovedlo se stáhnout mp3, zkuste to znovu");
-
+                        error = true;
                     }
-                    else if (response != ""){
+
+
+                    if (response.contains("Download") && !error){
 
                         QString odkaz_na_stazeni = "error";
 
@@ -1082,8 +1243,6 @@ void MainWindow::on_pushButton_clicked(){
                         if (odkaz_na_stazeni != "error"){
 
                             odkaz_na_stazeni.replace("\\", "");
-
-                            //ShellExecuteA(0, 0, stazeni_url.c_str(), 0, 0, SW_HIDE);
                             MainWindow::get(odkaz_na_stazeni, "Zvukový soubor (*.mp3)");
 
                             return;
@@ -1097,9 +1256,9 @@ void MainWindow::on_pushButton_clicked(){
                                     ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                             }
                         }
-
                     }
-                }else if(_id == "error"){
+
+                } else if(_id == "error"){
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 6] Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1109,7 +1268,7 @@ void MainWindow::on_pushButton_clicked(){
                     }
 
 
-                }else if(k_data_vid == "error"){
+                } else if(k_data_vid == "error"){
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 7] Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1117,8 +1276,8 @@ void MainWindow::on_pushButton_clicked(){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                     }
-                }
-                else{
+
+                } else{
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 8] Nastala neznámá chyba (stahování zvuku)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1146,10 +1305,10 @@ void MainWindow::on_pushButton_clicked(){
                     data.append("type=youtube");
                     data.append("&");
                     data.append("_id=");
-                    data.append(_id.toLocal8Bit());
+                    data.append(QUrl::toPercentEncoding(_id).toStdString());
                     data.append("&");
                     data.append("v_id=");
-                    data.append(k_data_vid.toLocal8Bit());
+                    data.append(QUrl::toPercentEncoding(k_data_vid).toStdString());
                     data.append("&");
                     data.append("ajax=1");
                     data.append("&");
@@ -1160,29 +1319,46 @@ void MainWindow::on_pushButton_clicked(){
                     data.append("fquality=");
 
                     QStringList splitted_kvalita = text_kvalita.split("p");
-
                     data.append(splitted_kvalita[0].toStdString());
 
                     MainWindow::post("https://www.y2mate.com/mates/convert", data, 2);     // post request na získání odkazu ke stažení
 
+                    bool error = false;
+
                     if (response == "error"){
                         QMessageBox::critical(this, "Chyba", "[kód 9] Problém v post requestu!");
+                        error = true;
 
-                    }
-                    else if (response.contains("Refresh to try again")){
+                    } else if(response.contains("it may take a few minutes")){
+                        // y2mate response: it may take a few minutes
+
+                        while(MainWindow::checkdone_y2mate("https://www.y2mate.com/mates/convert", data)){
+
+                            SleepThread sleep_thread;
+                            sleep_thread.sleep_time = 10;
+                            sleep_thread.start();
+
+                            while(sleep_thread.isRunning()){
+
+                                qApp->processEvents();
+                            }
+                        }
+
+                    } else if (response.contains("Refresh to try again")){
 
                         QMessageBox::critical(this, "Chyba", "[kód 10] Nepovedlo se stáhnout mp4, zkuste to zachvíli.");
+                        error = true;
 
-                    }
-                    else if (!response.contains("Download")){
+                    } else if (!response.contains("Download")){
 
                         QMessageBox::critical(this, "Chyba", "[kód 11] Nepovedlo se stáhnout mp4");
-
+                        error = true;
                     }
-                    else if (response != ""){
+
+
+                    if (response.contains("Download") && !error){
 
                         QString odkaz_na_stazeni = "error";
-
 
                         QRegExp rx("href=\\\\\\\"(.+)\\\\\\\" rel=");
                         int pos = rx.indexIn(response);
@@ -1208,7 +1384,8 @@ void MainWindow::on_pushButton_clicked(){
                             }
                         }
                     }
-                }else if(_id == "error"){
+
+                } else if(_id == "error"){
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 12] Problém!\n_id se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1217,8 +1394,7 @@ void MainWindow::on_pushButton_clicked(){
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                     }
 
-
-                }else if(k_data_vid == "error"){
+                } else if(k_data_vid == "error"){
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 13] Problém!\nk_data_vid se nepodařilo získat\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1226,9 +1402,8 @@ void MainWindow::on_pushButton_clicked(){
                             QString odkaz = "https://www.y2mate.com/youtube-mp3/" + k_data_vid;
                             ShellExecute(0, 0, odkaz.toStdWString().c_str(), 0, 0, SW_HIDE);
                     }
-                }
 
-                else{
+                } else{
 
                     QMessageBox::StandardButton reply_box = QMessageBox::critical(this, "Chyba", "[kód 14] Nastala neznámá chyba (stahování videa)\n\nChcete otevřít y2mate v prohlížeči?", QMessageBox::Yes | QMessageBox::No);
 
@@ -1278,7 +1453,7 @@ void MainWindow::on_pushButton_2_clicked()
 }
 
 void MainWindow::load_settings(){
-    // načtení hodnoty nastavení do hodnoty_nastaveni[]
+    // načtení hodnot nastavení do hodnoty_nastaveni[]
 
     QFile file("nastaveni.txt");
 

@@ -46,8 +46,10 @@ private slots:
     void httpFinished();
     void httpReadyRead();
     void get_headers(QString location);
-    void get_nazev();
+    bool get_nazev();
     void downloadProgress(qint64 ist, qint64 max);
+    bool checkdone_y2mate(QString url, QByteArray post_data);
+    QString strip(QString string_a);
 
     QStringList history_soubor(QString operace, QString data_k_ulozeni);
     void load_history();
