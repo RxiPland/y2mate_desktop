@@ -13,6 +13,7 @@
   - y2mate watermark
   - bitrate (kvalitu)
   - dvojité mezery
+  - mezery na začátku a konci
 - Možnost upravit videu čas začátku a konce ([FFmpeg](https://ffmpeg.org/))
 - Možnost konverze do .OGG nebo i .WAV
 - Aplikace je kompletně v češtině
