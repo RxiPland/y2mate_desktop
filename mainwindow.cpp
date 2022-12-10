@@ -437,8 +437,9 @@ void MainWindow::get_headers(QString location)
             nazev_souboru = rx.cap(1); // "y2mate.com%20-%20LAmour%20Toujours%20Hardstyle.mp3"
             nazev_souboru = QUrl::fromPercentEncoding(nazev_souboru.toUtf8());
 
-            nazev_souboru.replace("y2mate.com - ", "");      // remove watermarku from video name
+            nazev_souboru.replace("y2mate.com - ", "");      // remove watermark from video name
             nazev_souboru.replace("  ", " ");   // remove double spaces
+            nazev_souboru = nazev_souboru.trimmed();  // remove whitespaces from start and end
 
             QString formaty_mp4[] = {"1080p", "720p", "480p", "360p", "240p", "144p"};
             QString formaty_mp3[] = {"320kbps", "256kbps", "192kbps", "128kbps", "96kbps", "64kbps"};
@@ -962,7 +963,9 @@ bool MainWindow::get_nazev(){
     }
 
 
-    nazev_souboru = nazev_souboru.trimmed();  // remove whitespaces from start and end
+    if(nazev_souboru == "[Název nenalezen]"){
+        QMessageBox::critical(this, "Chyba", "Název se nepodařilo získat. Zkuste to znovu.");
+    }
 
     return false;
 }

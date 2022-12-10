@@ -161,11 +161,11 @@ void EditVideoWindow::on_pushButton_3_clicked()
     } else if(!ui->actionVymazat_p_vodn_soubor->isChecked() && !(name_changed || filetype_changed)){
         // the file is not to be deleted, but filetype or name is the same
 
-        QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, musíte nový přejmenovat nebo změnit koncovku!");
+        QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, musí mít nový jiné jméno nebo koncovku!");
         EditVideoWindow::disable_widgets(false);
         return;
 
-    } else if(new_file.exists()){
+    } else if(new_file.exists() && !ui->actionVymazat_p_vodn_soubor->isChecked()){
         // file with this new name already exists
 
         QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
