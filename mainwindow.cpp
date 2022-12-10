@@ -2,9 +2,8 @@
 #include "ui_mainwindow.h"
 #include "settings_dialog.h"
 #include "editvideowindow.h"
-#include "sleepthread.h"
+#include "threadfunctions.h"
 
-#include <string>
 #include <QMessageBox>
 #include <stdio.h>
 #include <QDebug>
@@ -18,7 +17,6 @@
 #include <QTextCodec>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <qthread.h>
 
 using namespace std;
 
@@ -34,7 +32,7 @@ QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
-QString app_version = "v1.8.2";  // actual version of app
+QString app_version = "v1.8.3";  // actual version of app
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool downloading_ffmpeg = false;
 bool downloading_ffmpeg_menubar = false;
@@ -475,14 +473,6 @@ void MainWindow::httpFinished()
     QFileInfo fi;
     if (file){
 
-        // save "downloaded" video to history
-        /*
-        if (hodnoty_nastaveni[3]){
-            MainWindow::history_soubor("save", nazev_souboru + " /;/ " + video_duration + " /;/ " + yt_video_link);
-            MainWindow::load_history();
-        }
-        */
-
         fi.setFile(file->fileName());
         file->close();
         file->deleteLater();
@@ -540,7 +530,8 @@ void MainWindow::httpFinished()
                         ui->label_3->setText("Stahuji ffmpeg.exe");
 
 
-                        std::system("mkdir tools");
+                        // create directory tools
+                        ShellExecute(0, L"open", L"cmd.exe", L"/C mkdir tools", QDir::currentPath().toStdWString().c_str(), SW_HIDE);
 
                         file = openFileForWrite("tools/ffmpeg.exe");
                         if (!file){
@@ -660,47 +651,6 @@ std::unique_ptr<QFile> MainWindow::openFileForWrite(const QString &fileName)
     file->open(QIODevice::WriteOnly);
 
     return file;
-}
-
-QString MainWindow::strip(QString string_a){
-
-    // remove whitespaces at beggining & at end
-
-    int i;
-    QString temp_string;
-    QString final_string;
-
-    bool whitespace_lock = false;
-
-    // from beggining
-    for(i=0; i<string_a.length(); i++){
-
-        if(string_a[i] != ' ' && !whitespace_lock){
-            whitespace_lock = true;
-            temp_string.append(string_a[i]);
-
-        } else if(whitespace_lock){
-            temp_string.append(string_a[i]);
-        }
-    }
-
-    whitespace_lock = false;
-
-    // from end
-    for(i=temp_string.length()-1; i>=0; i--){
-
-        if(temp_string[i] != ' ' && !whitespace_lock){
-            whitespace_lock = true;
-            final_string.append(temp_string[i]);
-
-        } else if(whitespace_lock){
-            final_string.append(temp_string[i]);
-        }
-    }
-
-    std::reverse(final_string.begin(), final_string.end());
-
-    return final_string;
 }
 
 void MainWindow::get(QString url, QString koncovka)
@@ -992,7 +942,8 @@ bool MainWindow::get_nazev(){
         nazev_souboru = "[Název nenalezen]";
     }
 
-    nazev_souboru = MainWindow::strip(nazev_souboru);  // remove whitespaces from both sides of string
+
+    nazev_souboru = nazev_souboru.trimmed();  // remove whitespaces from start and end
 
     return false;
 }
@@ -1108,7 +1059,8 @@ void MainWindow::on_pushButton_clicked(){
                 // získat název videa
                 while(MainWindow::get_nazev()){
 
-                    SleepThread sleep_thread;
+                    ThreadFunctions sleep_thread;
+                    sleep_thread.operace = 1;
                     sleep_thread.sleep_time = 10;
                     sleep_thread.start();
 
@@ -1209,7 +1161,8 @@ void MainWindow::on_pushButton_clicked(){
 
                         while(MainWindow::checkdone_y2mate("https://www.y2mate.com/mates/mp3Convert", data)){
 
-                            SleepThread sleep_thread;
+                            ThreadFunctions sleep_thread;
+                            sleep_thread.operace = 1;
                             sleep_thread.sleep_time = 10;
                             sleep_thread.start();
 
@@ -1334,7 +1287,8 @@ void MainWindow::on_pushButton_clicked(){
 
                         while(MainWindow::checkdone_y2mate("https://www.y2mate.com/mates/convert", data)){
 
-                            SleepThread sleep_thread;
+                            ThreadFunctions sleep_thread;
+                            sleep_thread.operace = 1;
                             sleep_thread.sleep_time = 10;
                             sleep_thread.start();
 
@@ -1822,8 +1776,8 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             ui->label_4->setHidden(false);
             ui->label_3->setText("Stahuji ffmpeg.exe");
 
-
-            std::system("mkdir tools");
+            // create directory tools
+            ShellExecute(0, L"open", L"cmd.exe", L"/C mkdir tools", QDir::currentPath().toStdWString().c_str(), SW_HIDE);
 
             file = openFileForWrite("tools/ffmpeg.exe");
             if (!file){
@@ -1884,20 +1838,26 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             // get duration
             command = ("/C ffmpeg.exe -i \"" + temp_cesta_k_souboru + "\" > ffmpeg_output_temp.txt 2>&1").toStdWString();
 
-            SHELLEXECUTEINFO ShExecInfo = {0};
-            ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-            ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-            ShExecInfo.hwnd = NULL;
-            ShExecInfo.lpVerb = L"open";
-            ShExecInfo.lpFile = L"cmd.exe";
-            ShExecInfo.lpParameters = command.c_str();
-            ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
-            ShExecInfo.nShow = SW_HIDE;
-            ShExecInfo.hInstApp = NULL;
 
-            ShellExecuteEx(&ShExecInfo);
-            WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-            CloseHandle(ShExecInfo.hProcess);
+            ThreadFunctions shellThread;
+            shellThread.operace = 2;  // Thread func
+
+            shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+            shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+            shellThread.ShExecInfo.hwnd = NULL;
+            shellThread.ShExecInfo.lpVerb = L"open";
+            shellThread.ShExecInfo.lpFile = L"cmd.exe";
+            shellThread.ShExecInfo.lpParameters = command.c_str();
+            shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+            shellThread.ShExecInfo.nShow = SW_HIDE;
+            shellThread.ShExecInfo.hInstApp = NULL;
+
+            shellThread.start();
+
+            // wait for thread to complete
+            while(shellThread.isRunning()){
+                qApp->processEvents();
+            }
 
             QFile output_file("tools/ffmpeg_output_temp.txt");
             QString video_duration_file;

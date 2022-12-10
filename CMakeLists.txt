@@ -34,8 +34,8 @@ set(PROJECT_SOURCES
         editvideowindow.cpp
         ui_editvideowindow.h
 
-        sleepthread.h
-        sleepthread.cpp
+        threadfunctions.h
+        threadfunctions.cpp
 
         mainwindow.ui
         settings_dialog.ui

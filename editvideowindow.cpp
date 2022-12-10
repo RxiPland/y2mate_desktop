@@ -1,5 +1,7 @@
 #include "editvideowindow.h"
 #include "ui_editvideowindow.h"
+#include "threadfunctions.h"
+
 #include <QFile>
 #include <QMessageBox>
 #include <windows.h>
@@ -128,153 +130,277 @@ void EditVideoWindow::on_pushButton_3_clicked()
     bool end_changed = compare_arrays(time_end, video_length);
     bool filetype_changed = filetype != file_extension;
 
-    ULONG_PTR ret;
-    std::wstring command;
+    QFile new_file(dir_path + name + filetype);
 
     QMessageBox msgBox;
     msgBox.setWindowTitle("Úprava videa");
 
+    if(!(name_changed || start_changed || end_changed || filetype_changed)){
+        // nothing changed
+
+        msgBox.setText("Nebyly provedeny žádné změny.");
+        msgBox.addButton("Ok", QMessageBox::YesRole);
+        QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
+        QAbstractButton* pButtonCancel = msgBox.addButton("Zrušit", QMessageBox::YesRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == pButtonOpen) {
+            // open file by default media player
+
+            ShellExecute(0, L"open", new_file.fileName().toStdWString().c_str(), 0, 0, SW_RESTORE);
+
+        } else if(msgBox.clickedButton() == pButtonCancel){
+
+            EditVideoWindow::disable_widgets(false);
+            return;
+        }
+
+        EditVideoWindow::on_pushButton_clicked();
+        return;
+
+    } else if(!ui->actionVymazat_p_vodn_soubor->isChecked() && !(name_changed || filetype_changed)){
+        // the file is not to be deleted, but filetype or name is the same
+
+        QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, musíte nový přejmenovat nebo změnit koncovku!");
+        EditVideoWindow::disable_widgets(false);
+        return;
+
+    } else if(new_file.exists()){
+        // file with this new name already exists
+
+        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
+        EditVideoWindow::disable_widgets(false);
+        return;
+    }
+
+    std::wstring command;
+
     if((start_changed || end_changed) && !filetype_changed){
         // cut time, without changing file type
 
-        // rename file
-        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
-        ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
-
-        // convert renamed file & delete
         QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
-        command = ("/C ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + dir_path + name + filetype + "\"").toStdWString();
 
-        // delete _ORIGINAL file
+        // convert file and delete original file
         if(ui->actionVymazat_p_vodn_soubor->isChecked()){
 
-            command = command + (" & del \"" + dir_path + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+            // rename file
+            command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+
+            // convert renamed file & delete
+            command += (" & ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + new_file.fileName() + "\"").toStdWString();
+
+            // delete _ORIGINAL file
+            command += (" & del \"" + dir_path + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+
+        } else {
+            // convert file without deletion (with new name)
+            command = ("/C ffmpeg.exe -i \"" + dir_path + video_name + file_extension + "\" " + time_params + " -y -hide_banner -loglevel error -c:a copy \"" + new_file.fileName() + "\"").toStdWString();
         }
 
-        SHELLEXECUTEINFO ShExecInfo = {0};
-        ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-        ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-        ShExecInfo.hwnd = NULL;
-        ShExecInfo.lpVerb = L"open";
-        ShExecInfo.lpFile = L"cmd.exe";
-        ShExecInfo.lpParameters = command.c_str();
-        ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
-        ShExecInfo.nShow = SW_HIDE;
-        ShExecInfo.hInstApp = NULL;
-        ret = ShellExecuteEx(&ShExecInfo);
-        WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
+        ThreadFunctions shellThread;
+        shellThread.operace = 2;  // Thread func
 
-        CloseHandle(ShExecInfo.hProcess);
+        shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+        shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+        shellThread.ShExecInfo.hwnd = NULL;
+        shellThread.ShExecInfo.lpVerb = L"open";
+        shellThread.ShExecInfo.lpFile = L"cmd.exe";
+        shellThread.ShExecInfo.lpParameters = command.c_str();
+        shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+        shellThread.ShExecInfo.nShow = SW_HIDE;
+        shellThread.ShExecInfo.hInstApp = NULL;
 
-        if(ret==1){
-            msgBox.setText("Čas videa byl úspěšně upraven");
+        shellThread.start();
+
+        // wait for thread to complete
+        while(shellThread.isRunning()){
+            qApp->processEvents();
+        }
+
+        // check if created file exists
+        if(new_file.exists()){
+            msgBox.setText("Soubor byl úspěšně překonvertován");
 
         } else{
-            msgBox.setText("Nastala chyba!\n\nShellExecuteEx() response kód: " + QString::number(ret));
+            QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba a soubor se nepodařilo překonvertovat!");
+            return;
         }
 
 
     } else if(start_changed || end_changed || filetype_changed){
         // cut time AND convert to different file type
 
-        // rename file
-        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
-        ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE);
-
-        // convert renamed file & delete
+        QString audio_parameters = "";
         QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
 
-        if(filetype == ".ogg"){
-
-            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -vn -crf 20 -codec:a libvorbis -hide_banner -loglevel error \"" + dir_path + name + filetype + "\"").toStdWString();
-
-        }else if(filetype == ".wav"){
-
-            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -vn -crf 20 -acodec pcm_s16le -hide_banner -loglevel error \"" + dir_path + name + filetype + "\"").toStdWString();
-
-        }else {
-
-            command = ("/C ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -vn -crf 20 -c:a libmp3lame -hide_banner -loglevel error \"" + dir_path + name + filetype + "\"").toStdWString();
-        }
-
-        // delete _ORIGINAL file
         if(ui->actionVymazat_p_vodn_soubor->isChecked()){
+            // rename & convert & delete
 
-            command = command + (" & del \"" + dir_path + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+
+            // rename file
+            command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+
+            if(filetype == ".ogg"){
+
+                audio_parameters = "-codec:a libvorbis";
+
+            }else if(filetype == ".wav"){
+
+                audio_parameters = "-acodec pcm_s16le";
+
+            }else {
+                audio_parameters = "-c:a libmp3lame";
+            }
+
+            // convert renamed file
+            command += (" & ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
+
+            // delete _ORIGINAL file
+            command += (" & del \"" + dir_path + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
+
+        } else{
+            // convert without deletion
+
+            if(filetype == ".ogg"){
+
+                audio_parameters = "-codec:a libvorbis";
+
+            }else if(filetype == ".wav"){
+
+                audio_parameters = "-acodec pcm_s16le";
+
+            }else {
+                audio_parameters = "-c:a libmp3lame";
+            }
+
+            // convert file
+            command += (" & ffmpeg.exe -i \"" + dir_path + name + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
         }
 
-        SHELLEXECUTEINFO ShExecInfo = {0};
-        ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-        ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-        ShExecInfo.hwnd = NULL;
-        ShExecInfo.lpVerb = L"open";
-        ShExecInfo.lpFile = L"cmd.exe";
-        ShExecInfo.lpParameters = command.c_str();
-        ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
-        ShExecInfo.nShow = SW_HIDE;
-        ShExecInfo.hInstApp = NULL;
-        ret = ShellExecuteEx(&ShExecInfo);
-        WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-        CloseHandle(ShExecInfo.hProcess);
 
-        if(ret==1){
+        ThreadFunctions shellThread;
+        shellThread.operace = 2;  // Thread func
+
+        shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+        shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+        shellThread.ShExecInfo.hwnd = NULL;
+        shellThread.ShExecInfo.lpVerb = L"open";
+        shellThread.ShExecInfo.lpFile = L"cmd.exe";
+        shellThread.ShExecInfo.lpParameters = command.c_str();
+        shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+        shellThread.ShExecInfo.nShow = SW_HIDE;
+        shellThread.ShExecInfo.hInstApp = NULL;
+
+        shellThread.start();
+
+        // wait for thread to complete
+        while(shellThread.isRunning()){
+            qApp->processEvents();
+        }
+
+
+        // check if created file exists
+        if(new_file.exists()){
             msgBox.setText("Soubor byl úspěšně překonvertován");
 
         } else{
-            msgBox.setText("Nastala chyba!\n\nShellExecuteEx() response kód: " + QString::number(ret));
+
+            QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba a soubor se nepodařilo překonvertovat!");
+            EditVideoWindow::disable_widgets(false);
+            return;
         }
 
-
     } else if(name_changed){
-        // only rename
+        // rename or duplicate
 
-        QFile new_name_path(dir_path + name + file_extension);
+        if(ui->actionVymazat_p_vodn_soubor->isChecked()){
+            // rename
 
-        if(new_name_path.exists()){
+            command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + file_extension + "\"").toStdWString();
 
-            QMessageBox msgBoxExists;
-            msgBoxExists.setWindowTitle("Nový název");
-            msgBoxExists.setText("Soubor s tímto názvem již existuje. Starý soubor se automaticky odstraní!");
-            msgBoxExists.addButton("Ok", QMessageBox::YesRole);
-            QAbstractButton* pButtonCancel = msgBoxExists.addButton("Zrušit", QMessageBox::NoRole);
-            msgBoxExists.exec();
+            ThreadFunctions shellThread;
+            shellThread.operace = 2;  // Thread func
 
-            if (msgBoxExists.clickedButton() == pButtonCancel) {
+            shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+            shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+            shellThread.ShExecInfo.hwnd = NULL;
+            shellThread.ShExecInfo.lpVerb = L"open";
+            shellThread.ShExecInfo.lpFile = L"cmd.exe";
+            shellThread.ShExecInfo.lpParameters = command.c_str();
+            shellThread.ShExecInfo.lpDirectory = NULL;
+            shellThread.ShExecInfo.nShow = SW_HIDE;
+            shellThread.ShExecInfo.hInstApp = NULL;
 
+            shellThread.start();
+
+            // wait for thread to complete
+            while(shellThread.isRunning()){
+                qApp->processEvents();
+            }
+
+
+            if(new_file.exists()){
+                msgBox.setText("Soubor byl úspěšně přejmenován");
+
+            } else{
+                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba a soubor se nepodařilo přejmenovat!");
+                EditVideoWindow::disable_widgets(false);
+                return;
+            }
+
+        } else{
+            // duplicate
+
+            command = ("/C copy \"" + dir_path + video_name + file_extension + "\" \"" + dir_path + name + file_extension + "\"").toStdWString();
+
+            ThreadFunctions shellThread;
+            shellThread.operace = 2;  // Thread func
+
+            shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+            shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+            shellThread.ShExecInfo.hwnd = NULL;
+            shellThread.ShExecInfo.lpVerb = L"open";
+            shellThread.ShExecInfo.lpFile = L"cmd.exe";
+            shellThread.ShExecInfo.lpParameters = command.c_str();
+            shellThread.ShExecInfo.lpDirectory = NULL;
+            shellThread.ShExecInfo.nShow = SW_HIDE;
+            shellThread.ShExecInfo.hInstApp = NULL;
+
+            shellThread.start();
+
+            // wait for thread to complete
+            while(shellThread.isRunning()){
+                qApp->processEvents();
+            }
+
+            if(new_file.exists()){
+                msgBox.setText("Soubor byl úspěšně duplikován.");
+
+            } else{
+                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba a soubor se nepodařilo duplikovat!");
+                EditVideoWindow::disable_widgets(false);
                 return;
             }
         }
 
-        command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + file_extension + "\"").toStdWString();
-        ret = reinterpret_cast<ULONG_PTR>(ShellExecute(0, L"open", L"cmd.exe", command.c_str(), 0, SW_HIDE));
-
-        if(ret>32){
-            msgBox.setText("Soubor byl úspěšně přejmenován");
-
-        } else{
-            msgBox.setText("Nastala chyba!\n\nShellExecute() response kód: " + QString::number(ret));
-        }
-
     } else{
 
-        msgBox.setText("Nebyly provedeny žádné změny");
+        msgBox.setText("Nebyly provedeny žádné změny.");
     }
 
-    // ask user to open new file or skip
+    // ask user to open created file or skip
     msgBox.addButton("Ok", QMessageBox::YesRole);
     QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
     msgBox.exec();
 
     if (msgBox.clickedButton() == pButtonOpen) {
 
-        QString cesta_k_souboru = "\"" + dir_path + name + filetype + "\"";
-        std::wstring command = cesta_k_souboru.toStdWString();
-
-        ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
+        ShellExecute(0, L"open", new_file.fileName().toStdWString().c_str(), 0, 0, SW_RESTORE);
     }
 
     EditVideoWindow::on_pushButton_clicked();
 }
+
 
 void EditVideoWindow::on_timeEdit_userTimeChanged(const QTime &time)
 {
