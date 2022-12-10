@@ -32,7 +32,7 @@ QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
-QString app_version = "v1.8.3";  // actual version of app
+QString app_version = "v1.8.4";  // actual version of app
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool downloading_ffmpeg = false;
 bool downloading_ffmpeg_menubar = false;
@@ -531,7 +531,26 @@ void MainWindow::httpFinished()
 
 
                         // create directory tools
-                        ShellExecute(0, L"open", L"cmd.exe", L"/C mkdir tools", QDir::currentPath().toStdWString().c_str(), SW_HIDE);
+                        ThreadFunctions shellThread;
+                        shellThread.operace = 2;  // Thread func
+
+                        shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+                        shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+                        shellThread.ShExecInfo.hwnd = NULL;
+                        shellThread.ShExecInfo.lpVerb = L"open";
+                        shellThread.ShExecInfo.lpFile = L"cmd.exe";
+                        shellThread.ShExecInfo.lpParameters = L"/C mkdir tools";
+                        shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()).toStdWString().c_str();
+                        shellThread.ShExecInfo.nShow = SW_HIDE;
+                        shellThread.ShExecInfo.hInstApp = NULL;
+
+                        shellThread.start();
+
+                        // wait for thread to complete
+                        while(shellThread.isRunning()){
+                            qApp->processEvents();
+                        }
+
 
                         file = openFileForWrite("tools/ffmpeg.exe");
                         if (!file){
@@ -1777,7 +1796,25 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             ui->label_3->setText("Stahuji ffmpeg.exe");
 
             // create directory tools
-            ShellExecute(0, L"open", L"cmd.exe", L"/C mkdir tools", QDir::currentPath().toStdWString().c_str(), SW_HIDE);
+            ThreadFunctions shellThread;
+            shellThread.operace = 2;  // Thread func
+
+            shellThread.ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+            shellThread.ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+            shellThread.ShExecInfo.hwnd = NULL;
+            shellThread.ShExecInfo.lpVerb = L"open";
+            shellThread.ShExecInfo.lpFile = L"cmd.exe";
+            shellThread.ShExecInfo.lpParameters = L"/C mkdir tools";
+            shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()).toStdWString().c_str();
+            shellThread.ShExecInfo.nShow = SW_HIDE;
+            shellThread.ShExecInfo.hInstApp = NULL;
+
+            shellThread.start();
+
+            // wait for thread to complete
+            while(shellThread.isRunning()){
+                qApp->processEvents();
+            }
 
             file = openFileForWrite("tools/ffmpeg.exe");
             if (!file){
