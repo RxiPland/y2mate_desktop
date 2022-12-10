@@ -9,11 +9,14 @@
 #include <QFileDialog>
 #include <windows.h>
 
-QString app_version_settings = "";  // aktuální verze programu (doplní se pomocí funkce set_version(); )
 QString last_location_path_settings = "/";
 QString video_quality = "";
 bool posledni_ulozene_nastaveni[5] = {};  // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool path_changed = false;  // pokud se nastaví nová cesta, bude true
+
+
+QString app_version_settings = "";  // aktuální verze programu (doplní se pomocí funkce set_version(); )
+QByteArray user_agent_settings = "";
 
 settings_dialog::settings_dialog(QWidget *parent) :
     QDialog(parent),
@@ -47,10 +50,11 @@ settings_dialog::~settings_dialog()
     delete ui;
 }
 
-void settings_dialog::set_version(QString version){
+void settings_dialog::set_version(QString version, QByteArray user_agent){
 
     ui->label->setText("Aktuální verze: " + version);
     app_version_settings = version;
+    user_agent_settings = user_agent;
 }
 
 void settings_dialog::check_version(bool show_response=false){
@@ -60,7 +64,7 @@ void settings_dialog::check_version(bool show_response=false){
 
     QNetworkRequest request = QNetworkRequest(api_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+    request.setRawHeader("User-Agent", user_agent);
 
     QNetworkReply *reply_check = manager.get(request);
 

@@ -19,7 +19,7 @@ class settings_dialog : public QDialog
 public:
     explicit settings_dialog(QWidget *parent = nullptr);
     ~settings_dialog();
-    void set_version(QString version);  // set app's version
+    void set_version(QString version, QByteArray user_agent);  // set app's version
 
 private:
     Ui::settings_dialog *ui;

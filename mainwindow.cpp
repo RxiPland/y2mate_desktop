@@ -32,7 +32,10 @@ QString yt_video_link = "";  // odkaz na youtube video
 QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
+QByteArray user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
 QString app_version = "v1.8.4";  // actual version of app
+
+
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
 bool downloading_ffmpeg = false;
 bool downloading_ffmpeg_menubar = false;
@@ -355,7 +358,7 @@ void MainWindow::check_version(){
 
     QNetworkRequest request = QNetworkRequest(api_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+    request.setRawHeader("User-Agent", user_agent);
 
     QNetworkReply *reply_check = manager.get(request);
 
@@ -403,7 +406,7 @@ void MainWindow::get_headers(QString location)
 
     QNetworkRequest request;
     request.setUrl(QUrl(location));
-    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+    request.setRawHeader("User-Agent", user_agent);
 
     QNetworkReply *reply_headers = manager.head(request);
 
@@ -560,7 +563,7 @@ void MainWindow::httpFinished()
                         }
 
                         QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
-                        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+                        request.setRawHeader("User-Agent", user_agent);
 
                         reply.reset();
                         reply.reset(manager.get(request));
@@ -638,7 +641,7 @@ void MainWindow::httpFinished()
 
             } else{
 
-                QMessageBox::about(this, "Chyba", "ffmpeg.exe se nepodařilo stáhnout!\n\nMožné chyby:\n1) Internet není dostupný\n2) github.com není dostupný");
+                QMessageBox::about(this, "Chyba", "ffmpeg.exe se nepodařilo stáhnout!\n\nMožné chyby:\n1) Internet není dostupný\n2) github.com není dostupný\n3) složku tools se nepodařilo vytvořit");
             }
         }
     }
@@ -726,7 +729,7 @@ void MainWindow::get(QString url, QString koncovka)
 
         QNetworkRequest request;
         request.setUrl(QUrl(url));
-        request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");    
+        request.setRawHeader("User-Agent", user_agent);
 
         // check if url is working
         QNetworkReply *reply_headers = manager.head(request);
@@ -761,7 +764,7 @@ void MainWindow::post(QString location, QByteArray data, int druh_promenne)
     QNetworkRequest request;
     request.setUrl(QUrl(location));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
-    request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+    request.setRawHeader("User-Agent", user_agent);
 
     // check if url is working
     QNetworkReply *reply_headers = manager.head(request);
@@ -1689,7 +1692,7 @@ void MainWindow::on_actionNastaven_triggered()
 
     settings_dialog nastaveni_dialog;
     nastaveni_dialog.setModal(true);
-    nastaveni_dialog.set_version(app_version);
+    nastaveni_dialog.set_version(app_version, user_agent);
     this->hide();
     nastaveni_dialog.exec();
 
@@ -1826,7 +1829,7 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             }
 
             QNetworkRequest request = QNetworkRequest(QUrl("https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe"));
-            request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36");
+            request.setRawHeader("User-Agent", user_agent);
 
             reply.reset();
             reply.reset(manager.get(request));
