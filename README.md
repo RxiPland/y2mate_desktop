@@ -3,7 +3,8 @@
 - Nenáročný program na stahování videí/hudby z youtube
 - Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
-- Možnost si sestříhat délku videa
+- Možnost sestříhat si délku videa
+- Možnost konverze do formátů jako .OGG nebo .WAV
 #
 - Video kvalita maximálně 1080p
 - Kvalita zvuku maximálně 320kbps
@@ -15,7 +16,6 @@
   - dvojité mezery
   - mezery na začátku a konci
 - Možnost upravit videu čas začátku a konce ([FFmpeg](https://ffmpeg.org/))
-- Možnost konverze do .OGG nebo i .WAV
 - Aplikace je kompletně v češtině
 - Přehledné/jednoduché prostředí
 - Historie hledaných videí
