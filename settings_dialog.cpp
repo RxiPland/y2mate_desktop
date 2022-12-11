@@ -1,6 +1,7 @@
 #include "settings_dialog.h"
 #include "ui_settings_dialog.h"
 #include "mainwindow.h"
+
 #include <QFile>
 #include <QTextCodec>
 #include <QJsonDocument>

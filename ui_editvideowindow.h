@@ -84,7 +84,7 @@ public:
 
         lineEdit = new QLineEdit(centralwidget);
         lineEdit->setObjectName("lineEdit");
-        lineEdit->setMaxLength(100);
+        lineEdit->setMaxLength(150);
         lineEdit->setReadOnly(false);
         lineEdit->setClearButtonEnabled(false);
 
