@@ -392,12 +392,16 @@ void EditVideoWindow::on_pushButton_3_clicked()
 
     // ask user to open created file or skip
     msgBox.addButton("Ok", QMessageBox::YesRole);
-    QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
+    QAbstractButton* pButtonOpenFile = msgBox.addButton("Otevřít soubor", QMessageBox::YesRole);
+    QAbstractButton* pButtonOpenDir = msgBox.addButton("Otevřít umístění", QMessageBox::YesRole);
     msgBox.exec();
 
-    if (msgBox.clickedButton() == pButtonOpen) {
+    if (msgBox.clickedButton() == pButtonOpenFile) {
 
         ShellExecute(0, L"open", new_file.fileName().toStdWString().c_str(), 0, 0, SW_RESTORE);
+
+    } else if (msgBox.clickedButton() == pButtonOpenDir){
+        ShellExecute(0, L"open", L"explorer.exe", dir_path.toStdWString().c_str(), 0, SW_RESTORE);
     }
 
     EditVideoWindow::on_pushButton_clicked();

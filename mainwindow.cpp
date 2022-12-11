@@ -500,18 +500,19 @@ void MainWindow::httpFinished()
             msgBox.setWindowTitle("V pořádku");
             msgBox.setText("Soubor byl úspěšně stažen.");
             msgBox.addButton("Ok", QMessageBox::YesRole);
-            QAbstractButton* pButtonOpen = msgBox.addButton("Otevřít soubor", QMessageBox::NoRole);
+            QAbstractButton* pButtonOpenFile = msgBox.addButton("Otevřít soubor", QMessageBox::NoRole);
+            QAbstractButton* pButtonOpenDir = msgBox.addButton("Otevřít umístění", QMessageBox::NoRole);
             QAbstractButton* pButtonEdit = msgBox.addButton("Upravit video", QMessageBox::NoRole);
             msgBox.exec();
 
 
-            if (msgBox.clickedButton() == pButtonOpen) {
+            if (msgBox.clickedButton() == pButtonOpenFile) {
                 // otevřít soubor
 
-                cesta_k_souboru = "\"" + cesta_k_souboru + "\"";
-                std::wstring command = cesta_k_souboru.toStdWString();
+                ShellExecute(0, L"open", cesta_k_souboru.toStdWString().c_str(), 0, 0, SW_RESTORE);
 
-                ShellExecute(0, L"open", command.c_str(), 0, 0, SW_RESTORE);
+            } else if(msgBox.clickedButton() == pButtonOpenDir){
+                ShellExecute(0, L"open", L"explorer.exe", dir_path.toStdWString().c_str(), 0, SW_RESTORE);
 
             } else if(msgBox.clickedButton() == pButtonEdit){
 
