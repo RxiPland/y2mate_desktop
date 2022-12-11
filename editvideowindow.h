@@ -27,6 +27,8 @@ private slots:
     void on_timeEdit_userTimeChanged(const QTime &time);
     void on_timeEdit_2_userTimeChanged(const QTime &time2);
 
+    void on_lineEdit_returnPressed();
+
 private:
     Ui::EditVideoWindow *ui;
 };

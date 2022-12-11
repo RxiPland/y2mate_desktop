@@ -82,6 +82,8 @@ void EditVideoWindow::disable_widgets(bool disable){
     ui->pushButton_3->setDisabled(disable);
 
     ui->comboBox->setDisabled(disable);
+
+    ui->actionVymazat_p_vodn_soubor->setDisabled(disable);
 }
 
 void EditVideoWindow::on_pushButton_2_clicked()
@@ -244,11 +246,11 @@ void EditVideoWindow::on_pushButton_3_clicked()
 
                 audio_parameters = "-codec:a libvorbis";
 
-            }else if(filetype == ".wav"){
+            } else if(filetype == ".wav"){
 
                 audio_parameters = "-acodec pcm_s16le";
 
-            }else {
+            } else {
                 audio_parameters = "-c:a libmp3lame";
             }
 
@@ -274,7 +276,7 @@ void EditVideoWindow::on_pushButton_3_clicked()
             }
 
             // convert file
-            command += (" & ffmpeg.exe -i \"" + dir_path + name + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
+            command = ("/C ffmpeg.exe -i \"" + dir_path + video_name + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
         }
 
 
@@ -424,5 +426,11 @@ void EditVideoWindow::on_timeEdit_2_userTimeChanged(const QTime &time2)
     } else if(time2 == zero){
         ui->timeEdit_2->setTime(zero.addSecs(1));
     }
+}
+
+
+void EditVideoWindow::on_lineEdit_returnPressed()
+{
+    EditVideoWindow::on_pushButton_3_clicked();
 }
 
