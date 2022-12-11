@@ -64,7 +64,7 @@ void settings_dialog::check_version(bool show_response=false){
 
     QNetworkRequest request = QNetworkRequest(api_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    request.setRawHeader("User-Agent", user_agent);
+    request.setRawHeader("User-Agent", user_agent_settings);
 
     QNetworkReply *reply_check = manager.get(request);
 

@@ -165,10 +165,10 @@ void EditVideoWindow::on_pushButton_3_clicked()
         EditVideoWindow::disable_widgets(false);
         return;
 
-    } else if(new_file.exists() && !ui->actionVymazat_p_vodn_soubor->isChecked()){
+    } else if(new_file.exists() && (name_changed || filetype_changed)){
         // file with this new name already exists
 
-        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
+        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem a koncovkou již ve složce existuje!");
         EditVideoWindow::disable_widgets(false);
         return;
     }

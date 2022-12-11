@@ -30,6 +30,9 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit">
+            <property name="maxLength">
+             <number>100</number>
+            </property>
             <property name="readOnly">
              <bool>false</bool>
             </property>

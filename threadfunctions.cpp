@@ -1,4 +1,5 @@
 #include "threadfunctions.h"
+#include <QDebug>
 
 ThreadFunctions::ThreadFunctions()
 {

@@ -96,6 +96,12 @@ MainWindow::MainWindow(QWidget *parent)
         MainWindow::check_version();
     }
 
+    QFile output_file("tools/ffmpeg_output_temp.txt");
+    if(output_file.exists()){
+
+        ShellExecute(0, L"open", L"cmd.exe", L"/C del \"ffmpeg_output_temp.txt\"", (QDir::currentPath()+ "/tools").toStdWString().c_str(), SW_HIDE);
+    }
+
     MainWindow::load_history();
 }
 
@@ -1114,8 +1120,6 @@ void MainWindow::on_pushButton_clicked(){
 
             } else{
 
-                qInfo() << response_najit_formaty;
-
                 QMessageBox::critical(this, "Chyba", "[kód 2] Nastala neznámá chyba\n\n1) Zkontrolujte připojení k síti");
                 ui->lineEdit->setClearButtonEnabled(true);
             }
@@ -1822,6 +1826,13 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
                 qApp->processEvents();
             }
 
+            QDir tools_dir(QDir::currentPath() + "/tools");
+
+            if(!tools_dir.exists()){
+                QMessageBox::critical(this, "Problém", "Nastal problém při vytváření složky!");
+                return;
+            }
+
             file = openFileForWrite("tools/ffmpeg.exe");
             if (!file){
                 QMessageBox::critical(this, "Problém", "Nastal problém při vytváření souboru.\n\n" + cesta_k_souboru);
@@ -1879,9 +1890,9 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             QString video_name = video_name_list.join(".");
 
             // get duration
-            command = ("/C ffmpeg.exe -i \"" + temp_cesta_k_souboru + "\" > ffmpeg_output_temp.txt 2>&1").toStdWString();
+            command = ("/C ffmpeg.exe -i \"" + temp_cesta_k_souboru + "\" > \"" + QDir::currentPath()+ "/tools/" + "ffmpeg_output_temp.txt\" 2>&1").toStdWString();
 
-
+            // store ffmpeg log into txt file
             ThreadFunctions shellThread;
             shellThread.operace = 2;  // Thread func
 
@@ -1891,18 +1902,51 @@ void MainWindow::on_actionOtev_t_soubor_triggered()
             shellThread.ShExecInfo.lpVerb = L"open";
             shellThread.ShExecInfo.lpFile = L"cmd.exe";
             shellThread.ShExecInfo.lpParameters = command.c_str();
-            shellThread.ShExecInfo.lpDirectory = (QDir::currentPath()+ "/tools").toStdWString().c_str();
+            shellThread.ShExecInfo.lpDirectory = NULL;
             shellThread.ShExecInfo.nShow = SW_HIDE;
             shellThread.ShExecInfo.hInstApp = NULL;
 
-            shellThread.start();
-
-            // wait for thread to complete
-            while(shellThread.isRunning()){
-                qApp->processEvents();
-            }
 
             QFile output_file("tools/ffmpeg_output_temp.txt");
+
+            ThreadFunctions sleep_function;
+            sleep_function.operace = 1;
+            sleep_function.sleep_time = 1;
+            int i;
+
+            // max five attempts to create
+            for(i=0; i<5; i++){
+
+                if(!output_file.exists()){
+
+                    shellThread.start();
+
+                    // wait for thread to complete
+                    while(shellThread.isRunning()){
+                        qApp->processEvents();
+                    }
+
+                } else{
+                    break;
+                }
+
+                if(i>1){
+                    // sleep for 1sec before next attempt
+                    sleep_function.start();
+
+                    while(sleep_function.isRunning()){
+                        qApp->processEvents();
+                    }
+                }
+            }
+
+            if(i==5){
+                QMessageBox::warning(this, "Nastala chyba", "ffmpeg_output_temp.txt se nepodařilo vytvořit!");
+                MainWindow::disable_widgets(false);
+
+                return;
+            }
+
             QString video_duration_file;
 
             if (output_file.exists()){
