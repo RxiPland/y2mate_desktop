@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <windows.h>
 #include <QDir>
+#include <QFileDialog>
 
 QString video_name;   // video name without file extension
 QString file_extension;   // file extension with dot
@@ -109,6 +110,13 @@ void EditVideoWindow::on_pushButton_3_clicked()
     EditVideoWindow::disable_widgets(true);
 
     QString name = ui->lineEdit->text();
+
+    if(name == ""){
+        QMessageBox::warning(this, "Chyba", "Název souboru nemůže být prázdný!");
+        EditVideoWindow::disable_widgets(false);
+        return;
+    }
+
     QString filetype = ui->comboBox->currentText();
 
     QTime qtime_start = ui->timeEdit->time();
@@ -132,7 +140,23 @@ void EditVideoWindow::on_pushButton_3_clicked()
     bool end_changed = compare_arrays(time_end, video_length);
     bool filetype_changed = filetype != file_extension;
 
+
     QFile new_file(dir_path + name + filetype);
+
+    if(!ui->actionVymazat_p_vodn_soubor->isChecked() && !(name_changed || filetype_changed)){
+        // the file will not be deleted, but filetype or name is the same
+
+        QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, musí mít nový jiné jméno nebo koncovku!");
+        EditVideoWindow::disable_widgets(false);
+        return;
+
+    } else if(new_file.exists() && (name_changed || filetype_changed)){
+        // file with this new name already exists
+
+        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem a koncovkou již ve složce existuje!");
+        EditVideoWindow::disable_widgets(false);
+        return;
+    }
 
     QMessageBox msgBox;
     msgBox.setWindowTitle("Úprava videa");
@@ -159,20 +183,6 @@ void EditVideoWindow::on_pushButton_3_clicked()
 
         EditVideoWindow::on_pushButton_clicked();
         return;
-
-    } else if(!ui->actionVymazat_p_vodn_soubor->isChecked() && !(name_changed || filetype_changed)){
-        // the file is not to be deleted, but filetype or name is the same
-
-        QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, musí mít nový jiné jméno nebo koncovku!");
-        EditVideoWindow::disable_widgets(false);
-        return;
-
-    } else if(new_file.exists() && (name_changed || filetype_changed)){
-        // file with this new name already exists
-
-        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem a koncovkou již ve složce existuje!");
-        EditVideoWindow::disable_widgets(false);
-        return;
     }
 
     std::wstring command;
@@ -180,9 +190,19 @@ void EditVideoWindow::on_pushButton_3_clicked()
     if((start_changed || end_changed) && !filetype_changed){
         // cut time, without changing file type
 
-        QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
+        QString time_params;
 
-        // convert file and delete original file
+        if(end_changed){
+            // both start & end time
+            time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
+
+        } else{
+            // only start time
+            time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]);
+        }
+
+
+        // convert file and delete _ORIGINAL file
         if(ui->actionVymazat_p_vodn_soubor->isChecked()){
 
             // rename file
@@ -235,24 +255,24 @@ void EditVideoWindow::on_pushButton_3_clicked()
         QString audio_parameters = "";
         QString time_params = "-ss " + QString::number(time_start[0]) + ":" + QString::number(time_start[1]) + ":" + QString::number(time_start[2]) + " -to " + QString::number(time_end[0]) + ":" + QString::number(time_end[1]) + ":" + QString::number(time_end[2]);
 
+        if(filetype == ".ogg"){
+
+            audio_parameters = "-codec:a libvorbis";
+
+        }else if(filetype == ".wav"){
+
+            audio_parameters = "-acodec pcm_s16le";
+
+        }else {
+            audio_parameters = "-c:a libmp3lame";
+        }
+
         if(ui->actionVymazat_p_vodn_soubor->isChecked()){
             // rename & convert & delete
 
 
             // rename file
             command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
-
-            if(filetype == ".ogg"){
-
-                audio_parameters = "-codec:a libvorbis";
-
-            } else if(filetype == ".wav"){
-
-                audio_parameters = "-acodec pcm_s16le";
-
-            } else {
-                audio_parameters = "-c:a libmp3lame";
-            }
 
             // convert renamed file
             command += (" & ffmpeg.exe -i \"" + dir_path + name + "_ORIGINAL" + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
@@ -261,21 +281,7 @@ void EditVideoWindow::on_pushButton_3_clicked()
             command += (" & del \"" + dir_path + name + "_ORIGINAL" + file_extension + "\"").toStdWString();
 
         } else{
-            // convert without deletion
-
-            if(filetype == ".ogg"){
-
-                audio_parameters = "-codec:a libvorbis";
-
-            }else if(filetype == ".wav"){
-
-                audio_parameters = "-acodec pcm_s16le";
-
-            }else {
-                audio_parameters = "-c:a libmp3lame";
-            }
-
-            // convert file
+            // convert without deletion (keep the original file)
             command = ("/C ffmpeg.exe -i \"" + dir_path + video_name + file_extension + "\" " + time_params + " -y -vn -crf 20 " + audio_parameters + " -hide_banner -loglevel error \"" + new_file.fileName() + "\"").toStdWString();
         }
 
@@ -316,7 +322,7 @@ void EditVideoWindow::on_pushButton_3_clicked()
         // rename or duplicate
 
         if(ui->actionVymazat_p_vodn_soubor->isChecked()){
-            // rename
+            // only rename
 
             command = ("/C ren \"" + dir_path + video_name + file_extension + "\" \"" + name + file_extension + "\"").toStdWString();
 
@@ -351,7 +357,7 @@ void EditVideoWindow::on_pushButton_3_clicked()
             }
 
         } else{
-            // duplicate
+            // duplicate (with different name)
 
             command = ("/C copy \"" + dir_path + video_name + file_extension + "\" \"" + dir_path + name + file_extension + "\"").toStdWString();
 
