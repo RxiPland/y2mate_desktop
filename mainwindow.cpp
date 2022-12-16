@@ -33,7 +33,7 @@ QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
 QByteArray user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
-QString app_version = "v1.8.4";  // actual version of app
+QString app_version = "v1.8.5";  // actual version of app
 
 
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
