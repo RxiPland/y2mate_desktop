@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.4.0
+** Created by: Qt User Interface Compiler version 6.4.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -407,7 +407,7 @@ public:
 
         pushButton->setText(QCoreApplication::translate("MainWindow", "Naj\303\255t", nullptr));
         pushButton_2->setText(QCoreApplication::translate("MainWindow", "Zru\305\241it", nullptr));
-        menuInfo->setTitle(QCoreApplication::translate("MainWindow", "Info", nullptr));
+        menuInfo->setTitle(QCoreApplication::translate("MainWindow", "Mo\305\276nosti", nullptr));
         menuHistorie->setTitle(QCoreApplication::translate("MainWindow", "Historie", nullptr));
         menu1->setTitle(QCoreApplication::translate("MainWindow", "1.", nullptr));
         menu2->setTitle(QCoreApplication::translate("MainWindow", "2.", nullptr));

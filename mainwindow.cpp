@@ -33,7 +33,7 @@ QString last_location_path = "/"; // poslední cesta uloženého souboru
 QString selected_video_quality = "128 kbps";
 
 QByteArray user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36";
-QString app_version = "v1.8.5";  // actual version of app
+QString app_version = "v1.8.6";  // actual version of app
 
 
 bool hodnoty_nastaveni[5] = {}; // {REPLACE_VIDEO_NAME, UNDERSCORE_REPLACE, AUTO_CHECK_UPDATE, SAVE_HISTORY, LAST_LOCATION}
@@ -879,6 +879,12 @@ bool MainWindow::get_nazev(){
     // using function get_headers()
     // return true, if y2mate response is: it may take a few minutes
 
+    // TODO:
+    // python: chr(int("010C", 16)) -> Č
+
+    // QChar unicode = (QChar) QString("010C").toInt(nullptr, 16);
+    // QString converted = (QString)unicode;
+
     QString video_quality_post;
 
     if(!(response_najit_formaty.contains(selected_video_quality) || response_najit_formaty.contains(selected_video_quality))){
@@ -1023,6 +1029,7 @@ void MainWindow::on_pushButton_clicked(){
 
             MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data, 1);     // post request na získání informací o videu
 
+            qInfo() << response_najit_formaty;
 
             if (response_najit_formaty == "error"){
 
