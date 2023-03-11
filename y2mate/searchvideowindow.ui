@@ -178,8 +178,8 @@
      <string>Možnosti</string>
     </property>
     <addaction name="action_menu1_1"/>
-    <addaction name="separator"/>
     <addaction name="action_menu1_2"/>
+    <addaction name="separator"/>
     <addaction name="action_menu1_3"/>
    </widget>
    <addaction name="menu_1"/>
@@ -187,10 +187,10 @@
   <action name="action_menu1_1">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/images/settings.ico</normaloff>:/images/settings.ico</iconset>
+     <normaloff>:/images/y2mate.ico</normaloff>:/images/y2mate.ico</iconset>
    </property>
    <property name="text">
-    <string>Nastavení</string>
+    <string>y2mate</string>
    </property>
   </action>
   <action name="action_menu1_2">
@@ -205,10 +205,10 @@
   <action name="action_menu1_3">
    <property name="icon">
     <iconset resource="resources.qrc">
-     <normaloff>:/images/y2mate.ico</normaloff>:/images/y2mate.ico</iconset>
+     <normaloff>:/images/settings.ico</normaloff>:/images/settings.ico</iconset>
    </property>
    <property name="text">
-    <string>y2mate</string>
+    <string>Nastavení</string>
    </property>
   </action>
  </widget>

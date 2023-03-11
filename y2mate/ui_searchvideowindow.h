@@ -53,7 +53,7 @@ public:
         action_menu1_1 = new QAction(SearchVideoWindow);
         action_menu1_1->setObjectName("action_menu1_1");
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/images/y2mate.ico"), QSize(), QIcon::Normal, QIcon::Off);
         action_menu1_1->setIcon(icon);
         action_menu1_2 = new QAction(SearchVideoWindow);
         action_menu1_2->setObjectName("action_menu1_2");
@@ -63,7 +63,7 @@ public:
         action_menu1_3 = new QAction(SearchVideoWindow);
         action_menu1_3->setObjectName("action_menu1_3");
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/images/y2mate.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
         action_menu1_3->setIcon(icon2);
         centralwidget = new QWidget(SearchVideoWindow);
         centralwidget->setObjectName("centralwidget");
@@ -135,8 +135,8 @@ public:
 
         menubar->addAction(menu_1->menuAction());
         menu_1->addAction(action_menu1_1);
-        menu_1->addSeparator();
         menu_1->addAction(action_menu1_2);
+        menu_1->addSeparator();
         menu_1->addAction(action_menu1_3);
 
         retranslateUi(SearchVideoWindow);
@@ -147,9 +147,9 @@ public:
     void retranslateUi(QMainWindow *SearchVideoWindow)
     {
         SearchVideoWindow->setWindowTitle(QCoreApplication::translate("SearchVideoWindow", "y2mate desktop", nullptr));
-        action_menu1_1->setText(QCoreApplication::translate("SearchVideoWindow", "Nastaven\303\255", nullptr));
+        action_menu1_1->setText(QCoreApplication::translate("SearchVideoWindow", "y2mate", nullptr));
         action_menu1_2->setText(QCoreApplication::translate("SearchVideoWindow", "Zdrojov\303\275 k\303\263d", nullptr));
-        action_menu1_3->setText(QCoreApplication::translate("SearchVideoWindow", "y2mate", nullptr));
+        action_menu1_3->setText(QCoreApplication::translate("SearchVideoWindow", "Nastaven\303\255", nullptr));
         lineEdit->setText(QString());
         lineEdit->setPlaceholderText(QCoreApplication::translate("SearchVideoWindow", "Vlo\305\276te URL videa", nullptr));
         pushButton->setText(QCoreApplication::translate("SearchVideoWindow", "Naj\303\255t", nullptr));
