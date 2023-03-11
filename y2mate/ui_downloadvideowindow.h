@@ -21,21 +21,22 @@ QT_BEGIN_NAMESPACE
 class Ui_downloadVideoWindow
 {
 public:
-    QMenuBar *menubar;
     QWidget *centralwidget;
+    QMenuBar *menubar;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *downloadVideoWindow)
     {
         if (downloadVideoWindow->objectName().isEmpty())
             downloadVideoWindow->setObjectName("downloadVideoWindow");
-        downloadVideoWindow->resize(240, 320);
-        menubar = new QMenuBar(downloadVideoWindow);
-        menubar->setObjectName("menubar");
-        downloadVideoWindow->setMenuBar(menubar);
+        downloadVideoWindow->resize(470, 209);
         centralwidget = new QWidget(downloadVideoWindow);
         centralwidget->setObjectName("centralwidget");
         downloadVideoWindow->setCentralWidget(centralwidget);
+        menubar = new QMenuBar(downloadVideoWindow);
+        menubar->setObjectName("menubar");
+        menubar->setGeometry(QRect(0, 0, 470, 21));
+        downloadVideoWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(downloadVideoWindow);
         statusbar->setObjectName("statusbar");
         downloadVideoWindow->setStatusBar(statusbar);
