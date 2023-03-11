@@ -2,7 +2,12 @@
 #include "./ui_searchvideowindow.h"
 #include "settingsdialog.h"
 
-#include <windows.h>
+#include <Windows.h>
+#include <QFile>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QMessageBox>
 
 
 SearchVideoWindow::SearchVideoWindow(QWidget *parent)
@@ -44,5 +49,47 @@ void SearchVideoWindow::on_action_menu1_3_triggered()
     this->hide();
     sd.exec();
     this->show();
+}
+
+
+void SearchVideoWindow::on_action_menu2_1_triggered()
+{
+    // delete history from JSON file
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+        if(loadedJson.isEmpty()){
+            // JSON will not be loaded
+
+            QMessageBox::critical(this, "Chyba", "Nastala chyba při načítání JSONu ze souboru s nastavením!\n\n" + dataFile.fileName());
+            return;
+        }
+
+        QJsonObject history;
+
+        int i;
+        for(i=1; i<6; i++){
+
+            history[QString::number(i)] = "";
+        }
+        loadedJson["search_history"] = history;
+
+        QJsonDocument docData(loadedJson);
+
+        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        dataFile.write(docData.toJson());
+        dataFile.close();
+
+        QMessageBox::information(this, "Oznámení", "Historie byla úspěšně vymazána");
+    }
 }
 
