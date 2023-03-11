@@ -34,6 +34,7 @@ private:
     QNetworkAccessManager manager;
 
     void disableWidgets(bool disable = true);
+    void sortQualities(QStringList *list);
 
 };
 #endif // SEARCHVIDEOWINDOW_H

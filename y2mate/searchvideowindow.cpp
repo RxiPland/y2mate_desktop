@@ -83,6 +83,31 @@ void searchVideoWindow::disableWidgets(bool disable)
 }
 
 
+void searchVideoWindow::sortQualities(QStringList *list)
+{
+    QStringList tempList = list->toList();
+
+    int i;
+    static QRegularExpression re("(kbps|p)");
+
+    for(i=0; i<tempList.length(); i++){
+
+        tempList[i] = tempList[i].replace(re, "");
+    }
+
+    // source: https://stackoverflow.com/questions/65061873/sorting-a-qstring-list-by-numbers-c
+    std::sort(tempList.begin(), tempList.end(), [](const QString &lhs, const QString &rhs)
+    {
+        int num_lhs = lhs.toInt();
+        int num_rhs = rhs.toInt();
+        return num_lhs < num_rhs;
+    });
+
+    *list = tempList;
+}
+
+
+
 void searchVideoWindow::on_action_menu1_1_triggered()
 {
     // open y2mate's website
@@ -268,6 +293,7 @@ void searchVideoWindow::on_pushButton_clicked()
             mp3Qualities.append(x.toObject()["q"].toString());
         }
     }
+    sortQualities(&mp3Qualities);
 
     // capture mp4 qualities
     QJsonObject mp4Files = formats["mp4"].toObject();
@@ -279,10 +305,14 @@ void searchVideoWindow::on_pushButton_clicked()
             mp4Qualities.append(x.toObject()["q"].toString());
         }
     }
+    sortQualities(&mp4Qualities);
+
 
     QString ytChannel = loadedJson["a"].toString();
     int videoDuration = loadedJson["t"].toInt();
     QString videoName = loadedJson["title"].toString();
+
+
 
     qInfo() << mp3Qualities;
     qInfo() << mp4Qualities;
