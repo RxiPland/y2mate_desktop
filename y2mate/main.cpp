@@ -1,11 +1,36 @@
 #include "searchvideowindow.h"
 
 #include <QApplication>
+#include <QFile>
+#include <QDir>
+#include <QJsonObject>
+#include <QJsonDocument>
 
 
-QString app_version = "v2.0.0";
-QByteArray user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+QString appVersion = "v2.0.0";
 
+void checkSettings(){
+
+    QFile dataFile("Data/data.json");
+
+    if (dataFile.exists()){
+        // everything OK
+
+    } else{
+        // create file with default content (settings)
+        QDir directory;
+        directory.mkdir("./Data");
+
+        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+
+        QJsonObject objData;
+        objData["appVersion"] = appVersion;
+        objData["userAgent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+
+        QJsonDocument docData(objData);
+        dataFile.write(docData.toJson());
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -13,7 +38,10 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon(":/images/y2mate.ico"));
     a.setQuitOnLastWindowClosed(true);
 
+    checkSettings();
+
     SearchVideoWindow svw;
+    svw.appVersion = appVersion;
     svw.show();
 
     return a.exec();
