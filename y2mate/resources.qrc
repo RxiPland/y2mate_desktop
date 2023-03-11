@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/github.ico</file>
+        <file>images/y2mate.ico</file>
+        <file>images/delete.ico</file>
+        <file>images/settings.ico</file>
+        <file>images/open_file.ico</file>
+    </qresource>
+</RCC>
