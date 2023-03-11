@@ -34,15 +34,15 @@ bool checkSettings(){
 
             } else{
                 // everything OK
-                return jsonCorrupted;
+                return false;
             }
         }
 
         jsonCorrupted = true;
     }
 
-    // create file with default content (settings)
-    QDir directory;
+    // create folder
+    QDir directory(QDir::currentPath());
     directory.mkdir("./Data");
 
     QJsonObject objData;
@@ -60,6 +60,7 @@ bool checkSettings(){
 
     QJsonDocument docData(objData);
 
+    // write settings to file
     dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
     dataFile.write(docData.toJson());
     dataFile.close();

@@ -146,13 +146,14 @@ void searchVideoWindow::on_action_menu2_1_triggered()
 void searchVideoWindow::on_pushButton_clicked()
 {
     // search video button
-    searchVideoWindow::disableWidgets();
 
-    QString videoUrl = ui->lineEdit->text();
+    searchVideoWindow::disableWidgets();
+    QString videoUrl = ui->lineEdit->text().trimmed();
 
     // source: https://regex101.com/r/kM8eW3/1
     QRegExp rx("(^$|(http(s)?://)([\\w-]+\\.)+[\\w-]+([\\w- ;,./?%&=]*))");
 
+    // validate URL
     if(videoUrl == ""){
 
         QMessageBox::critical(this, "Chyba", "Pole pro URL adresu nemůže být prázdné!");
@@ -169,6 +170,7 @@ void searchVideoWindow::on_pushButton_clicked()
         ui->lineEdit->setFocus();
         return;
     }
+
 
 
 }
