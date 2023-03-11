@@ -49,13 +49,14 @@ bool checkSettings(){
     objData["app_version"] = appVersion;
     objData["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
     objData["allow_history"] = true;
+    objData["check_for_updates"] = true;
 
     QJsonObject history;
 
     int i;
     for(i=1; i<6; i++){
 
-        history[QString::number(i)] = "";
+        history[QString::number(i)] = QJsonObject();
     }
     objData["search_history"] = history;
 
