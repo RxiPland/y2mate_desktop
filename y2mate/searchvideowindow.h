@@ -22,6 +22,7 @@ public:
     QString appVersion;
     QByteArray userAgent;
     bool allowHistory;
+    bool checkForUpdates;
 
 private slots:
     void on_action_menu1_1_triggered();
