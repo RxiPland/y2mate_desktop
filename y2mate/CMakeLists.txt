@@ -1,10 +1,6 @@
-# uic mainwindow.ui -o ui_mainwindow.h
-
 cmake_minimum_required(VERSION 3.5)
 
-project(y2mate VERSION 0.1 LANGUAGES CXX)
-
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+project(y2mate_desktop VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -13,62 +9,42 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/images/appicon.rc")
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
-        resources.qrc
         main.cpp
-
-        mainwindow.cpp
-        mainwindow.h
-        ui_mainwindow.h
-
-        settings_dialog.h
-        settings_dialog.cpp
-        ui_settings_dialog.h
-
-        editvideowindow.h
-        editvideowindow.cpp
-        ui_editvideowindow.h
-
-        threadfunctions.h
-        threadfunctions.cpp
-
-        mainwindow.ui
-        settings_dialog.ui
-        editvideowindow.ui
+        searchvideo.cpp
+        searchvideo.h
+        searchvideo.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(y2mate
+    qt_add_executable(y2mate_desktop
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        ${APP_ICON_RESOURCE_WINDOWS}
     )
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET y2mate APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET y2mate_desktop APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
-        add_library(y2mate SHARED
+        add_library(y2mate_desktop SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(y2mate
+        add_executable(y2mate_desktop
             ${PROJECT_SOURCES}
         )
     endif()
 endif()
 
-target_link_libraries(y2mate PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(y2mate_desktop PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-set_target_properties(y2mate PROPERTIES
+set_target_properties(y2mate_desktop PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -76,17 +52,10 @@ set_target_properties(y2mate PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-install(TARGETS y2mate
+install(TARGETS y2mate_desktop
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(y2mate)
+    qt_finalize_executable(y2mate_desktop)
 endif()
-
-
-find_package(Qt6 REQUIRED COMPONENTS Network)
-target_link_libraries(y2mate PRIVATE Qt6::Network)
-
-find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
-target_link_libraries(y2mate PRIVATE Qt6::Core5Compat)
