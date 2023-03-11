@@ -25,6 +25,10 @@ set(PROJECT_SOURCES
         settingsdialog.h
         settingsdialog.cpp
         settingsdialog.ui
+
+        downloadvideowindow.h
+        downloadvideowindow.cpp
+        downloadvideowindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
