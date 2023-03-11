@@ -13,6 +13,7 @@
 #include <QRegExp>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QLabel>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -27,7 +28,10 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     }
 
     searchVideoWindow::loadSettings();
-    //searchVideoWindow::checkUpdate();
+
+    if(searchVideoWindow::checkForUpdates){
+        searchVideoWindow::checkUpdate();
+    }
 }
 
 searchVideoWindow::~searchVideoWindow()
@@ -37,6 +41,9 @@ searchVideoWindow::~searchVideoWindow()
 
 void searchVideoWindow::loadSettings()
 {
+    QLabel *label = new QLabel("Načítám nastavení ...   ");
+    ui->statusBar->addWidget(label);
+
     QFile dataFile(QDir::currentPath() + "/Data/data.json");
 
     if (dataFile.exists()){
@@ -73,27 +80,57 @@ void searchVideoWindow::loadSettings()
 
                 searchVideoWindow::appVersion = loadedJson["app_version"].toString().toUtf8();
                 searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
+                searchVideoWindow::checkForUpdates = loadedJson["check_for_updates"].toBool();
                 searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
 
-                // disable history tab
-                ui->menu2_1->menuAction()->setVisible(allowHistory);
-                ui->menu2_2->menuAction()->setVisible(allowHistory);
-                ui->menu2_3->menuAction()->setVisible(allowHistory);
-                ui->menu2_4->menuAction()->setVisible(allowHistory);
-                ui->menu2_5->menuAction()->setVisible(allowHistory);
-
-                ui->action_menu2_6->setDisabled(!allowHistory);
-                ui->action_menu2_6->setIconVisibleInMenu(allowHistory);
+                // disable/enable history tab
 
                 if(!allowHistory){
+                    ui->menu2_1->menuAction()->setVisible(false);
+                    ui->menu2_2->menuAction()->setVisible(false);
+                    ui->menu2_3->menuAction()->setVisible(false);
+                    ui->menu2_4->menuAction()->setVisible(false);
+                    ui->menu2_5->menuAction()->setVisible(false);
+
                     ui->action_menu2_6->setText("Historie není povolena");
+                    ui->action_menu2_6->setDisabled(true);
+                    ui->action_menu2_6->setIconVisibleInMenu(false);
 
                 } else{
+                    QJsonObject history = loadedJson["search_history"].toObject();
+
+                    QJsonObject history1 = history["1"].toObject();
+                    if(history1.isEmpty()){
+                        ui->menu2_1->menuAction()->setVisible(false);
+                    }
+
+                    QJsonObject history2 = history["2"].toObject();
+                    if(history2.isEmpty()){
+                        ui->menu2_2->menuAction()->setVisible(false);
+                    }
+
+                    QJsonObject history3 = history["3"].toObject();
+                    if(history3.isEmpty()){
+                        ui->menu2_3->menuAction()->setVisible(false);
+                    }
+
+                    QJsonObject history4 = history["4"].toObject();
+                    if(history4.isEmpty()){
+                        ui->menu2_4->menuAction()->setVisible(false);
+                    }
+
+                    QJsonObject history5 = history["5"].toObject();
+                    if(history5.isEmpty()){
+                        ui->menu2_5->menuAction()->setVisible(false);
+                    }
+
                     ui->action_menu2_6->setText("Smazat historii");
                 }
             }
         }
     }
+
+    ui->statusBar->removeWidget(label);
 }
 
 void searchVideoWindow::checkUpdate()
@@ -362,7 +399,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         int i;
         for(i=1; i<6; i++){
 
-            history[QString::number(i)] = "";
+            history[QString::number(i)] = QJsonObject();
         }
         loadedJson["search_history"] = history;
 
@@ -390,5 +427,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         this->close();
         return;
     }
+
+    searchVideoWindow::loadSettings();
 }
 
