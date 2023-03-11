@@ -1,6 +1,7 @@
 #include "searchvideowindow.h"
 #include "./ui_searchvideowindow.h"
 #include "settingsdialog.h"
+#include "downloadvideowindow.h"
 
 #include <Windows.h>
 #include <QFile>
@@ -313,10 +314,16 @@ void searchVideoWindow::on_pushButton_clicked()
     QString videoName = loadedJson["title"].toString();
 
 
+    downloadVideoWindow dvw;
+    this->hide();
+    dvw.show();
 
-    qInfo() << mp3Qualities;
-    qInfo() << mp4Qualities;
+    while(!dvw.isHidden()){
+        qApp->processEvents();
+    }
 
+    disableWidgets(false);
+    this->show();
 }
 
 void searchVideoWindow::on_lineEdit_returnPressed()
