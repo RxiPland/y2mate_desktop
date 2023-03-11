@@ -30,6 +30,7 @@ public:
     QAction *action_menu1_1;
     QAction *action_menu1_2;
     QAction *action_menu1_3;
+    QAction *action_menu2_1;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_2;
@@ -44,6 +45,7 @@ public:
     QSpacerItem *horizontalSpacer_3;
     QMenuBar *menubar;
     QMenu *menu_1;
+    QMenu *menu_2;
 
     void setupUi(QMainWindow *SearchVideoWindow)
     {
@@ -65,6 +67,11 @@ public:
         QIcon icon2;
         icon2.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
         action_menu1_3->setIcon(icon2);
+        action_menu2_1 = new QAction(SearchVideoWindow);
+        action_menu2_1->setObjectName("action_menu2_1");
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/images/delete.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        action_menu2_1->setIcon(icon3);
         centralwidget = new QWidget(SearchVideoWindow);
         centralwidget->setObjectName("centralwidget");
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -131,13 +138,17 @@ public:
         menubar->setGeometry(QRect(0, 0, 553, 21));
         menu_1 = new QMenu(menubar);
         menu_1->setObjectName("menu_1");
+        menu_2 = new QMenu(menubar);
+        menu_2->setObjectName("menu_2");
         SearchVideoWindow->setMenuBar(menubar);
 
         menubar->addAction(menu_1->menuAction());
+        menubar->addAction(menu_2->menuAction());
         menu_1->addAction(action_menu1_1);
         menu_1->addAction(action_menu1_2);
         menu_1->addSeparator();
         menu_1->addAction(action_menu1_3);
+        menu_2->addAction(action_menu2_1);
 
         retranslateUi(SearchVideoWindow);
 
@@ -150,10 +161,12 @@ public:
         action_menu1_1->setText(QCoreApplication::translate("SearchVideoWindow", "y2mate", nullptr));
         action_menu1_2->setText(QCoreApplication::translate("SearchVideoWindow", "Zdrojov\303\275 k\303\263d", nullptr));
         action_menu1_3->setText(QCoreApplication::translate("SearchVideoWindow", "Nastaven\303\255", nullptr));
+        action_menu2_1->setText(QCoreApplication::translate("SearchVideoWindow", "Smazat historii", nullptr));
         lineEdit->setText(QString());
         lineEdit->setPlaceholderText(QCoreApplication::translate("SearchVideoWindow", "Vlo\305\276te URL videa", nullptr));
         pushButton->setText(QCoreApplication::translate("SearchVideoWindow", "Naj\303\255t", nullptr));
         menu_1->setTitle(QCoreApplication::translate("SearchVideoWindow", "Mo\305\276nosti", nullptr));
+        menu_2->setTitle(QCoreApplication::translate("SearchVideoWindow", "Historie", nullptr));
     } // retranslateUi
 
 };

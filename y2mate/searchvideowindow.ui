@@ -182,7 +182,14 @@
     <addaction name="separator"/>
     <addaction name="action_menu1_3"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Historie</string>
+    </property>
+    <addaction name="action_menu2_1"/>
+   </widget>
    <addaction name="menu_1"/>
+   <addaction name="menu_2"/>
   </widget>
   <action name="action_menu1_1">
    <property name="icon">
@@ -209,6 +216,15 @@
    </property>
    <property name="text">
     <string>Nastavení</string>
+   </property>
+  </action>
+  <action name="action_menu2_1">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/images/delete.ico</normaloff>:/images/delete.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Smazat historii</string>
    </property>
   </action>
  </widget>
