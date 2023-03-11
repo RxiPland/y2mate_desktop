@@ -19,6 +19,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -56,7 +57,6 @@ public:
     QHBoxLayout *horizontalLayout;
     QSpacerItem *horizontalSpacer;
     QPushButton *pushButton;
-    QSpacerItem *verticalSpacer_3;
     QSpacerItem *horizontalSpacer_3;
     QMenuBar *menubar;
     QMenu *menu_1;
@@ -66,6 +66,7 @@ public:
     QMenu *menu2_3;
     QMenu *menu2_4;
     QMenu *menu2_5;
+    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *SearchVideoWindow)
     {
@@ -171,10 +172,6 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        verticalSpacer_3 = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        verticalLayout->addItem(verticalSpacer_3);
-
 
         horizontalLayout_2->addLayout(verticalLayout);
 
@@ -201,6 +198,9 @@ public:
         menu2_5 = new QMenu(menu_2);
         menu2_5->setObjectName("menu2_5");
         SearchVideoWindow->setMenuBar(menubar);
+        statusBar = new QStatusBar(SearchVideoWindow);
+        statusBar->setObjectName("statusBar");
+        SearchVideoWindow->setStatusBar(statusBar);
 
         menubar->addAction(menu_1->menuAction());
         menubar->addAction(menu_2->menuAction());
