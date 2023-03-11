@@ -18,6 +18,13 @@ public:
     QString appVersion;
     QByteArray userAgent;
 
+private slots:
+    void on_action_menu1_1_triggered();
+
+    void on_action_menu1_2_triggered();
+
+    void on_action_menu1_3_triggered();
+
 private:
     Ui::SearchVideoWindow *ui;
 };
