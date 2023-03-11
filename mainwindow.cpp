@@ -413,6 +413,7 @@ void MainWindow::get_headers(QString location)
     QNetworkRequest request;
     request.setUrl(QUrl(location));
     request.setRawHeader("User-Agent", user_agent);
+    request.setRawHeader("Referer", "https://www.y2mate.com/en474");
 
     QNetworkReply *reply_headers = manager.head(request);
 
@@ -433,7 +434,9 @@ void MainWindow::get_headers(QString location)
         }
     }
 
+
     QString header = reply_headers->header(QNetworkRequest::ContentDispositionHeader).toString();
+
     nazev_souboru = "[Název nenalezen]";
 
     if(header.contains("filename")){
@@ -1028,8 +1031,6 @@ void MainWindow::on_pushButton_clicked(){
             data.append("ajax=1");
 
             MainWindow::post("https://www.y2mate.com/mates/mp3/ajax", data, 1);     // post request na získání informací o videu
-
-            qInfo() << response_najit_formaty;
 
             if (response_najit_formaty == "error"){
 
