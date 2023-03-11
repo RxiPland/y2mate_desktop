@@ -9,9 +9,10 @@
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QProcess>
+#include <QRegExp>
 
 
-SearchVideoWindow::SearchVideoWindow(QWidget *parent, bool jsonCorrupted)
+searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     : QMainWindow(parent)
     , ui(new Ui::SearchVideoWindow)
 {
@@ -23,13 +24,19 @@ SearchVideoWindow::SearchVideoWindow(QWidget *parent, bool jsonCorrupted)
     }
 }
 
-SearchVideoWindow::~SearchVideoWindow()
+searchVideoWindow::~searchVideoWindow()
 {
     delete ui;
 }
 
+void searchVideoWindow::disableWidgets(bool disable)
+{
+    ui->lineEdit->setDisabled(disable);
+    ui->pushButton->setDisabled(disable);
+}
 
-void SearchVideoWindow::on_action_menu1_1_triggered()
+
+void searchVideoWindow::on_action_menu1_1_triggered()
 {
     // open y2mate's website
 
@@ -37,7 +44,7 @@ void SearchVideoWindow::on_action_menu1_1_triggered()
 }
 
 
-void SearchVideoWindow::on_action_menu1_2_triggered()
+void searchVideoWindow::on_action_menu1_2_triggered()
 {
     // open source code on github
 
@@ -45,7 +52,7 @@ void SearchVideoWindow::on_action_menu1_2_triggered()
 }
 
 
-void SearchVideoWindow::on_action_menu1_3_triggered()
+void searchVideoWindow::on_action_menu1_3_triggered()
 {
     // open settings window
 
@@ -58,9 +65,15 @@ void SearchVideoWindow::on_action_menu1_3_triggered()
 }
 
 
-void SearchVideoWindow::on_action_menu2_1_triggered()
+void searchVideoWindow::on_action_menu2_1_triggered()
 {
     // delete history from JSON file
+
+    QMessageBox::StandardButton replyBox = QMessageBox::information(this, "Oznámení", "Opravdu chcete smazat historii?", QMessageBox::Yes | QMessageBox::No);
+
+    if (replyBox == QMessageBox::No){
+        return;
+    }
 
     QFile dataFile(QDir::currentPath() + "/Data/data.json");
 
@@ -130,19 +143,39 @@ void SearchVideoWindow::on_action_menu2_1_triggered()
 }
 
 
-void SearchVideoWindow::on_pushButton_clicked()
+void searchVideoWindow::on_pushButton_clicked()
 {
     // search video button
+    searchVideoWindow::disableWidgets();
 
+    QString videoUrl = ui->lineEdit->text();
+
+    // source: https://regex101.com/r/kM8eW3/1
+    QRegExp rx("(^$|(http(s)?://)([\\w-]+\\.)+[\\w-]+([\\w- ;,./?%&=]*))");
+
+    if(videoUrl == ""){
+
+        QMessageBox::critical(this, "Chyba", "Pole pro URL adresu nemůže být prázdné!");
+
+        searchVideoWindow::disableWidgets(false);
+        ui->lineEdit->setFocus();
+        return;
+
+    } else if (!rx.exactMatch(videoUrl)){
+
+        QMessageBox::critical(this, "Chyba", "Zadejte kompletní URL adresu!\n\nPř. https://www.google.com");
+
+        searchVideoWindow::disableWidgets(false);
+        ui->lineEdit->setFocus();
+        return;
+    }
 
 
 }
 
-
-void SearchVideoWindow::on_lineEdit_returnPressed()
+void searchVideoWindow::on_lineEdit_returnPressed()
 {
     // return pressed when writing URL
 
-    SearchVideoWindow::on_pushButton_clicked();
+    searchVideoWindow::on_pushButton_clicked();
 }
-
