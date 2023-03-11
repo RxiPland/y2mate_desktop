@@ -8,13 +8,19 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QMessageBox>
+#include <QProcess>
 
 
-SearchVideoWindow::SearchVideoWindow(QWidget *parent)
+SearchVideoWindow::SearchVideoWindow(QWidget *parent, bool jsonCorrupted)
     : QMainWindow(parent)
     , ui(new Ui::SearchVideoWindow)
 {
     ui->setupUi(this);
+    this->show();
+
+    if(jsonCorrupted){
+        QMessageBox::warning(this, "Oznámení", "Soubor s nastavením byl poškozen. Nastavení bylo přepsáno do defaultního stavu, aby program mohl fungovat.");
+    }
 }
 
 SearchVideoWindow::~SearchVideoWindow()
@@ -65,12 +71,26 @@ void SearchVideoWindow::on_action_menu2_1_triggered()
         QByteArray fileContent = dataFile.readAll();
         dataFile.close();
 
+        if(fileContent.isEmpty()){
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            this->close();
+            return;
+        }
+
         QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
 
         if(loadedJson.isEmpty()){
-            // JSON will not be loaded
+            // JSON cannot be loaded
 
-            QMessageBox::critical(this, "Chyba", "Nastala chyba při načítání JSONu ze souboru s nastavením!\n\n" + dataFile.fileName());
+            QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            this->close();
             return;
         }
 
@@ -86,10 +106,43 @@ void SearchVideoWindow::on_action_menu2_1_triggered()
         QJsonDocument docData(loadedJson);
 
         dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
-        dataFile.write(docData.toJson());
+        int status = dataFile.write(docData.toJson());
         dataFile.close();
 
-        QMessageBox::information(this, "Oznámení", "Historie byla úspěšně vymazána");
+        if (status == -1){
+            QMessageBox::critical(this, "Chyba", "Nastala chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+
+            return;
+        }
+
+        QMessageBox::information(this, "Oznámení", "Historie byla úspěšně smazána");
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        this->close();
+        return;
     }
+}
+
+
+void SearchVideoWindow::on_pushButton_clicked()
+{
+    // search video button
+
+
+
+}
+
+
+void SearchVideoWindow::on_lineEdit_returnPressed()
+{
+    // return pressed when writing URL
+
+    SearchVideoWindow::on_pushButton_clicked();
 }
 

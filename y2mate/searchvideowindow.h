@@ -12,7 +12,7 @@ class SearchVideoWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    SearchVideoWindow(QWidget *parent = nullptr);
+    SearchVideoWindow(QWidget *parent = nullptr, bool jsonCorrupted = false);
     ~SearchVideoWindow();
 
     QString appVersion;
@@ -20,11 +20,8 @@ public:
 
 private slots:
     void on_action_menu1_1_triggered();
-
     void on_action_menu1_2_triggered();
-
     void on_action_menu1_3_triggered();
-
     void on_action_menu2_1_triggered();
 
 private:
