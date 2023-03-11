@@ -248,7 +248,44 @@ void searchVideoWindow::on_pushButton_clicked()
     QByteArray response = replyPost->readAll();
     QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
 
-    qInfo() << loadedJson;
+    QString status = loadedJson["status"].toString().toLower();
+
+    if (status != "ok"){
+
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"status\": \"%1\"").arg(status));
+        return;
+    }
+
+    QJsonObject formats = loadedJson["links"].toObject();
+
+    // capture mp3 qualities
+    QJsonObject mp3Files = formats["mp3"].toObject();
+    QStringList mp3Qualities;
+
+    foreach(QJsonValueConstRef x, mp3Files){
+
+        if(x.toObject()["f"] == "mp3"){
+            mp3Qualities.append(x.toObject()["q"].toString());
+        }
+    }
+
+    // capture mp4 qualities
+    QJsonObject mp4Files = formats["mp4"].toObject();
+    QStringList mp4Qualities;
+
+    foreach(QJsonValueConstRef x, mp4Files){
+
+        if(x.toObject()["f"] == "mp4"){
+            mp4Qualities.append(x.toObject()["q"].toString());
+        }
+    }
+
+    QString ytChannel = loadedJson["a"].toString();
+    int videoDuration = loadedJson["t"].toInt();
+    QString videoName = loadedJson["title"].toString();
+
+    qInfo() << mp3Qualities;
+    qInfo() << mp4Qualities;
 
 }
 
