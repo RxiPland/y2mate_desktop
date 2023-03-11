@@ -11,7 +11,7 @@ QString appVersion = "v2.0.0";
 
 void checkSettings(){
 
-    QFile dataFile("Data/data.json");
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
 
     if (dataFile.exists()){
         // everything OK
@@ -20,8 +20,6 @@ void checkSettings(){
         // create file with default content (settings)
         QDir directory;
         directory.mkdir("./Data");
-
-        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
         QJsonObject objData;
         objData["app_version"] = appVersion;
@@ -34,11 +32,13 @@ void checkSettings(){
 
             history[QString::number(i)] = "";
         }
-
         objData["search_history"] = history;
 
         QJsonDocument docData(objData);
+
+        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
         dataFile.write(docData.toJson());
+        dataFile.close();
     }
 }
 
