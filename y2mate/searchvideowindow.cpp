@@ -10,6 +10,8 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QRegExp>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -22,11 +24,56 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     if(jsonCorrupted){
         QMessageBox::warning(this, "Oznámení", "Soubor s nastavením byl poškozen. Nastavení bylo přepsáno do defaultního stavu, aby program mohl fungovat.");
     }
+
+    searchVideoWindow::loadSettings();
 }
 
 searchVideoWindow::~searchVideoWindow()
 {
     delete ui;
+}
+
+void searchVideoWindow::loadSettings()
+{
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            this->close();
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+
+                this->close();
+                return;
+
+            } else{
+                // everything OK
+
+                searchVideoWindow::appVersion = loadedJson["app_version"].toString().toUtf8();
+                searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
+            }
+        }
+    }
 }
 
 void searchVideoWindow::disableWidgets(bool disable)
@@ -172,6 +219,36 @@ void searchVideoWindow::on_pushButton_clicked()
     }
 
 
+    // request
+
+    QByteArray data;
+
+    data.append("k_query=");
+    data.append(QUrl::toPercentEncoding(videoUrl).toStdString());
+    data.append("&");
+    data.append("k_page=mp3");
+    data.append("&");
+    data.append("hl=en");
+    data.append("&");
+    data.append("q_auto=1");
+
+
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://www.y2mate.com/mates/analyzeV2/ajax"));
+    request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
+
+    QNetworkReply *replyPost = manager.post(request, data);
+
+    while (!replyPost->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    QByteArray response = replyPost->readAll();
+    QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
+
+    qInfo() << loadedJson;
 
 }
 
