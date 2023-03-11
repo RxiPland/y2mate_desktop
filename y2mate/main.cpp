@@ -24,8 +24,18 @@ void checkSettings(){
         dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
 
         QJsonObject objData;
-        objData["appVersion"] = appVersion;
-        objData["userAgent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+        objData["app_version"] = appVersion;
+        objData["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
+
+        QJsonObject history;
+
+        int i;
+        for(i=1; i<6; i++){
+
+            history[QString::number(i)] = "";
+        }
+
+        objData["search_history"] = history;
 
         QJsonDocument docData(objData);
         dataFile.write(docData.toJson());
