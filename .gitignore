@@ -1,2 +1,3 @@
 .git
-/CMakeLists.txt.user
+/y2mate/CMakeLists.txt.user
+/build-y2mate-*/

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>searchVideo</class>
- <widget class="QMainWindow" name="searchVideo">
+ <class>SearchVideoWindow</class>
+ <widget class="QMainWindow" name="SearchVideoWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>searchVideo</string>
+   <string>SearchVideoWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar"/>

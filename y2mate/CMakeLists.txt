@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(y2mate_desktop VERSION 0.1 LANGUAGES CXX)
+project(y2mate VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -14,37 +14,37 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        searchvideo.cpp
-        searchvideo.h
-        searchvideo.ui
+        searchvideowindow.cpp
+        searchvideowindow.h
+        searchvideowindow.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(y2mate_desktop
+    qt_add_executable(y2mate
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
 # Define target properties for Android with Qt 6 as:
-#    set_property(TARGET y2mate_desktop APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#    set_property(TARGET y2mate APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
-        add_library(y2mate_desktop SHARED
+        add_library(y2mate SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(y2mate_desktop
+        add_executable(y2mate
             ${PROJECT_SOURCES}
         )
     endif()
 endif()
 
-target_link_libraries(y2mate_desktop PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(y2mate PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-set_target_properties(y2mate_desktop PROPERTIES
+set_target_properties(y2mate PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -52,10 +52,10 @@ set_target_properties(y2mate_desktop PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-install(TARGETS y2mate_desktop
+install(TARGETS y2mate
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(y2mate_desktop)
+    qt_finalize_executable(y2mate)
 endif()
