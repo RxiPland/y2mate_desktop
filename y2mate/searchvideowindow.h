@@ -2,6 +2,7 @@
 #define SEARCHVIDEOWINDOW_H
 
 #include <QMainWindow>
+#include <QNetworkAccessManager>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SearchVideoWindow; }
@@ -14,6 +15,8 @@ class searchVideoWindow : public QMainWindow
 public:
     searchVideoWindow(QWidget *parent = nullptr, bool jsonCorrupted = false);
     ~searchVideoWindow();
+
+    void loadSettings();
 
     QString appVersion;
     QByteArray userAgent;
@@ -28,6 +31,7 @@ private slots:
 
 private:
     Ui::SearchVideoWindow *ui;
+    QNetworkAccessManager manager;
 
     void disableWidgets(bool disable = true);
 
