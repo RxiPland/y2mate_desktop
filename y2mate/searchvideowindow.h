@@ -15,6 +15,9 @@ public:
     SearchVideoWindow(QWidget *parent = nullptr);
     ~SearchVideoWindow();
 
+    QString appVersion;
+    QByteArray userAgent;
+
 private:
     Ui::SearchVideoWindow *ui;
 };
