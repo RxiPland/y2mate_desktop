@@ -21,6 +21,10 @@ set(PROJECT_SOURCES
         searchvideowindow.cpp
         searchvideowindow.h
         searchvideowindow.ui
+
+        settingsdialog.h
+        settingsdialog.cpp
+        settingsdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
