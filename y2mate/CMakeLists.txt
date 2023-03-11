@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(y2mate VERSION 0.1 LANGUAGES CXX)
+project(y2mate VERSION 2.0.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -9,11 +9,15 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/images/appicon.rc")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
+        resources.qrc
         main.cpp
+
         searchvideowindow.cpp
         searchvideowindow.h
         searchvideowindow.ui
@@ -59,3 +63,9 @@ install(TARGETS y2mate
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(y2mate)
 endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Network)
+target_link_libraries(y2mate PRIVATE Qt6::Network)
+
+find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
+target_link_libraries(y2mate PRIVATE Qt6::Core5Compat)
