@@ -27,6 +27,7 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     }
 
     searchVideoWindow::loadSettings();
+    //searchVideoWindow::checkUpdate();
 }
 
 searchVideoWindow::~searchVideoWindow()
@@ -72,7 +73,61 @@ void searchVideoWindow::loadSettings()
 
                 searchVideoWindow::appVersion = loadedJson["app_version"].toString().toUtf8();
                 searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
+                searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
+
+                // disable history tab
+                ui->menu2_1->menuAction()->setVisible(allowHistory);
+                ui->menu2_2->menuAction()->setVisible(allowHistory);
+                ui->menu2_3->menuAction()->setVisible(allowHistory);
+                ui->menu2_4->menuAction()->setVisible(allowHistory);
+                ui->menu2_5->menuAction()->setVisible(allowHistory);
+
+                ui->action_menu2_6->setDisabled(!allowHistory);
+                ui->action_menu2_6->setIconVisibleInMenu(allowHistory);
+
+                if(!allowHistory){
+                    ui->action_menu2_6->setText("Historie není povolena");
+
+                } else{
+                    ui->action_menu2_6->setText("Smazat historii");
+                }
             }
+        }
+    }
+}
+
+void searchVideoWindow::checkUpdate()
+{
+
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+
+    QNetworkReply *replyGet = manager.get(request);
+
+    while (!replyGet->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    QByteArray response = replyGet->readAll();
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    QString newestVersion = jsonObject["tag_name"].toString();
+
+    if (newestVersion != appVersion && newestVersion != ""){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Aktualizace");
+        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
+        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
+        msgBox.addButton("Zrušit", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton()==pButtonYes) {
+            ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
         }
     }
 }
@@ -136,85 +191,6 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     sd.exec();
     this->show();
 }
-
-
-void searchVideoWindow::on_action_menu2_1_triggered()
-{
-    // delete history from JSON file
-
-    QMessageBox::StandardButton replyBox = QMessageBox::information(this, "Oznámení", "Opravdu chcete smazat historii?", QMessageBox::Yes | QMessageBox::No);
-
-    if (replyBox == QMessageBox::No){
-        return;
-    }
-
-    QFile dataFile(QDir::currentPath() + "/Data/data.json");
-
-    if (dataFile.exists()){
-
-        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
-
-        QByteArray fileContent = dataFile.readAll();
-        dataFile.close();
-
-        if(fileContent.isEmpty()){
-
-            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
-
-            QProcess::startDetached(QApplication::applicationFilePath());
-
-            this->close();
-            return;
-        }
-
-        QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
-
-        if(loadedJson.isEmpty()){
-            // JSON cannot be loaded
-
-            QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
-
-            QProcess::startDetached(QApplication::applicationFilePath());
-
-            this->close();
-            return;
-        }
-
-        QJsonObject history;
-
-        int i;
-        for(i=1; i<6; i++){
-
-            history[QString::number(i)] = "";
-        }
-        loadedJson["search_history"] = history;
-
-        QJsonDocument docData(loadedJson);
-
-        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
-        int status = dataFile.write(docData.toJson());
-        dataFile.close();
-
-        if (status == -1){
-            QMessageBox::critical(this, "Chyba", "Nastala chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
-
-            return;
-        }
-
-        QMessageBox::information(this, "Oznámení", "Historie byla úspěšně smazána");
-
-    } else{
-        // file with settings not found
-
-        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
-
-        QProcess::startDetached(QApplication::applicationFilePath());
-
-        this->close();
-        return;
-    }
-}
-
 
 void searchVideoWindow::on_pushButton_clicked()
 {
@@ -326,9 +302,93 @@ void searchVideoWindow::on_pushButton_clicked()
     this->show();
 }
 
+
 void searchVideoWindow::on_lineEdit_returnPressed()
 {
     // return pressed when writing URL
 
     searchVideoWindow::on_pushButton_clicked();
 }
+
+void searchVideoWindow::on_action_menu2_6_triggered()
+{
+    // delete history from JSON file
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Upozornění");
+    msgBox.setText("Opravdu chcete smazat historii?");
+    msgBox.addButton("Ano", QMessageBox::YesRole);
+    QAbstractButton* pButtonNo = msgBox.addButton("Zrušit", QMessageBox::NoRole);
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == pButtonNo) {
+        return;
+    }
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            this->close();
+            return;
+        }
+
+        QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+        if(loadedJson.isEmpty()){
+            // JSON cannot be loaded
+
+            QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            this->close();
+            return;
+        }
+
+        QJsonObject history;
+
+        int i;
+        for(i=1; i<6; i++){
+
+            history[QString::number(i)] = "";
+        }
+        loadedJson["search_history"] = history;
+
+        QJsonDocument docData(loadedJson);
+
+        dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+        int status = dataFile.write(docData.toJson());
+        dataFile.close();
+
+        if (status == -1){
+            QMessageBox::critical(this, "Chyba", "Nastala chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+
+            return;
+        }
+
+        QMessageBox::information(this, "Oznámení", "Historie byla úspěšně smazána");
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        this->close();
+        return;
+    }
+}
+

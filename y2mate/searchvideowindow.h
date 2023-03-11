@@ -17,17 +17,19 @@ public:
     ~searchVideoWindow();
 
     void loadSettings();
+    void checkUpdate();
 
     QString appVersion;
     QByteArray userAgent;
+    bool allowHistory;
 
 private slots:
     void on_action_menu1_1_triggered();
     void on_action_menu1_2_triggered();
     void on_action_menu1_3_triggered();
-    void on_action_menu2_1_triggered();
     void on_pushButton_clicked();
     void on_lineEdit_returnPressed();
+    void on_action_menu2_6_triggered();
 
 private:
     Ui::SearchVideoWindow *ui;

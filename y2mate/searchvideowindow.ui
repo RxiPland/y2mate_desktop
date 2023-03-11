@@ -186,7 +186,58 @@
     <property name="title">
      <string>Historie</string>
     </property>
-    <addaction name="action_menu2_1"/>
+    <widget class="QMenu" name="menu2_1">
+     <property name="title">
+      <string>1</string>
+     </property>
+     <addaction name="action_menu_2_1_1"/>
+     <addaction name="action_menu_2_1_2"/>
+     <addaction name="separator"/>
+     <addaction name="action_menu_2_1_3"/>
+    </widget>
+    <widget class="QMenu" name="menu2_2">
+     <property name="title">
+      <string>2</string>
+     </property>
+     <addaction name="action_menu_2_2_1"/>
+     <addaction name="action_menu_2_2_2"/>
+     <addaction name="separator"/>
+     <addaction name="action_menu_2_2_3"/>
+    </widget>
+    <widget class="QMenu" name="menu2_3">
+     <property name="title">
+      <string>3</string>
+     </property>
+     <addaction name="action_menu_2_3_1"/>
+     <addaction name="action_menu_2_3_2"/>
+     <addaction name="separator"/>
+     <addaction name="action_menu_2_3_3"/>
+    </widget>
+    <widget class="QMenu" name="menu2_4">
+     <property name="title">
+      <string>4</string>
+     </property>
+     <addaction name="action_menu_2_4_1"/>
+     <addaction name="action_menu_2_4_2"/>
+     <addaction name="separator"/>
+     <addaction name="action_menu_2_4_3"/>
+    </widget>
+    <widget class="QMenu" name="menu2_5">
+     <property name="title">
+      <string>5</string>
+     </property>
+     <addaction name="action_menu_2_5_1"/>
+     <addaction name="action_menu_2_5_2"/>
+     <addaction name="separator"/>
+     <addaction name="action_menu_2_5_3"/>
+    </widget>
+    <addaction name="menu2_1"/>
+    <addaction name="menu2_2"/>
+    <addaction name="menu2_3"/>
+    <addaction name="menu2_4"/>
+    <addaction name="menu2_5"/>
+    <addaction name="separator"/>
+    <addaction name="action_menu2_6"/>
    </widget>
    <addaction name="menu_1"/>
    <addaction name="menu_2"/>
@@ -218,13 +269,88 @@
     <string>Nastavení</string>
    </property>
   </action>
-  <action name="action_menu2_1">
+  <action name="action_menu2_6">
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/images/delete.ico</normaloff>:/images/delete.ico</iconset>
    </property>
    <property name="text">
     <string>Smazat historii</string>
+   </property>
+  </action>
+  <action name="action_menu_2_1_1">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_1_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_1_3">
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="action_menu_2_2_1">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_2_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_2_3">
+   <property name="text">
+    <string>Délka:</string>
+   </property>
+  </action>
+  <action name="action_menu_2_3_1">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_3_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_3_3">
+   <property name="text">
+    <string>Délka</string>
+   </property>
+  </action>
+  <action name="action_menu_2_4_1">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_4_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_4_3">
+   <property name="text">
+    <string>Délka</string>
+   </property>
+  </action>
+  <action name="action_menu_2_5_1">
+   <property name="text">
+    <string>Použít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_5_2">
+   <property name="text">
+    <string>Otevřít</string>
+   </property>
+  </action>
+  <action name="action_menu_2_5_3">
+   <property name="text">
+    <string>Délka:</string>
    </property>
   </action>
  </widget>
