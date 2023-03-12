@@ -1,5 +1,6 @@
 #include "downloadvideowindow.h"
 #include "ui_downloadvideowindow.h"
+#include "downloaddialog.h"
 
 #include <QRegularExpression>
 #include <QMessageBox>
@@ -153,12 +154,17 @@ void downloadVideoWindow::on_pushButton_clicked()
     data.append("k=");
     data.append(QUrl::toPercentEncoding(downloadToken).toStdString());
 
+    QLabel *label = new QLabel("Zpracovávám video...   ");
+    ui->statusBar->addWidget(label);
+
     QNetworkReply *replyPost = manager.post(request, data);
 
     while (!replyPost->isFinished())
     {
         qApp->processEvents();
     }
+
+    ui->statusBar->removeWidget(label);
 
     QNetworkReply::NetworkError error = replyPost->error();
 
@@ -193,6 +199,12 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
+    downloadDialog dd;
+    dd.appVersion = downloadVideoWindow::appVersion;
+    dd.userAgent = downloadVideoWindow::userAgent;
+    dd.downloadLink = downloadLink;
+
+    dd.exec();
 
     downloadVideoWindow::disableWidgets(false);
 }
