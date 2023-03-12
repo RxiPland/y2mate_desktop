@@ -21,14 +21,25 @@ public:
     QJsonObject mp3Qualities;
     QJsonObject mp4Qualities;
 
+    QStringList mp3QualitiesKeysSorted;
+    QStringList mp4QualitiesKeysSorted;
+
     QString videoName;
     QString videoID;
     QString ytChannel;
     int videoDuration=0;
     QString videoUrl;
 
+    bool exitApp = true;
+
+private slots:
+    void on_pushButton_2_clicked();
+    void on_comboBox_currentTextChanged(const QString &arg1);
+
 private:
     Ui::downloadVideoWindow *ui;
+
+    void sortQualities(QStringList *list);
 };
 
 #endif // DOWNLOADVIDEOWINDOW_H

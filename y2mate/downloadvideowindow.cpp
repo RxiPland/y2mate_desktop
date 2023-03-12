@@ -13,9 +13,35 @@ downloadVideoWindow::~downloadVideoWindow()
     delete ui;
 }
 
+void downloadVideoWindow::sortQualities(QStringList *list)
+{
+    QStringList tempList = list->toList();
+
+    int i;
+    static QRegularExpression re("(kbps|p)");
+
+    for(i=0; i<tempList.length(); i++){
+
+        tempList[i] = tempList[i].replace(re, "");
+    }
+
+    // source: https://stackoverflow.com/questions/65061873/sorting-a-qstring-list-by-numbers-c
+    std::sort(tempList.begin(), tempList.end(), [](const QString &lhs, const QString &rhs)
+    {
+        int num_lhs = lhs.toInt();
+        int num_rhs = rhs.toInt();
+        return num_lhs < num_rhs;
+    });
+
+    *list = tempList;
+}
+
 void downloadVideoWindow::loadData()
 {
     // set data to widgets
+
+    ui->comboBox_2->setDisabled(true);
+    ui->comboBox_2->clear();
 
     ui->lineEdit->setText(downloadVideoWindow::videoUrl);
     ui->label->setText(QString("Název: %1").arg(downloadVideoWindow::videoName));
@@ -55,4 +81,57 @@ void downloadVideoWindow::loadData()
 
     ui->label_2->setText(QString("Délka: %1").arg(timeDuration));
     ui->label_3->setText(QString("Kanál: %1").arg(downloadVideoWindow::ytChannel));
+
+
+    downloadVideoWindow::mp3QualitiesKeysSorted = mp3Qualities.keys();
+    downloadVideoWindow::mp4QualitiesKeysSorted = mp4Qualities.keys();
+
+    sortQualities(&mp3QualitiesKeysSorted);
+    sortQualities(&mp4QualitiesKeysSorted);
 }
+
+void downloadVideoWindow::on_pushButton_2_clicked()
+{
+    exitApp = false;
+    this->close();
+}
+
+
+void downloadVideoWindow::on_comboBox_currentTextChanged(const QString &arg1)
+{
+    int i;
+
+    ui->comboBox_2->clear();
+    ui->comboBox_2->addItem("<Vyberte kvalitu>");
+
+    if(arg1.contains("mp3")){
+
+        QString a;
+
+        for(i=mp3QualitiesKeysSorted.length()-1; 0<=i; i--){
+
+            a = mp3QualitiesKeysSorted[i];
+
+            if (a.contains("128")){
+                ui->comboBox_2->addItem(a + "kbps (standard)");
+
+            } else{
+                ui->comboBox_2->addItem(a + "kbps");
+            }
+        }
+
+    } else if (arg1.contains("mp4")){
+
+        for(i=mp4QualitiesKeysSorted.length()-1; 0<=i; i--){
+            ui->comboBox_2->addItem(mp4QualitiesKeysSorted[i] + "p");
+        }
+
+    } else{
+        ui->comboBox_2->setDisabled(true);
+        ui->comboBox_2->clear();
+        return;
+    }
+
+    ui->comboBox_2->setDisabled(false);
+}
+

@@ -55,7 +55,7 @@ public:
     {
         if (downloadVideoWindow->objectName().isEmpty())
             downloadVideoWindow->setObjectName("downloadVideoWindow");
-        downloadVideoWindow->resize(581, 208);
+        downloadVideoWindow->resize(581, 240);
         centralwidget = new QWidget(downloadVideoWindow);
         centralwidget->setObjectName("centralwidget");
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -72,8 +72,10 @@ public:
 
         lineEdit = new QLineEdit(centralwidget);
         lineEdit->setObjectName("lineEdit");
-        lineEdit->setEnabled(false);
+        lineEdit->setEnabled(true);
         lineEdit->setBaseSize(QSize(0, 0));
+        lineEdit->setMaxLength(9999);
+        lineEdit->setReadOnly(true);
 
         verticalLayout->addWidget(lineEdit);
 
@@ -178,7 +180,7 @@ public:
         downloadVideoWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(downloadVideoWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 581, 25));
+        menubar->setGeometry(QRect(0, 0, 581, 21));
         downloadVideoWindow->setMenuBar(menubar);
 
         retranslateUi(downloadVideoWindow);
@@ -195,7 +197,7 @@ public:
         label_3->setText(QCoreApplication::translate("downloadVideoWindow", "Kan\303\241l:", nullptr));
         comboBox->setItemText(0, QCoreApplication::translate("downloadVideoWindow", "<Vyberte form\303\241t>", nullptr));
         comboBox->setItemText(1, QCoreApplication::translate("downloadVideoWindow", "mp3 (pouze zvuk)", nullptr));
-        comboBox->setItemText(2, QCoreApplication::translate("downloadVideoWindow", "mp4 (video + zvuk)", nullptr));
+        comboBox->setItemText(2, QCoreApplication::translate("downloadVideoWindow", "mp4 (video)", nullptr));
 
         comboBox_2->setItemText(0, QCoreApplication::translate("downloadVideoWindow", "<Vyberte kvalitu>", nullptr));
 
