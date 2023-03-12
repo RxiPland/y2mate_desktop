@@ -1,6 +1,10 @@
 #include "downloadvideowindow.h"
 #include "ui_downloadvideowindow.h"
 
+#include <QRegularExpression>
+#include <QMessageBox>
+
+
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::downloadVideoWindow)
@@ -36,12 +40,22 @@ void downloadVideoWindow::sortQualities(QStringList *list)
     *list = tempList;
 }
 
+void downloadVideoWindow::disableWidgets(bool disable)
+{
+    ui->comboBox->setDisabled(disable);
+    ui->comboBox_2->setDisabled(disable);
+
+    ui->pushButton->setDisabled(disable);
+    ui->pushButton_2->setDisabled(disable);
+}
+
 void downloadVideoWindow::loadData()
 {
     // set data to widgets
 
     ui->comboBox_2->setDisabled(true);
     ui->comboBox_2->clear();
+    ui->pushButton->setDisabled(true);
 
     ui->lineEdit->setText(downloadVideoWindow::videoUrl);
     ui->label->setText(QString("Název: %1").arg(downloadVideoWindow::videoName));
@@ -96,6 +110,35 @@ void downloadVideoWindow::on_pushButton_2_clicked()
     this->close();
 }
 
+void downloadVideoWindow::on_pushButton_clicked()
+{
+    // download video
+
+    downloadVideoWindow::disableWidgets();
+
+    QString format = ui->comboBox->currentText().split(' ').first();
+    QString quality = ui->comboBox_2->currentText().split(' ').first();
+
+    QString downloadToken;
+
+    if (format == "mp3"){
+        downloadToken = mp3Qualities[quality].toString();
+
+    } else if (format == "mp4"){
+        downloadToken = mp4Qualities[quality].toString();
+
+    }
+
+    if (downloadToken.isEmpty()){
+
+        QMessageBox::critical(this, "Chyba", "Nepodařilo se najít token pro stažení videa!");
+        downloadVideoWindow::disableWidgets(false);
+        return;
+    }
+
+    qInfo() << downloadToken;
+    downloadVideoWindow::disableWidgets(false);
+}
 
 void downloadVideoWindow::on_comboBox_currentTextChanged(const QString &arg1)
 {
@@ -129,9 +172,28 @@ void downloadVideoWindow::on_comboBox_currentTextChanged(const QString &arg1)
     } else{
         ui->comboBox_2->setDisabled(true);
         ui->comboBox_2->clear();
+        ui->pushButton->setDisabled(true);
         return;
     }
 
+    if(ui->comboBox_2->currentText() == "<Vyberte kvalitu>"){
+        ui->pushButton->setDisabled(true);
+
+    } else{
+        ui->pushButton->setDisabled(false);
+    }
+
     ui->comboBox_2->setDisabled(false);
+}
+
+
+void downloadVideoWindow::on_comboBox_2_currentTextChanged(const QString &arg1)
+{
+    if(arg1 == "<Vyberte kvalitu>"){
+        ui->pushButton->setDisabled(true);
+
+    } else{
+        ui->pushButton->setDisabled(false);
+    }
 }
 

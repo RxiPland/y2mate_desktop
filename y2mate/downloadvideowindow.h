@@ -35,11 +35,15 @@ public:
 private slots:
     void on_pushButton_2_clicked();
     void on_comboBox_currentTextChanged(const QString &arg1);
+    void on_pushButton_clicked();
+
+    void on_comboBox_2_currentTextChanged(const QString &arg1);
 
 private:
     Ui::downloadVideoWindow *ui;
 
     void sortQualities(QStringList *list);
+    void disableWidgets(bool disable = true);
 };
 
 #endif // DOWNLOADVIDEOWINDOW_H
