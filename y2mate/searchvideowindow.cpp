@@ -359,6 +359,8 @@ void searchVideoWindow::on_pushButton_clicked()
     videoName = tempName;
 
     downloadVideoWindow dvw(nullptr);
+    dvw.appVersion = searchVideoWindow::appVersion;
+    dvw.userAgent = searchVideoWindow::userAgent;
     dvw.ytChannel = ytChannel;
     dvw.videoDuration = videoDuration;
     dvw.videoName = videoName;
