@@ -21,6 +21,7 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     , ui(new Ui::SearchVideoWindow)
 {
     ui->setupUi(this);
+    this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
     this->show();
 
     if(jsonCorrupted){
@@ -79,6 +80,8 @@ void searchVideoWindow::loadSettings()
                 // everything OK
 
                 searchVideoWindow::appVersion = loadedJson["app_version"].toString().toUtf8();
+                this->setWindowTitle("y2mate desktop  |  " + searchVideoWindow::appVersion);
+
                 searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
                 searchVideoWindow::checkForUpdates = loadedJson["check_for_updates"].toBool();
                 searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
