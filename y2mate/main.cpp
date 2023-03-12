@@ -79,7 +79,6 @@ int main(int argc, char *argv[])
     bool jsonCorrupted = checkSettings();
 
     searchVideoWindow svw(nullptr, jsonCorrupted);
-    svw.appVersion = appVersion;
     svw.show();
 
     return a.exec();
