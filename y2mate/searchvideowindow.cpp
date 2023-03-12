@@ -159,7 +159,7 @@ void searchVideoWindow::checkUpdate()
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
         msgBox.setText("Je dostupná novější verze y2mate desktop: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
-        QAbstractButton* pButtonYes = msgBox.addButton("Otevřít odkaz", QMessageBox::YesRole);
+        QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
 
@@ -288,10 +288,18 @@ void searchVideoWindow::on_pushButton_clicked()
     QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
 
     QString status = loadedJson["status"].toString().toLower();
+    QString message = loadedJson["mess"].toString();
 
     if (status != "ok"){
 
-        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"status\": \"%1\"").arg(status));
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"status\": \"%1\"}").arg(status));
+        disableWidgets(false);
+        return;
+
+    } else if (!message.isEmpty()){
+
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"message\": \"%1\"}").arg(message));
+        disableWidgets(false);
         return;
     }
 
