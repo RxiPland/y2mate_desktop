@@ -74,6 +74,7 @@ public:
         lineEdit->setObjectName("lineEdit");
         lineEdit->setEnabled(true);
         lineEdit->setBaseSize(QSize(0, 0));
+        lineEdit->setFocusPolicy(Qt::NoFocus);
         lineEdit->setMaxLength(9999);
         lineEdit->setReadOnly(true);
 
@@ -121,6 +122,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(comboBox->sizePolicy().hasHeightForWidth());
         comboBox->setSizePolicy(sizePolicy1);
+        comboBox->setMinimumSize(QSize(0, 27));
 
         verticalLayout_2->addWidget(comboBox);
 
@@ -131,6 +133,7 @@ public:
         comboBox_2 = new QComboBox(centralwidget);
         comboBox_2->addItem(QString());
         comboBox_2->setObjectName("comboBox_2");
+        comboBox_2->setMinimumSize(QSize(0, 27));
 
         verticalLayout_2->addWidget(comboBox_2);
 
@@ -145,6 +148,7 @@ public:
         verticalLayout_3->setObjectName("verticalLayout_3");
         pushButton_2 = new QPushButton(centralwidget);
         pushButton_2->setObjectName("pushButton_2");
+        pushButton_2->setMinimumSize(QSize(0, 27));
 
         verticalLayout_3->addWidget(pushButton_2);
 
@@ -156,7 +160,7 @@ public:
         pushButton->setObjectName("pushButton");
         sizePolicy1.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
         pushButton->setSizePolicy(sizePolicy1);
-        pushButton->setMinimumSize(QSize(150, 0));
+        pushButton->setMinimumSize(QSize(150, 27));
 
         verticalLayout_3->addWidget(pushButton);
 
