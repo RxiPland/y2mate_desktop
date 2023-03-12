@@ -176,32 +176,6 @@ void searchVideoWindow::disableWidgets(bool disable)
     ui->pushButton->setDisabled(disable);
 }
 
-
-void searchVideoWindow::sortQualities(QStringList *list)
-{
-    QStringList tempList = list->toList();
-
-    int i;
-    static QRegularExpression re("(kbps|p)");
-
-    for(i=0; i<tempList.length(); i++){
-
-        tempList[i] = tempList[i].replace(re, "");
-    }
-
-    // source: https://stackoverflow.com/questions/65061873/sorting-a-qstring-list-by-numbers-c
-    std::sort(tempList.begin(), tempList.end(), [](const QString &lhs, const QString &rhs)
-    {
-        int num_lhs = lhs.toInt();
-        int num_rhs = rhs.toInt();
-        return num_lhs < num_rhs;
-    });
-
-    *list = tempList;
-}
-
-
-
 void searchVideoWindow::on_action_menu1_1_triggered()
 {
     // open y2mate's website
@@ -341,7 +315,6 @@ void searchVideoWindow::on_pushButton_clicked()
             mp3Qualities[x.toObject()["q"].toString()] = x.toObject()["k"].toString();
         }
     }
-    //sortQualities(&mp3Qualities);
 
     // capture mp4 qualities
     QJsonObject mp4Files = formats["mp4"].toObject();
@@ -353,7 +326,6 @@ void searchVideoWindow::on_pushButton_clicked()
             mp4Qualities[x.toObject()["q"].toString()] = x.toObject()["k"].toString();
         }
     }
-    //sortQualities(&mp4Qualities);
 
 
     QString ytChannel = loadedJson["a"].toString();
@@ -391,13 +363,22 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;
 
+    // set data to widgets
     dvw.loadData();
 
     dvw.show();
     this->hide();
 
+    // wait until closed
     while(!dvw.isHidden()){
         qApp->processEvents();
+    }
+
+    // exit if pressed X
+    if(dvw.exitApp){
+        qApp->setQuitOnLastWindowClosed(true);
+        this->close();
+        return;
     }
 
     disableWidgets(false);
@@ -408,7 +389,7 @@ void searchVideoWindow::on_pushButton_clicked()
 
 void searchVideoWindow::on_lineEdit_returnPressed()
 {
-    // return pressed when writing URL
+    // return pressed when typing URL
 
     searchVideoWindow::on_pushButton_clicked();
 }
