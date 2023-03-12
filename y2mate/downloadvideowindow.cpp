@@ -14,6 +14,7 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
     ui(new Ui::downloadVideoWindow)
 {
     ui->setupUi(this);
+    this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 }
 
 downloadVideoWindow::~downloadVideoWindow()
@@ -154,7 +155,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     data.append("k=");
     data.append(QUrl::toPercentEncoding(downloadToken).toStdString());
 
-    QLabel *label = new QLabel("Zpracovávám video...   ");
+    QLabel *label = new QLabel("Čekám na zpracování videa...   ");
     ui->statusBar->addWidget(label);
 
     QNetworkReply *replyPost = manager.post(request, data);
