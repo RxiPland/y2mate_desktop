@@ -151,6 +151,10 @@ void searchVideoWindow::checkUpdate()
         qApp->processEvents();
     }
 
+    if(replyGet->error() != QNetworkReply::NoError){
+        return;
+    }
+
     QByteArray response = replyGet->readAll();
     QJsonDocument jsonResponse = QJsonDocument::fromJson(response);
     QJsonObject jsonObject = jsonResponse.object();
