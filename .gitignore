@@ -1,3 +1,5 @@
 .git
 /y2mate/CMakeLists.txt.user
 /build-y2mate-*/
+/UninsIS.dll
+/y2mate_setup_script.iss
