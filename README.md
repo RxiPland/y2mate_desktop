@@ -50,7 +50,7 @@
 # Poznámky
 
 - Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
-- Verze knihovny: QT6
+- Verze knihovny Qt: 6.4.2
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
 - FFmpeg.exe je stahován z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/tools/ffmpeg.exe)
