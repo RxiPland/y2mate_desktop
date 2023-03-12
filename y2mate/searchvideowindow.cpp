@@ -172,6 +172,7 @@ void searchVideoWindow::checkUpdate()
 void searchVideoWindow::disableWidgets(bool disable)
 {
     ui->lineEdit->setDisabled(disable);
+    ui->lineEdit->setClearButtonEnabled(!disable);
     ui->pushButton->setDisabled(disable);
 }
 
@@ -284,6 +285,24 @@ void searchVideoWindow::on_pushButton_clicked()
         qApp->processEvents();
     }
 
+    QNetworkReply::NetworkError error = replyPost->error();
+
+    if(error == QNetworkReply::HostNotFoundError){
+        // no internet connection available
+
+        disableWidgets(false);
+        QMessageBox::critical(this, "Chyba", "Nelze se připojit k internetu nebo server není dostupný!");
+        return;
+
+    } else if (error != QNetworkReply::NetworkError::NoError){
+        // an unknown error occured
+
+        disableWidgets(false);
+        const QString &errorString = replyPost->errorString();
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
+        return;
+    }
+
     QByteArray response = replyPost->readAll();
     QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
 
@@ -337,12 +356,30 @@ void searchVideoWindow::on_pushButton_clicked()
     //sortQualities(&mp4Qualities);
 
 
-
     QString ytChannel = loadedJson["a"].toString();
     int videoDuration = loadedJson["t"].toInt();
-    QString videoName = loadedJson["title"].toString();
     QString videoId = loadedJson["vid"].toString();
+    QString videoName = loadedJson["title"].toString();
 
+    // remove duplicated whitespaces
+    QString tempName;
+    QChar c;
+    bool whitespace = false;
+    int i;
+    for(i=0; i<videoName.length(); i++){
+
+        c = videoName[i];
+
+        if(c == ' ' && !whitespace){
+            whitespace = true;
+            tempName.append(c);
+
+        } else if (c != ' '){
+            whitespace = false;
+            tempName.append(c);
+        }
+    }
+    videoName = tempName;
 
     downloadVideoWindow dvw(nullptr);
     dvw.ytChannel = ytChannel;
@@ -356,8 +393,8 @@ void searchVideoWindow::on_pushButton_clicked()
 
     dvw.loadData();
 
-    this->hide();
     dvw.show();
+    this->hide();
 
     while(!dvw.isHidden()){
         qApp->processEvents();
