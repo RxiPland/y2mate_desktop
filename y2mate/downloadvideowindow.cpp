@@ -3,6 +3,9 @@
 
 #include <QRegularExpression>
 #include <QMessageBox>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -126,7 +129,6 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     } else if (format == "mp4"){
         downloadToken = mp4Qualities[quality].toString();
-
     }
 
     if (downloadToken.isEmpty()){
@@ -136,7 +138,62 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
-    qInfo() << downloadToken;
+    // request for URL with file
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://www.y2mate.com/mates/convertV2/index"));
+    request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
+    request.setRawHeader("Referer", "https://www.y2mate.com/youtube-mp3/" + videoID.toUtf8());
+
+    QByteArray data;
+
+    data.append("vid=");
+    data.append(QUrl::toPercentEncoding(downloadVideoWindow::videoID).toStdString());
+    data.append("&");
+    data.append("k=");
+    data.append(QUrl::toPercentEncoding(downloadToken).toStdString());
+
+    QNetworkReply *replyPost = manager.post(request, data);
+
+    while (!replyPost->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    QNetworkReply::NetworkError error = replyPost->error();
+
+    if(error == QNetworkReply::HostNotFoundError){
+        // no internet connection available
+
+        disableWidgets(false);
+        QMessageBox::critical(this, "Chyba", "Nelze se připojit k internetu nebo server není dostupný!");
+        return;
+
+    } else if (error != QNetworkReply::NetworkError::NoError){
+        // an unknown error occured
+
+        disableWidgets(false);
+        const QString &errorString = replyPost->errorString();
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
+        return;
+    }
+
+    QByteArray response = replyPost->readAll();
+    QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
+
+    QString downloadLink;
+
+    if(loadedJson["c_status"] == "CONVERTED"){
+        downloadLink = loadedJson["dlink"].toString();
+    }
+
+    if(downloadLink.isEmpty()){
+        disableWidgets(false);
+        QMessageBox::critical(this, "Chyba", QString("Nepodařilo se získat odkaz na stažení souboru! Server vrátil:\n\n%1").arg(response));
+        return;
+    }
+
+
     downloadVideoWindow::disableWidgets(false);
 }
 

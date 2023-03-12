@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QJsonObject>
+#include <QNetworkAccessManager>
 
 namespace Ui {
 class downloadVideoWindow;
@@ -17,6 +18,9 @@ public:
     ~downloadVideoWindow();
 
     void loadData();
+
+    QString appVersion;
+    QByteArray userAgent;
 
     QJsonObject mp3Qualities;
     QJsonObject mp4Qualities;
@@ -41,6 +45,7 @@ private slots:
 
 private:
     Ui::downloadVideoWindow *ui;
+    QNetworkAccessManager manager;
 
     void sortQualities(QStringList *list);
     void disableWidgets(bool disable = true);
