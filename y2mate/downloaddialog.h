@@ -20,6 +20,11 @@ public:
 
     QString downloadLink;
 
+    bool canceled = false;
+
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::downloadDialog *ui;
 };
