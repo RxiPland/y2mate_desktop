@@ -19,6 +19,7 @@
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QStatusBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -47,9 +48,9 @@ public:
     QPushButton *pushButton_2;
     QSpacerItem *verticalSpacer_3;
     QPushButton *pushButton;
-    QSpacerItem *verticalSpacer_5;
     QSpacerItem *horizontalSpacer_3;
     QMenuBar *menubar;
+    QStatusBar *statusBar;
 
     void setupUi(QMainWindow *downloadVideoWindow)
     {
@@ -170,10 +171,6 @@ public:
 
         verticalLayout->addLayout(horizontalLayout);
 
-        verticalSpacer_5 = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        verticalLayout->addItem(verticalSpacer_5);
-
 
         horizontalLayout_2->addLayout(verticalLayout);
 
@@ -186,6 +183,9 @@ public:
         menubar->setObjectName("menubar");
         menubar->setGeometry(QRect(0, 0, 581, 21));
         downloadVideoWindow->setMenuBar(menubar);
+        statusBar = new QStatusBar(downloadVideoWindow);
+        statusBar->setObjectName("statusBar");
+        downloadVideoWindow->setStatusBar(statusBar);
 
         retranslateUi(downloadVideoWindow);
 
