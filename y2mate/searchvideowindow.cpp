@@ -306,6 +306,14 @@ void searchVideoWindow::on_pushButton_clicked()
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"message\": \"%1\"}").arg(message));
         disableWidgets(false);
         return;
+
+    } else if (message.isEmpty()){
+        // OK
+
+    } else{
+        QMessageBox::warning(this, "Chyba", QString("Nastala neznámá chyba! Server vrátil:\n\n%1").arg(response));
+        disableWidgets(false);
+        return;
     }
 
     QJsonObject formats = loadedJson["links"].toObject();
