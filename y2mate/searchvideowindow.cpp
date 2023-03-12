@@ -290,9 +290,16 @@ void searchVideoWindow::on_pushButton_clicked()
     QString status = loadedJson["status"].toString().toLower();
     QString message = loadedJson["mess"].toString();
 
+
     if (status != "ok"){
 
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"status\": \"%1\"}").arg(status));
+        disableWidgets(false);
+        return;
+
+    } else if (message.contains("Please enter valid video URL.")){
+
+        QMessageBox::warning(this, "Chyba", "Video pod tímto odkazem neexistuje!");
         disableWidgets(false);
         return;
 
@@ -307,35 +314,48 @@ void searchVideoWindow::on_pushButton_clicked()
 
     // capture mp3 qualities
     QJsonObject mp3Files = formats["mp3"].toObject();
-    QStringList mp3Qualities;
+    QJsonObject mp3Qualities;
 
     foreach(QJsonValueConstRef x, mp3Files){
 
         if(x.toObject()["f"] == "mp3"){
-            mp3Qualities.append(x.toObject()["q"].toString());
+            mp3Qualities[x.toObject()["q"].toString()] = x.toObject()["k"].toString();
         }
     }
-    sortQualities(&mp3Qualities);
+    //sortQualities(&mp3Qualities);
 
     // capture mp4 qualities
     QJsonObject mp4Files = formats["mp4"].toObject();
-    QStringList mp4Qualities;
+    QJsonObject mp4Qualities;
 
     foreach(QJsonValueConstRef x, mp4Files){
 
         if(x.toObject()["f"] == "mp4"){
-            mp4Qualities.append(x.toObject()["q"].toString());
+            mp4Qualities[x.toObject()["q"].toString()] = x.toObject()["k"].toString();
         }
     }
-    sortQualities(&mp4Qualities);
+    //sortQualities(&mp4Qualities);
+
 
 
     QString ytChannel = loadedJson["a"].toString();
     int videoDuration = loadedJson["t"].toInt();
     QString videoName = loadedJson["title"].toString();
+    QString videoId = loadedJson["vid"].toString();
 
 
-    downloadVideoWindow dvw;
+    downloadVideoWindow dvw(nullptr);
+    dvw.ytChannel = ytChannel;
+    dvw.videoDuration = videoDuration;
+    dvw.videoName = videoName;
+    dvw.videoID = videoId;
+    dvw.videoUrl = videoUrl;
+
+    dvw.mp3Qualities = mp3Qualities;
+    dvw.mp4Qualities = mp4Qualities;
+
+    dvw.loadData();
+
     this->hide();
     dvw.show();
 
@@ -344,6 +364,7 @@ void searchVideoWindow::on_pushButton_clicked()
     }
 
     disableWidgets(false);
+    ui->lineEdit->clear();
     this->show();
 }
 
