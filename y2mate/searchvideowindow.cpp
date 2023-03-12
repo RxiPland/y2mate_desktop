@@ -342,9 +342,32 @@ void searchVideoWindow::on_pushButton_clicked()
 
 
     QString ytChannel = loadedJson["a"].toString();
+    if(ytChannel.isEmpty()){
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název youtube kanálu z odpovědi serveru!");
+        disableWidgets(false);
+        return;
+    }
+
     int videoDuration = loadedJson["t"].toInt();
+    if(videoDuration == 0){
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat délku videa z odpovědi serveru!");
+        disableWidgets(false);
+        return;
+    }
+
     QString videoId = loadedJson["vid"].toString();
+    if(videoId.isEmpty()){
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat ID videa z odpovědi serveru!");
+        disableWidgets(false);
+        return;
+    }
+
     QString videoName = loadedJson["title"].toString();
+    if(videoId.isEmpty()){
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název videa z odpovědi serveru!");
+        disableWidgets(false);
+        return;
+    }
 
     // remove duplicated whitespaces
     QString tempName;
