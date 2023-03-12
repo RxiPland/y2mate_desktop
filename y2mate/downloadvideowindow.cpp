@@ -7,6 +7,7 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QFileDialog>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -125,11 +126,14 @@ void downloadVideoWindow::on_pushButton_clicked()
     QString quality = ui->comboBox_2->currentText().split(' ').first();
 
     QString downloadToken;
+    QString fileExtension;
 
     if (format == "mp3"){
+        fileExtension = "Zvukový soubor (*.mp3)";
         downloadToken = mp3Qualities[quality].toString();
 
     } else if (format == "mp4"){
+        fileExtension = "Video (*.mp4)";
         downloadToken = mp4Qualities[quality].toString();
     }
 
@@ -199,6 +203,10 @@ void downloadVideoWindow::on_pushButton_clicked()
         QMessageBox::critical(this, "Chyba", QString("Nepodařilo se získat odkaz na stažení souboru! Server vrátil:\n\n%1").arg(response));
         return;
     }
+
+
+    QString filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", "", fileExtension);
+
 
     downloadDialog dd;
     dd.appVersion = downloadVideoWindow::appVersion;
