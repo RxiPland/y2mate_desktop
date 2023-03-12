@@ -252,12 +252,17 @@ void searchVideoWindow::on_pushButton_clicked()
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=UTF-8");
 
+    QLabel *label = new QLabel("Hledám video...   ");
+    ui->statusBar->addWidget(label);
+
     QNetworkReply *replyPost = manager.post(request, data);
 
     while (!replyPost->isFinished())
     {
         qApp->processEvents();
     }
+
+    ui->statusBar->removeWidget(label);
 
     QNetworkReply::NetworkError error = replyPost->error();
 
