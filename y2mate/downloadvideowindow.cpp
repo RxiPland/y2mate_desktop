@@ -6,9 +6,15 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
     ui(new Ui::downloadVideoWindow)
 {
     ui->setupUi(this);
+
 }
 
 downloadVideoWindow::~downloadVideoWindow()
 {
     delete ui;
+}
+
+void downloadVideoWindow::loadData()
+{
+    // set data to widgets
 }
