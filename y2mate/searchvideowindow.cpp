@@ -106,29 +106,46 @@ void searchVideoWindow::loadSettings()
                     QJsonObject history1 = history["1"].toObject();
                     if(history1.isEmpty()){
                         ui->menu2_1->menuAction()->setVisible(false);
+
+                    } else{
+                        ui->menu2_1->menuAction()->setText(history1["video_name"].toString());
                     }
 
                     QJsonObject history2 = history["2"].toObject();
                     if(history2.isEmpty()){
                         ui->menu2_2->menuAction()->setVisible(false);
+
+                    } else{
+                        ui->menu2_2->menuAction()->setText(history2["video_name"].toString());
                     }
 
                     QJsonObject history3 = history["3"].toObject();
                     if(history3.isEmpty()){
                         ui->menu2_3->menuAction()->setVisible(false);
+
+                    } else{
+                        ui->menu2_3->menuAction()->setText(history3["video_name"].toString());
                     }
 
                     QJsonObject history4 = history["4"].toObject();
                     if(history4.isEmpty()){
                         ui->menu2_4->menuAction()->setVisible(false);
+
+                    } else{
+                        ui->menu2_4->menuAction()->setText(history4["video_name"].toString());
                     }
 
                     QJsonObject history5 = history["5"].toObject();
                     if(history5.isEmpty()){
                         ui->menu2_5->menuAction()->setVisible(false);
+
+                    } else{
+                        ui->menu2_5->menuAction()->setText(history5["video_name"].toString());
                     }
 
                     ui->action_menu2_6->setText("Smazat historii");
+                    ui->action_menu2_6->setDisabled(false);
+                    ui->action_menu2_6->setIconVisibleInMenu(true);
                 }
             }
         }
@@ -184,6 +201,78 @@ void searchVideoWindow::disableWidgets(bool disable)
     ui->lineEdit->setDisabled(disable);
     ui->lineEdit->setClearButtonEnabled(!disable);
     ui->pushButton->setDisabled(disable);
+}
+
+void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, QString videoUrl)
+{
+    // save searched video to settings file
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
+                return;
+
+            } else{
+                // make space for new record
+                QJsonObject history = loadedJson["search_history"].toObject();
+
+                if(history["1"].toObject()["video_url"] != videoUrl){
+
+                    history["5"] = history["4"];
+                    history["4"] = history["3"];
+                    history["3"] = history["2"];
+                    history["2"] = history["1"];
+
+                    QJsonObject videoInfo;
+                    videoInfo["video_name"] = videoName;
+                    videoInfo["video_duration"] = videoDuration;
+                    videoInfo["video_url"] = videoUrl;
+
+                    history["1"] = videoInfo;
+                    loadedJson["search_history"] = history;
+
+
+                    QJsonDocument docData(loadedJson);
+
+                    dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+                    int status = dataFile.write(docData.toJson());
+                    dataFile.close();
+
+                    if (status == -1){
+                        QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+
+                        return;
+                    }
+                }
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
+        return;
+    }
+
+
 }
 
 void searchVideoWindow::on_action_menu1_1_triggered()
@@ -400,6 +489,30 @@ void searchVideoWindow::on_pushButton_clicked()
         }
     }
     videoName = tempName.trimmed();
+
+    // convert to %hh:%mm:%ss format
+    int hours = videoDuration/(60*60);
+    int minutes = (videoDuration/60)-(hours*60);
+    int seconds = videoDuration-(hours*(60*60)+minutes*60);
+
+    QString timeDuration;
+    if(hours < 10){
+        timeDuration.append('0');
+    }
+    timeDuration.append(QString("%1:").arg(hours));
+
+    if (minutes < 10){
+        timeDuration.append('0');
+    }
+    timeDuration.append(QString("%1:").arg(minutes));
+
+    if (seconds < 10){
+        timeDuration.append('0');
+    }
+    timeDuration.append(QString("%1").arg(seconds));
+
+    searchVideoWindow::saveToHistory(videoName, timeDuration, videoUrl);
+
 
     downloadVideoWindow dvw(nullptr);
     dvw.appVersion = searchVideoWindow::appVersion;

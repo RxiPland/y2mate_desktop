@@ -39,6 +39,7 @@ private:
 
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);
+    void saveToHistory(QString videoName, QString videoDuration, QString videoUrl);
 
 };
 #endif // SEARCHVIDEOWINDOW_H
