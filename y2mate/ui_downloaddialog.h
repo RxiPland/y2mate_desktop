@@ -12,6 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
+#include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QProgressBar>
@@ -31,6 +32,14 @@ public:
     QSpacerItem *verticalSpacer;
     QProgressBar *progressBar;
     QSpacerItem *verticalSpacer_2;
+    QGridLayout *gridLayout;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *pushButton_3;
+    QSpacerItem *horizontalSpacer_6;
+    QSpacerItem *horizontalSpacer_4;
+    QSpacerItem *horizontalSpacer_5;
+    QPushButton *pushButton_2;
+    QSpacerItem *verticalSpacer_3;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
     QPushButton *pushButton;
@@ -40,7 +49,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(257, 165);
+        downloadDialog->resize(257, 231);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -66,9 +75,50 @@ public:
 
         verticalLayout->addWidget(progressBar);
 
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer_2);
+
+        gridLayout = new QGridLayout();
+        gridLayout->setObjectName("gridLayout");
+        gridLayout->setContentsMargins(-1, 0, -1, -1);
+        horizontalSpacer_3 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_3, 0, 2, 1, 1);
+
+        pushButton_3 = new QPushButton(downloadDialog);
+        pushButton_3->setObjectName("pushButton_3");
+        pushButton_3->setMinimumSize(QSize(0, 0));
+        pushButton_3->setFocusPolicy(Qt::NoFocus);
+
+        gridLayout->addWidget(pushButton_3, 1, 1, 1, 1);
+
+        horizontalSpacer_6 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_6, 1, 2, 1, 1);
+
+        horizontalSpacer_4 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_4, 0, 0, 1, 1);
+
+        horizontalSpacer_5 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_5, 1, 0, 1, 1);
+
+        pushButton_2 = new QPushButton(downloadDialog);
+        pushButton_2->setObjectName("pushButton_2");
+        pushButton_2->setEnabled(false);
+        pushButton_2->setMinimumSize(QSize(0, 0));
+        pushButton_2->setFocusPolicy(Qt::NoFocus);
+
+        gridLayout->addWidget(pushButton_2, 0, 1, 1, 1);
+
+        verticalSpacer_3 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        gridLayout->addItem(verticalSpacer_3, 2, 1, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
@@ -110,6 +160,8 @@ public:
         downloadDialog->setWindowTitle(QCoreApplication::translate("downloadDialog", "Stahov\303\241n\303\255 - prob\303\255h\303\241", nullptr));
         label_2->setText(QCoreApplication::translate("downloadDialog", "N\303\241zev", nullptr));
         label->setText(QCoreApplication::translate("downloadDialog", "Sta\305\276eno", nullptr));
+        pushButton_3->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t um\303\255st\304\233n\303\255", nullptr));
+        pushButton_2->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t soubor", nullptr));
         pushButton->setText(QCoreApplication::translate("downloadDialog", "Zru\305\241it stahov\303\241n\303\255", nullptr));
     } // retranslateUi
 

@@ -3,6 +3,7 @@
 
 #include <QFileInfo>
 #include <QMessageBox>
+#include <windows.h>
 
 downloadDialog::downloadDialog(QWidget *parent) :
     QDialog(parent),
@@ -116,6 +117,7 @@ void downloadDialog::httpFinished()
 
     this->setWindowTitle("Stahování - dokončeno");
     ui->pushButton->setText("Hotovo");
+    ui->pushButton_2->setDisabled(false);
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
@@ -134,4 +136,30 @@ std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
     file->open(QIODevice::WriteOnly);
 
     return file;
+}
+
+void downloadDialog::on_pushButton_2_clicked()
+{
+    // open downloaded file
+
+    ShellExecute(0, L"open", filePath.toStdWString().c_str(), 0, 0, SW_RESTORE);
+
+    if(ui->pushButton->text() == "Hotovo"){
+        downloadDialog::on_pushButton_clicked();
+    }
+}
+
+void downloadDialog::on_pushButton_3_clicked()
+{
+    // open folder with downloaded file
+
+    QStringList temp = filePath.split('/');
+    temp.pop_back();
+    QString folderPath = temp.join('/').replace('/', '\\');
+
+    ShellExecute(0, L"open", L"explorer.exe", folderPath.toStdWString().c_str(), 0, SW_RESTORE);
+
+    if(ui->pushButton->text() == "Hotovo"){
+        downloadDialog::on_pushButton_clicked();
+    }
 }

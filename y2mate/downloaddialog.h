@@ -36,6 +36,8 @@ private slots:
     void downloadProgress(qint64 ist, qint64 max);
 
     void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
 
 private:
     Ui::downloadDialog *ui;
