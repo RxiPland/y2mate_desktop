@@ -46,11 +46,15 @@ public:
     QCheckBox *checkBox;
     QSpacerItem *verticalSpacer_2;
     QSpacerItem *verticalSpacer_5;
+    QPushButton *pushButton;
     QToolButton *toolButton_4;
     QCheckBox *checkBox_5;
     QCheckBox *checkBox_3;
-    QSpacerItem *verticalSpacer;
-    QPushButton *pushButton;
+    QSpacerItem *verticalSpacer_8;
+    QHBoxLayout *horizontalLayout_4;
+    QPushButton *pushButton_5;
+    QSpacerItem *horizontalSpacer_7;
+    QLabel *label_2;
     QSpacerItem *verticalSpacer_6;
     QLabel *label;
     QSpacerItem *verticalSpacer_7;
@@ -162,6 +166,14 @@ public:
 
         gridLayout->addItem(verticalSpacer_5, 7, 1, 1, 1);
 
+        pushButton = new QPushButton(settingsDialog);
+        pushButton->setObjectName("pushButton");
+        pushButton->setEnabled(false);
+        pushButton->setMinimumSize(QSize(0, 25));
+        pushButton->setFocusPolicy(Qt::NoFocus);
+
+        gridLayout->addWidget(pushButton, 4, 1, 1, 1);
+
         toolButton_4 = new QToolButton(settingsDialog);
         toolButton_4->setObjectName("toolButton_4");
         toolButton_4->setMinimumSize(QSize(30, 25));
@@ -182,22 +194,37 @@ public:
 
         gridLayout->addWidget(checkBox_3, 4, 0, 1, 1);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer, 9, 1, 1, 1);
-
-        pushButton = new QPushButton(settingsDialog);
-        pushButton->setObjectName("pushButton");
-        pushButton->setEnabled(false);
-        pushButton->setMinimumSize(QSize(0, 25));
-        pushButton->setFocusPolicy(Qt::NoFocus);
-
-        gridLayout->addWidget(pushButton, 4, 1, 1, 1);
-
 
         verticalLayout->addLayout(gridLayout);
 
-        verticalSpacer_6 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        verticalSpacer_8 = new QSpacerItem(20, 15, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout->addItem(verticalSpacer_8);
+
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_4->setContentsMargins(-1, 0, -1, -1);
+        pushButton_5 = new QPushButton(settingsDialog);
+        pushButton_5->setObjectName("pushButton_5");
+        pushButton_5->setMinimumSize(QSize(150, 25));
+        pushButton_5->setFocusPolicy(Qt::NoFocus);
+
+        horizontalLayout_4->addWidget(pushButton_5);
+
+        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        horizontalLayout_4->addItem(horizontalSpacer_7);
+
+        label_2 = new QLabel(settingsDialog);
+        label_2->setObjectName("label_2");
+        label_2->setMinimumSize(QSize(0, 25));
+
+        horizontalLayout_4->addWidget(label_2);
+
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
+        verticalSpacer_6 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
 
         verticalLayout->addItem(verticalSpacer_6);
 
@@ -214,7 +241,7 @@ public:
 
         verticalLayout->addWidget(label);
 
-        verticalSpacer_7 = new QSpacerItem(20, 5, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        verticalSpacer_7 = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout->addItem(verticalSpacer_7);
 
@@ -264,10 +291,12 @@ public:
         toolButton_5->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         checkBox_4->setText(QCoreApplication::translate("settingsDialog", "Zaznamen\303\241vat historii", nullptr));
         checkBox->setText(QCoreApplication::translate("settingsDialog", "Nahradit n\303\241zev n\303\241hodn\303\275mi znaky", nullptr));
+        pushButton->setText(QCoreApplication::translate("settingsDialog", "Nastavit", nullptr));
         toolButton_4->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         checkBox_5->setText(QCoreApplication::translate("settingsDialog", "Automaticky kontrolovat aktualizace", nullptr));
         checkBox_3->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255 lokace pro stahov\303\241n\303\255", nullptr));
-        pushButton->setText(QCoreApplication::translate("settingsDialog", "Nastavit", nullptr));
+        pushButton_5->setText(QCoreApplication::translate("settingsDialog", "Zkontrolovat aktualizace", nullptr));
+        label_2->setText(QCoreApplication::translate("settingsDialog", "Verze", nullptr));
         label->setText(QCoreApplication::translate("settingsDialog", "Nastaven\303\255 nen\303\255 ulo\305\276eno", nullptr));
         pushButton_2->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255", nullptr));
         pushButton_3->setText(QCoreApplication::translate("settingsDialog", "Zru\305\241it", nullptr));

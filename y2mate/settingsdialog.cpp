@@ -18,6 +18,7 @@ settingsDialog::settingsDialog(QWidget *parent) :
 
     settingsDialog::loadSettings();
 
+    this->show();
     ui->label->setHidden(true);
     ui->label->setStyleSheet("QLabel { color : red; }");
 }
@@ -100,6 +101,8 @@ void settingsDialog::loadSettings()
                 settingsDialog::lastPathEnabled = loadedJson["enable_last_path"].toBool();
                 settingsDialog::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
                 settingsDialog::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
+
+                ui->label_2->setText("Aktuální verze: " + settingsDialog::appVersion);
 
                 ui->checkBox->setChecked(replaceNameWithHash);
                 ui->checkBox_2->setChecked(replaceNameWithUnderscores);

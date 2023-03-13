@@ -268,6 +268,25 @@
          </property>
         </spacer>
        </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="pushButton">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="text">
+          <string>Nastavit</string>
+         </property>
+        </widget>
+       </item>
        <item row="6" column="2">
         <widget class="QToolButton" name="toolButton_4">
          <property name="minimumSize">
@@ -309,27 +328,34 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="1">
-        <widget class="QPushButton" name="pushButton">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
+      </layout>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_8">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>15</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="pushButton_5">
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>150</width>
            <height>25</height>
           </size>
          </property>
@@ -337,7 +363,36 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="text">
-          <string>Nastavit</string>
+          <string>Zkontrolovat aktualizace</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Verze</string>
          </property>
         </widget>
        </item>
@@ -348,10 +403,13 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::MinimumExpanding</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>40</height>
+         <height>20</height>
         </size>
        </property>
       </spacer>
@@ -385,7 +443,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>5</height>
+         <height>8</height>
         </size>
        </property>
       </spacer>
