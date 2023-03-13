@@ -36,6 +36,8 @@ public:
 
     bool lastPathEnabled = true;
     QString lastSavePath;
+    bool replaceNameWithHash = false;
+    bool replaceNameWithUnderscores = false;
 
     bool exitApp = true;
 

@@ -8,6 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QFileDialog>
+#include <QCryptographicHash>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -124,6 +125,8 @@ void downloadVideoWindow::loadData()
     QString timeDuration;
 
     /*
+    // alternative time format
+
     if(hours != 0){
         timeDuration.append(QString("%1h ").arg(hours));
         timeDuration.append(QString("%1min ").arg(minutes));
@@ -200,40 +203,57 @@ void downloadVideoWindow::on_pushButton_clicked()
         lastSavePath.append('/');
     }
 
-    // remove forbidden characters
-    QList<QChar> forbiddenChars = {'<', '>', ':', '\"', '/', '\\', '|', '?', '*'};
-    QString temp;
-    int i;
+    if(downloadVideoWindow::replaceNameWithHash){
+        // generate random 32chars string as replacement for video name
 
-    for(i=0; i<videoName.length(); i++){
+        QByteArray generatedId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
-        if(forbiddenChars.contains(videoName[i])){
-            temp.append(' ');
+        QCryptographicHash hash(QCryptographicHash::Md5);
+        hash.addData(generatedId);
 
-        } else{
-            temp.append(videoName[i]);
+        videoName = hash.result().toHex();
+
+    } else{
+        // remove forbidden characters
+        QList<QChar> forbiddenChars = {'<', '>', ':', '\"', '/', '\\', '|', '?', '*'};
+        QString temp;
+        int i;
+
+        for(i=0; i<videoName.length(); i++){
+
+            if(forbiddenChars.contains(videoName[i])){
+                temp.append(' ');
+
+            } else{
+                temp.append(videoName[i]);
+            }
         }
-    }
-    videoName = temp.trimmed();
+        videoName = temp.trimmed();
 
-    // remove double whitespaces
-    temp = "";
-    QChar c;
-    bool whitespace = false;
-    for(i=0; i<videoName.length(); i++){
+        // remove double whitespaces
+        temp = "";
+        QChar c;
+        bool whitespace = false;
+        for(i=0; i<videoName.length(); i++){
 
-        c = videoName[i];
+            c = videoName[i];
 
-        if(c == ' ' && !whitespace){
-            whitespace = true;
-            temp.append(c);
+            if(c == ' ' && !whitespace){
+                whitespace = true;
+                temp.append(c);
 
-        } else if (c != ' '){
-            whitespace = false;
-            temp.append(c);
+            } else if (c != ' '){
+                whitespace = false;
+                temp.append(c);
+            }
         }
+        videoName = temp.trimmed();
     }
-    videoName = temp.trimmed();
+
+    // replace whitespaceses with underscores (_)
+    if(downloadVideoWindow::replaceNameWithUnderscores){
+        videoName = videoName.replace(" ", "_");
+    }
 
 
     // get path for saving file

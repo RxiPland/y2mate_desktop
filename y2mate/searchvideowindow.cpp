@@ -87,6 +87,8 @@ void searchVideoWindow::loadSettings()
                 searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
                 searchVideoWindow::lastSavePath = loadedJson["last_path"].toString();
                 searchVideoWindow::lastPathEnabled = loadedJson["enable_last_path"].toBool();
+                searchVideoWindow::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
+                searchVideoWindow::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
 
                 // disable/enable history tab
 
@@ -576,6 +578,8 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.videoUrl = videoUrl;
     dvw.lastSavePath = searchVideoWindow::lastSavePath;
     dvw.lastPathEnabled = searchVideoWindow::lastPathEnabled;
+    dvw.replaceNameWithHash = searchVideoWindow::replaceNameWithHash;
+    dvw.replaceNameWithUnderscores = searchVideoWindow::replaceNameWithUnderscores;
 
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;
