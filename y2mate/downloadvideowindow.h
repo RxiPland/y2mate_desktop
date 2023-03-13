@@ -34,6 +34,8 @@ public:
     int videoDuration=0;
     QString videoUrl;
 
+    QString lastSavePath;
+
     bool exitApp = true;
 
 private slots:

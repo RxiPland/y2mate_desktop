@@ -24,6 +24,7 @@ public:
     QByteArray userAgent;
 
     QString downloadLink;
+    QString filePath;
 
     bool canceled = false;
 

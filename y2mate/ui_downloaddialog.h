@@ -39,7 +39,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(257, 145);
+        downloadDialog->resize(257, 165);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -101,7 +101,7 @@ public:
 
     void retranslateUi(QDialog *downloadDialog)
     {
-        downloadDialog->setWindowTitle(QCoreApplication::translate("downloadDialog", "Stahov\303\241n\303\255", nullptr));
+        downloadDialog->setWindowTitle(QCoreApplication::translate("downloadDialog", "Stahov\303\241n\303\255 - prob\303\255h\303\241", nullptr));
         label->setText(QCoreApplication::translate("downloadDialog", "Sta\305\276eno", nullptr));
         pushButton->setText(QCoreApplication::translate("downloadDialog", "Zru\305\241it stahov\303\241n\303\255", nullptr));
     } // retranslateUi

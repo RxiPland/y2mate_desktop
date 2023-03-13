@@ -144,6 +144,56 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
+
+    if(!lastSavePath.endsWith('/')){
+        lastSavePath.append('/');
+    }
+
+    // remove forbidden characters
+    QList<QChar> forbiddenChars = {'<', '>', ':', '\"', '/', '\\', '|', '?', '*'};
+    QString temp;
+    int i;
+
+    for(i=0; i<videoName.length(); i++){
+
+        if(forbiddenChars.contains(videoName[i])){
+            temp.append(' ');
+
+        } else{
+            temp.append(videoName[i]);
+        }
+    }
+    videoName = temp.trimmed();
+
+    // remove double whitespaces
+    temp = "";
+    QChar c;
+    bool whitespace = false;
+    for(i=0; i<videoName.length(); i++){
+
+        c = videoName[i];
+
+        if(c == ' ' && !whitespace){
+            whitespace = true;
+            temp.append(c);
+
+        } else if (c != ' '){
+            whitespace = false;
+            temp.append(c);
+        }
+    }
+    videoName = temp.trimmed();
+
+
+    // get path for saving file
+    QString filePath;
+    filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", lastSavePath + videoName, fileExtension);
+
+    if(filePath.isEmpty()){
+        downloadVideoWindow::disableWidgets(false);
+        return;
+    }
+
     // request for URL with file
     QNetworkRequest request;
     request.setUrl(QUrl("https://www.y2mate.com/mates/convertV2/index"));
@@ -204,18 +254,25 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
-
-    QString filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", "", fileExtension);
-
-
     downloadDialog dd;
+    dd.setModal(true);
+
     dd.appVersion = downloadVideoWindow::appVersion;
     dd.userAgent = downloadVideoWindow::userAgent;
     dd.downloadLink = downloadLink;
+    dd.filePath = filePath;
 
+    dd.startDownload();
     dd.exec();
 
-    downloadVideoWindow::disableWidgets(false);
+    // download was canceled
+    if(dd.canceled){
+       disableWidgets(false);
+       return;
+    }
+
+    exitApp = false;
+    this->close();
 }
 
 void downloadVideoWindow::on_comboBox_currentTextChanged(const QString &arg1)

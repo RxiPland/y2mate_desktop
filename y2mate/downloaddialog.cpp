@@ -2,6 +2,7 @@
 #include "ui_downloaddialog.h"
 
 #include <QFileInfo>
+#include <QMessageBox>
 
 downloadDialog::downloadDialog(QWidget *parent) :
     QDialog(parent),
@@ -22,6 +23,13 @@ downloadDialog::~downloadDialog()
 
 void downloadDialog::startDownload()
 {
+    file = openFileForWrite(downloadDialog::filePath);
+    if (!file){
+        QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + downloadDialog::filePath);
+        return;
+    }
+
+
     QNetworkRequest request;
     request.setUrl(QUrl(downloadDialog::downloadLink));
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
@@ -36,7 +44,21 @@ void downloadDialog::startDownload()
 
 void downloadDialog::on_pushButton_clicked()
 {
-    downloadDialog::canceled = true;
+    // cancel or complete download button
+
+    QString buttonText = ui->pushButton->text();
+
+    if(buttonText == "Hotovo"){
+        // everything OK
+
+    } else{
+        downloadDialog::canceled = true;
+
+        reply->close();
+        //reply.reset();
+        //reply->deleteLater();
+    }
+
     this->close();
 }
 
@@ -46,18 +68,17 @@ void downloadDialog::httpReadyRead()
     // We read all of its new data and write it into the file.
     // That way we use less RAM than when reading it at the finished()
     // signal of the QNetworkReply
-    if (file){
+    if(file){
         file->write(reply->readAll());
     }
 }
 
 void downloadDialog::httpFinished()
 {
-    // http request byl dokončen
+    // http request was finished
 
     QFileInfo fi;
     if (file){
-
         fi.setFile(file->fileName());
         file->close();
         file->deleteLater();
@@ -65,32 +86,32 @@ void downloadDialog::httpFinished()
     }
 
     QNetworkReply::NetworkError error = reply->error();
+    const QString &errorString = reply->errorString();
 
     reply.reset();
     reply->deleteLater();
 
-    if (error != QNetworkReply::NoError) {
+    if (error != QNetworkReply::NoError){
+
+        if(!canceled){
+            QMessageBox::critical(this, "Chyba", "Nastala chyba při stahování souboru! Chyba: " + errorString);
+        }
         QFile::remove(fi.absoluteFilePath());
+
+        return;
     }
+
+    this->setWindowTitle("Stahování - dokončeno");
+    ui->pushButton->setText("Hotovo");
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
 {
-    /*
+
     ui->progressBar->setRange(0,max);
     ui->progressBar->setValue(ist);
 
-    ui->label_4->setText(QString::number(ist/1000000) + "." + QString::number(ist/100000).back() + " / " + QString::number(max/1000000) + "." + QString::number(max/100000).back() + " MB");
-
-    if(max == ist){
-        ui->label_3->setHidden(true);
-        ui->label_4->setHidden(true);
-        ui->label_3->clear();
-        ui->label_4->clear();
-        ui->progressBar->setHidden(true);
-        ui->progressBar->setValue(0);
-    }
-    */
+    ui->label->setText(QString::number(ist/1000000) + "." + QString::number(ist/100000).back() + " / " + QString::number(max/1000000) + "." + QString::number(max/100000).back() + " MB");
 }
 
 std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
