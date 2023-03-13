@@ -192,6 +192,13 @@ void downloadVideoWindow::on_pushButton_clicked()
     if(filePath.isEmpty()){
         downloadVideoWindow::disableWidgets(false);
         return;
+
+    } else{
+        // overwrite last path
+
+        QStringList temp = filePath.split('/');
+        temp.pop_back();
+        lastSavePath = temp.join('/');
     }
 
     // request for URL with file
@@ -260,6 +267,8 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
+
+    // open download dialog
     downloadDialog dd;
     dd.appVersion = downloadVideoWindow::appVersion;
     dd.userAgent = downloadVideoWindow::userAgent;
