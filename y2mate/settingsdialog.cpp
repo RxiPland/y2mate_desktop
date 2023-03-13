@@ -17,7 +17,9 @@ settingsDialog::settingsDialog(QWidget *parent) :
     ui->setupUi(this);
 
     settingsDialog::loadSettings();
+
     ui->label->setHidden(true);
+    ui->label->setStyleSheet("QLabel { color : red; }");
 }
 
 settingsDialog::~settingsDialog()
@@ -122,7 +124,7 @@ void settingsDialog::loadSettings()
     }
 }
 
-void settingsDialog::saveSettings()
+bool settingsDialog::saveSettings()
 {
     // save settings to file
 
@@ -138,7 +140,7 @@ void settingsDialog::saveSettings()
             // File is empty
 
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
-            return;
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -147,7 +149,7 @@ void settingsDialog::saveSettings()
                 // JSON is corrupted
 
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
-                return;
+                return false;
 
             } else{
                 // overwrite settings
@@ -167,7 +169,7 @@ void settingsDialog::saveSettings()
                 if (status == -1){
                     QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
-                    return;
+                    return false;
                 }
             }
         }
@@ -176,8 +178,10 @@ void settingsDialog::saveSettings()
         // file with settings not found
 
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
-        return;
+        return false;
     }
+
+    return true;
 }
 
 void settingsDialog::on_pushButton_2_clicked()
@@ -200,6 +204,9 @@ void settingsDialog::on_pushButton_2_clicked()
     ui->checkBox_5->setChecked(checkForUpdates);
 
 
+    settingsDialog::settingsChanged = true;
+    ui->label->setHidden(false);
+
     QMessageBox::information(this, "Oznámení", "Bylo nastaveno defaultní nastavení, nezapomeňte uložit změny");
 }
 
@@ -214,7 +221,19 @@ void settingsDialog::on_pushButton_4_clicked()
 {
     // save settings
 
-    settingsDialog::saveSettings();
+    bool success = true;
+
+    // if any change made
+    if(settingsChanged){
+        success = settingsDialog::saveSettings();
+    }
+
+
+    if(success){
+        ui->label->setHidden(true);
+        QMessageBox::information(this, "Oznámení", "Nastavení bylo úspěšně uloženo");
+    }
+
     settingsDialog::settingsChanged = false;
     this->close();
 }
@@ -226,7 +245,6 @@ void settingsDialog::on_checkBox_clicked()
    settingsDialog::replaceNameWithHash = ui->checkBox->isChecked();
 
    if(!settingsDialog::settingsChanged){
-       ui->label->setStyleSheet("QLabel { color : red; }");
        ui->label->setHidden(false);
        settingsDialog::settingsChanged = true;
    }
@@ -239,7 +257,6 @@ void settingsDialog::on_checkBox_2_clicked()
     settingsDialog::replaceNameWithUnderscores = ui->checkBox_2->isChecked();
 
     if(!settingsDialog::settingsChanged){
-        ui->label->setStyleSheet("QLabel { color : red; }");
         ui->label->setHidden(false);
         settingsDialog::settingsChanged = true;
     }
@@ -261,7 +278,6 @@ void settingsDialog::on_checkBox_3_clicked()
     settingsDialog::lastPathEnabled = !isChecked;
 
     if(!settingsDialog::settingsChanged){
-        ui->label->setStyleSheet("QLabel { color : red; }");
         ui->label->setHidden(false);
         settingsDialog::settingsChanged = true;
     }
@@ -274,7 +290,6 @@ void settingsDialog::on_checkBox_4_clicked()
     settingsDialog::allowHistory = ui->checkBox_4->isChecked();
 
     if(!settingsDialog::settingsChanged){
-        ui->label->setStyleSheet("QLabel { color : red; }");
         ui->label->setHidden(false);
         settingsDialog::settingsChanged = true;
     }
@@ -287,7 +302,6 @@ void settingsDialog::on_checkBox_5_clicked()
     settingsDialog::checkForUpdates = ui->checkBox_5->isChecked();
 
     if(!settingsDialog::settingsChanged){
-        ui->label->setStyleSheet("QLabel { color : red; }");
         ui->label->setHidden(false);
         settingsDialog::settingsChanged = true;
     }

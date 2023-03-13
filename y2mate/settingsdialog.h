@@ -16,7 +16,7 @@ public:
     ~settingsDialog();
 
     void loadSettings();
-    void saveSettings();
+    bool saveSettings();
 
     bool settingsChanged = false;
 
