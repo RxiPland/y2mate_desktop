@@ -79,7 +79,7 @@ void searchVideoWindow::loadSettings()
             } else{
                 // everything OK
 
-                searchVideoWindow::appVersion = loadedJson["app_version"].toString().toUtf8();
+                searchVideoWindow::appVersion = loadedJson["app_version"].toString();
                 this->setWindowTitle("y2mate desktop  |  " + searchVideoWindow::appVersion);
 
                 searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
@@ -197,12 +197,13 @@ void searchVideoWindow::checkUpdate()
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
         msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setText("Je dostupná novější verze y2mate desktop: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
+        msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
+
         QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
         msgBox.exec();
 
-        if (msgBox.clickedButton()==pButtonYes) {
+        if (msgBox.clickedButton() == pButtonYes) {
             ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
         }
     }
@@ -283,8 +284,6 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
         return;
     }
-
-
 }
 
 QJsonObject searchVideoWindow::getVideoFromHistory(QString index)
@@ -352,6 +351,8 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     sd.setModal(true);
 
     sd.exec();
+
+    searchVideoWindow::loadSettings();
 }
 
 void searchVideoWindow::on_pushButton_clicked()
