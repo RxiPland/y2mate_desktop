@@ -378,7 +378,7 @@ void searchVideoWindow::on_pushButton_clicked()
 
     } else if (!rx.exactMatch(videoUrl)){
 
-        QMessageBox::critical(this, "Chyba", "Zadejte kompletní URL adresu!\n\nPř. https://www.google.com");
+        QMessageBox::critical(this, "Chyba", "Zadejte kompletní URL adresu!\n\nPř. https://www.youtube.com/watch?v=MNeX4EGtR5Y");
 
         searchVideoWindow::disableWidgets(false);
         ui->lineEdit->setFocus();
@@ -446,19 +446,13 @@ void searchVideoWindow::on_pushButton_clicked()
 
     if (status != "ok"){
 
-        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"status\": \"%1\"}").arg(status));
+        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! y2mate vrátil:\n\n%1").arg(response));
         disableWidgets(false);
         return;
 
-    } else if (message.contains("Please enter valid video URL.")){
+    } else if (message.contains("Please enter valid video URL.") || message.contains("Sorry! An error has occurred.")){
 
         QMessageBox::warning(this, "Chyba", "Video pod tímto odkazem neexistuje!");
-        disableWidgets(false);
-        return;
-
-    } else if (!message.isEmpty()){
-
-        QMessageBox::warning(this, "Chyba", QString("Nastala chyba! Y2mate vrátil: {\"message\": \"%1\"}").arg(message));
         disableWidgets(false);
         return;
 
