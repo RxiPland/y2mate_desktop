@@ -50,7 +50,7 @@ private:
 
     void sortQualities(QStringList *list);
     void disableWidgets(bool disable = true);
-    void saveLastPath(QString lastpath);
+    void savePath();
 };
 
 #endif // DOWNLOADVIDEOWINDOW_H

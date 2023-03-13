@@ -55,8 +55,10 @@ void downloadVideoWindow::disableWidgets(bool disable)
     ui->pushButton_2->setDisabled(disable);
 }
 
-void downloadVideoWindow::saveLastPath(QString lastpath)
+void downloadVideoWindow::savePath()
 {
+    // save last path to settings file
+
     QFile dataFile(QDir::currentPath() + "/Data/data.json");
 
     if (dataFile.exists()){
@@ -81,10 +83,7 @@ void downloadVideoWindow::saveLastPath(QString lastpath)
                 return;
 
             } else{
-                QStringList temp = lastpath.split('/');
-                temp.pop_back();
-                loadedJson["last_path"] = temp.join('/');
-
+                loadedJson["last_path"] = downloadVideoWindow::lastSavePath;
                 QJsonDocument docData(loadedJson);
 
                 dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
@@ -92,7 +91,7 @@ void downloadVideoWindow::saveLastPath(QString lastpath)
                 dataFile.close();
 
                 if (status == -1){
-                    QMessageBox::critical(this, "Chyba", "Nastala nezmámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+                    QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
                     return;
                 }
@@ -331,7 +330,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.exec();
 
     // save last path to file with settings
-    downloadVideoWindow::saveLastPath(filePath);
+    downloadVideoWindow::savePath();
 
     // download was canceled
     if(dd.canceled){
