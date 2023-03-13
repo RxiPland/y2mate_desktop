@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include <QFileDialog>
 #include <QCryptographicHash>
+#include <QProcess>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -17,6 +18,8 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
+
+    downloadVideoWindow::loadSettings();
 }
 
 downloadVideoWindow::~downloadVideoWindow()
@@ -162,6 +165,66 @@ void downloadVideoWindow::loadData()
 
     sortQualities(&mp3QualitiesKeysSorted);
     sortQualities(&mp4QualitiesKeysSorted);
+}
+
+void downloadVideoWindow::loadSettings()
+{
+    // load settings from file to variables
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            QApplication::quit();
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+
+                QApplication::quit();
+                return;
+
+            } else{
+                // everything OK
+
+                downloadVideoWindow::appVersion = loadedJson["app_version"].toString();
+                downloadVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
+
+                downloadVideoWindow::lastSavePath = loadedJson["last_path"].toString();
+                downloadVideoWindow::lastPathEnabled = loadedJson["enable_last_path"].toBool();
+                downloadVideoWindow::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
+                downloadVideoWindow::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        QApplication::quit();
+        return;
+    }
 }
 
 void downloadVideoWindow::on_pushButton_2_clicked()
@@ -343,7 +406,6 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     // open download dialog
     downloadDialog dd;
-    dd.appVersion = downloadVideoWindow::appVersion;
     dd.userAgent = downloadVideoWindow::userAgent;
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;

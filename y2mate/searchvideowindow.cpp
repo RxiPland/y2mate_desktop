@@ -563,17 +563,11 @@ void searchVideoWindow::on_pushButton_clicked()
 
 
     downloadVideoWindow dvw(nullptr);
-    dvw.appVersion = searchVideoWindow::appVersion;
-    dvw.userAgent = searchVideoWindow::userAgent;
     dvw.ytChannel = ytChannel;
     dvw.videoDuration = videoDuration;
     dvw.videoName = videoName;
     dvw.videoID = videoId;
     dvw.videoUrl = videoUrl;
-    dvw.lastSavePath = searchVideoWindow::lastSavePath;
-    dvw.lastPathEnabled = searchVideoWindow::lastPathEnabled;
-    dvw.replaceNameWithHash = searchVideoWindow::replaceNameWithHash;
-    dvw.replaceNameWithUnderscores = searchVideoWindow::replaceNameWithUnderscores;
 
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;

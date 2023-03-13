@@ -20,7 +20,6 @@ public:
 
     void startDownload();
 
-    QString appVersion;
     QByteArray userAgent;
 
     QString downloadLink;

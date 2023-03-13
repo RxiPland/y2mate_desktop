@@ -18,6 +18,7 @@ public:
     ~downloadVideoWindow();
 
     void loadData();
+    void loadSettings();
 
     QString appVersion;
     QByteArray userAgent;
