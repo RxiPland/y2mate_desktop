@@ -16,6 +16,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QToolButton>
@@ -51,6 +52,8 @@ public:
     QSpacerItem *verticalSpacer;
     QPushButton *pushButton;
     QSpacerItem *verticalSpacer_6;
+    QLabel *label;
+    QSpacerItem *verticalSpacer_7;
     QHBoxLayout *horizontalLayout;
     QPushButton *pushButton_2;
     QPushButton *pushButton_3;
@@ -61,7 +64,7 @@ public:
     {
         if (settingsDialog->objectName().isEmpty())
             settingsDialog->setObjectName("settingsDialog");
-        settingsDialog->resize(390, 259);
+        settingsDialog->resize(390, 271);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
         settingsDialog->setWindowIcon(icon);
@@ -198,6 +201,23 @@ public:
 
         verticalLayout->addItem(verticalSpacer_6);
 
+        label = new QLabel(settingsDialog);
+        label->setObjectName("label");
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
+        QFont font1;
+        font1.setPointSize(9);
+        label->setFont(font1);
+
+        verticalLayout->addWidget(label);
+
+        verticalSpacer_7 = new QSpacerItem(20, 5, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout->addItem(verticalSpacer_7);
+
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
         pushButton_2 = new QPushButton(settingsDialog);
@@ -243,11 +263,12 @@ public:
         toolButton_3->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         toolButton_5->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         checkBox_4->setText(QCoreApplication::translate("settingsDialog", "Zaznamen\303\241vat historii", nullptr));
-        checkBox->setText(QCoreApplication::translate("settingsDialog", "Nahradit n\303\241zev hashem", nullptr));
+        checkBox->setText(QCoreApplication::translate("settingsDialog", "Nahradit n\303\241zev n\303\241hodn\303\275mi znaky", nullptr));
         toolButton_4->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         checkBox_5->setText(QCoreApplication::translate("settingsDialog", "Automaticky kontrolovat aktualizace", nullptr));
         checkBox_3->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255 lokace pro stahov\303\241n\303\255", nullptr));
         pushButton->setText(QCoreApplication::translate("settingsDialog", "Nastavit", nullptr));
+        label->setText(QCoreApplication::translate("settingsDialog", "Nastaven\303\255 nen\303\255 ulo\305\276eno", nullptr));
         pushButton_2->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255", nullptr));
         pushButton_3->setText(QCoreApplication::translate("settingsDialog", "Zru\305\241it", nullptr));
         pushButton_4->setText(QCoreApplication::translate("settingsDialog", "Ulo\305\276it", nullptr));
