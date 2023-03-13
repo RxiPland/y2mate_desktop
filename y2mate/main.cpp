@@ -53,6 +53,7 @@ bool checkSettings(){
     objData["last_path"] = "/";
     objData["enable_last_path"] = true;
     objData["replace_name_with_hash"] = false;
+    objData["replace_name_with_underscores"] = false;
 
     QJsonObject history;
 
