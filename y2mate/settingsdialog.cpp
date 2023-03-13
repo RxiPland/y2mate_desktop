@@ -303,7 +303,7 @@ void settingsDialog::on_pushButton_5_clicked()
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
-        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
 
         QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
@@ -315,7 +315,7 @@ void settingsDialog::on_pushButton_5_clicked()
         }
 
     } else{
-        QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(settingsDialog::appVersion));
+        QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(newestVersion));
     }
 }
 
