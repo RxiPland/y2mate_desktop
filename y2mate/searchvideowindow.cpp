@@ -196,6 +196,7 @@ void searchVideoWindow::checkUpdate()
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
+        msgBox.setIcon(QMessageBox::Warning);
         msgBox.setText("Je dostupná novější verze y2mate desktop: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
         QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
@@ -350,9 +351,7 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     settingsDialog sd;
     sd.setModal(true);
 
-    this->hide();
     sd.exec();
-    this->show();
 }
 
 void searchVideoWindow::on_pushButton_clicked()
