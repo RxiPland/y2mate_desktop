@@ -109,6 +109,8 @@ void searchVideoWindow::loadSettings()
 
                     } else{
                         ui->menu2_1->menuAction()->setText(history1["video_name"].toString());
+                        ui->action_menu_2_1_3->setText("Délka: " + history1["video_duration"].toString());
+                        ui->menu2_1->menuAction()->setVisible(true);
                     }
 
                     QJsonObject history2 = history["2"].toObject();
@@ -117,6 +119,8 @@ void searchVideoWindow::loadSettings()
 
                     } else{
                         ui->menu2_2->menuAction()->setText(history2["video_name"].toString());
+                        ui->action_menu_2_2_3->setText("Délka: " + history2["video_duration"].toString());
+                        ui->menu2_2->menuAction()->setVisible(true);
                     }
 
                     QJsonObject history3 = history["3"].toObject();
@@ -125,6 +129,8 @@ void searchVideoWindow::loadSettings()
 
                     } else{
                         ui->menu2_3->menuAction()->setText(history3["video_name"].toString());
+                        ui->action_menu_2_3_3->setText("Délka: " + history3["video_duration"].toString());
+                        ui->menu2_3->menuAction()->setVisible(true);
                     }
 
                     QJsonObject history4 = history["4"].toObject();
@@ -133,6 +139,8 @@ void searchVideoWindow::loadSettings()
 
                     } else{
                         ui->menu2_4->menuAction()->setText(history4["video_name"].toString());
+                        ui->action_menu_2_4_3->setText("Délka: " + history4["video_duration"].toString());
+                        ui->menu2_4->menuAction()->setVisible(true);
                     }
 
                     QJsonObject history5 = history["5"].toObject();
@@ -141,6 +149,8 @@ void searchVideoWindow::loadSettings()
 
                     } else{
                         ui->menu2_5->menuAction()->setText(history5["video_name"].toString());
+                        ui->action_menu_2_5_3->setText("Délka: " + history5["video_duration"].toString());
+                        ui->menu2_5->menuAction()->setVisible(true);
                     }
 
                     ui->action_menu2_6->setText("Smazat historii");
@@ -544,6 +554,8 @@ void searchVideoWindow::on_pushButton_clicked()
         this->close();
         return;
     }
+
+    searchVideoWindow::loadSettings();
 
     disableWidgets(false);
     ui->lineEdit->clear();

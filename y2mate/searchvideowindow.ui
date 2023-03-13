@@ -274,6 +274,9 @@
    </property>
   </action>
   <action name="action_menu_2_1_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Délka:</string>
    </property>
@@ -289,6 +292,9 @@
    </property>
   </action>
   <action name="action_menu_2_2_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Délka:</string>
    </property>
@@ -304,6 +310,9 @@
    </property>
   </action>
   <action name="action_menu_2_3_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Délka</string>
    </property>
@@ -319,6 +328,9 @@
    </property>
   </action>
   <action name="action_menu_2_4_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Délka</string>
    </property>
@@ -334,6 +346,9 @@
    </property>
   </action>
   <action name="action_menu_2_5_3">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Délka:</string>
    </property>
