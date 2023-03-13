@@ -123,6 +123,7 @@ public:
         pushButton_4 = new QPushButton(downloadDialog);
         pushButton_4->setObjectName("pushButton_4");
         pushButton_4->setEnabled(false);
+        pushButton_4->setFocusPolicy(Qt::NoFocus);
 
         gridLayout->addWidget(pushButton_4, 0, 1, 1, 1);
 
