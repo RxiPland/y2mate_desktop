@@ -23,6 +23,8 @@ downloadDialog::~downloadDialog()
 
 void downloadDialog::startDownload()
 {
+    ui->label_2->setText(downloadDialog::filePath.split('/').last());
+
     file = openFileForWrite(downloadDialog::filePath);
     if (!file){
         QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + downloadDialog::filePath);

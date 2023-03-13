@@ -26,6 +26,7 @@ class Ui_downloadDialog
 public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
+    QLabel *label_2;
     QLabel *label;
     QSpacerItem *verticalSpacer;
     QProgressBar *progressBar;
@@ -44,6 +45,11 @@ public:
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
+        label_2 = new QLabel(downloadDialog);
+        label_2->setObjectName("label_2");
+
+        verticalLayout->addWidget(label_2);
+
         label = new QLabel(downloadDialog);
         label->setObjectName("label");
         label->setMinimumSize(QSize(0, 20));
@@ -102,6 +108,7 @@ public:
     void retranslateUi(QDialog *downloadDialog)
     {
         downloadDialog->setWindowTitle(QCoreApplication::translate("downloadDialog", "Stahov\303\241n\303\255 - prob\303\255h\303\241", nullptr));
+        label_2->setText(QCoreApplication::translate("downloadDialog", "N\303\241zev", nullptr));
         label->setText(QCoreApplication::translate("downloadDialog", "Sta\305\276eno", nullptr));
         pushButton->setText(QCoreApplication::translate("downloadDialog", "Zru\305\241it stahov\303\241n\303\255", nullptr));
     } // retranslateUi
