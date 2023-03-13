@@ -21,8 +21,10 @@ public:
 
     QString appVersion;
     QByteArray userAgent;
-    bool allowHistory;
-    bool checkForUpdates;
+    bool allowHistory = true;
+    bool checkForUpdates = true;
+
+    bool lastPathEnabled = true;
     QString lastSavePath;
 
 private slots:
@@ -32,25 +34,15 @@ private slots:
     void on_pushButton_clicked();
     void on_lineEdit_returnPressed();
     void on_action_menu2_6_triggered();
-
     void on_action_menu_2_1_1_triggered();
-
     void on_action_menu_2_1_2_triggered();
-
     void on_action_menu_2_2_1_triggered();
-
     void on_action_menu_2_2_2_triggered();
-
     void on_action_menu_2_3_1_triggered();
-
     void on_action_menu_2_3_2_triggered();
-
     void on_action_menu_2_4_1_triggered();
-
     void on_action_menu_2_4_2_triggered();
-
     void on_action_menu_2_5_1_triggered();
-
     void on_action_menu_2_5_2_triggered();
 
 private:

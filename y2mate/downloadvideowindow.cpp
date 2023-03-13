@@ -245,11 +245,13 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
 
     } else{
-        // overwrite last path
+        // overwrite last path if enabled
 
-        QStringList temp = filePath.split('/');
-        temp.pop_back();
-        lastSavePath = temp.join('/');
+        if(lastPathEnabled){
+            QStringList temp = filePath.split('/');
+            temp.pop_back();
+            lastSavePath = temp.join('/');
+        }
     }
 
     // request for URL with file

@@ -86,6 +86,7 @@ void searchVideoWindow::loadSettings()
                 searchVideoWindow::checkForUpdates = loadedJson["check_for_updates"].toBool();
                 searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
                 searchVideoWindow::lastSavePath = loadedJson["last_path"].toString();
+                searchVideoWindow::lastPathEnabled = loadedJson["enable_last_path"].toBool();
 
                 // disable/enable history tab
 
@@ -574,6 +575,7 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.videoID = videoId;
     dvw.videoUrl = videoUrl;
     dvw.lastSavePath = searchVideoWindow::lastSavePath;
+    dvw.lastPathEnabled = searchVideoWindow::lastPathEnabled;
 
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;

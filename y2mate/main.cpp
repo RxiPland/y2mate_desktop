@@ -51,6 +51,7 @@ bool checkSettings(){
     objData["allow_history"] = true;
     objData["check_for_updates"] = true;
     objData["last_path"] = "/";
+    objData["enable_last_path"] = true;
 
     QJsonObject history;
 

@@ -34,6 +34,7 @@ public:
     int videoDuration=0;
     QString videoUrl;
 
+    bool lastPathEnabled = true;
     QString lastSavePath;
 
     bool exitApp = true;
