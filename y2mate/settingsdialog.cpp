@@ -9,6 +9,8 @@
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 
 settingsDialog::settingsDialog(QWidget *parent) :
     QDialog(parent),
@@ -95,6 +97,8 @@ void settingsDialog::loadSettings()
                 // everything OK
 
                 settingsDialog::appVersion = loadedJson["app_version"].toString();
+                settingsDialog::userAgent = loadedJson["user_agent"].toString().toUtf8();
+
                 settingsDialog::checkForUpdates = loadedJson["check_for_updates"].toBool();
                 settingsDialog::allowHistory = loadedJson["allow_history"].toBool();
                 settingsDialog::lastSavePath = loadedJson["last_path"].toString();
@@ -239,6 +243,54 @@ void settingsDialog::on_pushButton_4_clicked()
 
     settingsDialog::settingsChanged = false;
     this->close();
+}
+
+void settingsDialog::on_pushButton_5_clicked()
+{
+    // check new version
+
+    QNetworkRequest request;
+    request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+
+    QNetworkReply *replyGet = manager.get(request);
+
+    while (!replyGet->isFinished())
+    {
+        qApp->processEvents();
+    }
+
+    if(replyGet->error() != QNetworkReply::NoError){
+        return;
+    }
+
+    QByteArray response = replyGet->readAll();
+    replyGet->deleteLater();
+
+    QJsonDocument jsonResponse = QJsonDocument::fromJson(response);
+    QJsonObject jsonObject = jsonResponse.object();
+
+    QString newestVersion = jsonObject["tag_name"].toString();
+
+    if (newestVersion != appVersion && newestVersion != ""){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Aktualizace");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
+
+        QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
+        msgBox.addButton("Zrušit", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == pButtonYes) {
+            ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
+        }
+
+    } else{
+        QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(settingsDialog::appVersion));
+    }
 }
 
 void settingsDialog::on_checkBox_clicked()

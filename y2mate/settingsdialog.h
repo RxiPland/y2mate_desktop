@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QNetworkAccessManager>
 
 namespace Ui {
 class settingsDialog;
@@ -30,12 +31,17 @@ private slots:
     void on_checkBox_4_clicked();
     void on_checkBox_5_clicked();
 
+    void on_pushButton_5_clicked();
+
 private:
     Ui::settingsDialog *ui;
+    QNetworkAccessManager manager;
 
     void closeEvent(QCloseEvent *bar = nullptr);
 
     QString appVersion;
+    QByteArray userAgent;
+
     bool checkForUpdates = true;
     bool allowHistory = true;
     QString lastSavePath;
