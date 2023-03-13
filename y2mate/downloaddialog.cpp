@@ -154,11 +154,9 @@ void downloadDialog::on_pushButton_3_clicked()
 {
     // open folder with downloaded file
 
-    QStringList temp = filePath.split('/');
-    temp.pop_back();
-    QString folderPath = temp.join('/').replace('/', '\\');
+    QString folderPathCommand = "/select, \"" + filePath.replace('/', '\\') + "\"";
 
-    ShellExecute(0, L"open", L"explorer.exe", folderPath.toStdWString().c_str(), 0, SW_RESTORE);
+    ShellExecute(0, L"open", L"explorer.exe", folderPathCommand.toStdWString().c_str(), 0, SW_RESTORE);
 
     if(ui->pushButton->text() == "Hotovo"){
         downloadDialog::on_pushButton_clicked();
