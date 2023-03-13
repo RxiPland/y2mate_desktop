@@ -276,7 +276,7 @@ void searchVideoWindow::on_pushButton_clicked()
 
     QNetworkReply::NetworkError error = replyPost->error();
 
-    if(error == QNetworkReply::HostNotFoundError){
+    if(error == QNetworkReply::HostNotFoundError || error == QNetworkReply::UnknownNetworkError){
         // no internet connection available
 
         disableWidgets(false);

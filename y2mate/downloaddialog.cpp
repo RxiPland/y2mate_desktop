@@ -54,9 +54,10 @@ void downloadDialog::on_pushButton_clicked()
     } else{
         downloadDialog::canceled = true;
 
-        reply->close();
-        //reply.reset();
-        //reply->deleteLater();
+        if(!reply.isNull()){
+            reply->close();
+            reply->deleteLater();
+        }
     }
 
     this->close();
@@ -94,9 +95,19 @@ void downloadDialog::httpFinished()
     if (error != QNetworkReply::NoError){
 
         if(!canceled){
-            QMessageBox::critical(this, "Chyba", "Nastala chyba při stahování souboru! Chyba: " + errorString);
+
+            if(errorString == "Connection closed"){
+                QMessageBox::critical(this, "Chyba", "Stahování bylo zrušeno, protože se nelze připojit k síti!");
+
+            } else{
+                QMessageBox::critical(this, "Chyba", "Nastala chyba při stahování souboru! Chyba: " + errorString);
+            }
         }
         QFile::remove(fi.absoluteFilePath());
+
+        if(!canceled){
+            downloadDialog::on_pushButton_clicked();
+        }
 
         return;
     }

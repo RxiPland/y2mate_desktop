@@ -223,11 +223,13 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     QNetworkReply::NetworkError error = replyPost->error();
 
-    if(error == QNetworkReply::HostNotFoundError){
+    if(error == QNetworkReply::HostNotFoundError || error == QNetworkReply::UnknownNetworkError){
         // no internet connection available
 
         disableWidgets(false);
         QMessageBox::critical(this, "Chyba", "Nelze se připojit k internetu nebo server není dostupný!");
+
+        replyPost->deleteLater();
         return;
 
     } else if (error != QNetworkReply::NetworkError::NoError){
@@ -236,6 +238,8 @@ void downloadVideoWindow::on_pushButton_clicked()
         disableWidgets(false);
         const QString &errorString = replyPost->errorString();
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
+
+        replyPost->deleteLater();
         return;
     }
 
