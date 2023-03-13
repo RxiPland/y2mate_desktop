@@ -38,8 +38,11 @@ public:
     QSpacerItem *horizontalSpacer_6;
     QSpacerItem *horizontalSpacer_4;
     QSpacerItem *horizontalSpacer_5;
-    QPushButton *pushButton_2;
     QSpacerItem *verticalSpacer_3;
+    QPushButton *pushButton_2;
+    QPushButton *pushButton_4;
+    QSpacerItem *horizontalSpacer_7;
+    QSpacerItem *horizontalSpacer_8;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer;
     QPushButton *pushButton;
@@ -49,7 +52,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(257, 231);
+        downloadDialog->resize(257, 255);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -84,26 +87,30 @@ public:
         gridLayout->setContentsMargins(-1, 0, -1, -1);
         horizontalSpacer_3 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
-        gridLayout->addItem(horizontalSpacer_3, 0, 2, 1, 1);
+        gridLayout->addItem(horizontalSpacer_3, 1, 2, 1, 1);
 
         pushButton_3 = new QPushButton(downloadDialog);
         pushButton_3->setObjectName("pushButton_3");
         pushButton_3->setMinimumSize(QSize(0, 0));
         pushButton_3->setFocusPolicy(Qt::NoFocus);
 
-        gridLayout->addWidget(pushButton_3, 1, 1, 1, 1);
+        gridLayout->addWidget(pushButton_3, 2, 1, 1, 1);
 
         horizontalSpacer_6 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
-        gridLayout->addItem(horizontalSpacer_6, 1, 2, 1, 1);
+        gridLayout->addItem(horizontalSpacer_6, 2, 2, 1, 1);
 
         horizontalSpacer_4 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
-        gridLayout->addItem(horizontalSpacer_4, 0, 0, 1, 1);
+        gridLayout->addItem(horizontalSpacer_4, 1, 0, 1, 1);
 
         horizontalSpacer_5 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
-        gridLayout->addItem(horizontalSpacer_5, 1, 0, 1, 1);
+        gridLayout->addItem(horizontalSpacer_5, 2, 0, 1, 1);
+
+        verticalSpacer_3 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        gridLayout->addItem(verticalSpacer_3, 3, 1, 1, 1);
 
         pushButton_2 = new QPushButton(downloadDialog);
         pushButton_2->setObjectName("pushButton_2");
@@ -111,11 +118,21 @@ public:
         pushButton_2->setMinimumSize(QSize(0, 0));
         pushButton_2->setFocusPolicy(Qt::NoFocus);
 
-        gridLayout->addWidget(pushButton_2, 0, 1, 1, 1);
+        gridLayout->addWidget(pushButton_2, 1, 1, 1, 1);
 
-        verticalSpacer_3 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        pushButton_4 = new QPushButton(downloadDialog);
+        pushButton_4->setObjectName("pushButton_4");
+        pushButton_4->setEnabled(false);
 
-        gridLayout->addItem(verticalSpacer_3, 2, 1, 1, 1);
+        gridLayout->addWidget(pushButton_4, 0, 1, 1, 1);
+
+        horizontalSpacer_7 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_7, 0, 0, 1, 1);
+
+        horizontalSpacer_8 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_8, 0, 2, 1, 1);
 
 
         verticalLayout->addLayout(gridLayout);
@@ -162,6 +179,7 @@ public:
         label->setText(QCoreApplication::translate("downloadDialog", "Sta\305\276eno", nullptr));
         pushButton_3->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t um\303\255st\304\233n\303\255", nullptr));
         pushButton_2->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t soubor", nullptr));
+        pushButton_4->setText(QCoreApplication::translate("downloadDialog", "Upravit video", nullptr));
         pushButton->setText(QCoreApplication::translate("downloadDialog", "Zru\305\241it stahov\303\241n\303\255", nullptr));
     } // retranslateUi
 

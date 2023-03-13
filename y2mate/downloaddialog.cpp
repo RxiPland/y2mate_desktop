@@ -118,6 +118,7 @@ void downloadDialog::httpFinished()
     this->setWindowTitle("Stahování - dokončeno");
     ui->pushButton->setText("Hotovo");
     ui->pushButton_2->setDisabled(false);
+    ui->pushButton_4->setDisabled(false);
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
