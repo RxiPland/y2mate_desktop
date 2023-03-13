@@ -32,6 +32,20 @@ bool checkSettings(){
             if(loadedJson.isEmpty()){
                 // JSON is corrupted
 
+            } else if (loadedJson["app_version"] != appVersion){
+                // version was manualy changed
+
+                loadedJson["app_version"] = appVersion;
+
+                QJsonDocument docData(loadedJson);
+
+                // write settings to file
+                dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+                dataFile.write(docData.toJson());
+                dataFile.close();
+
+                return false;
+
             } else{
                 // everything OK
                 return false;
