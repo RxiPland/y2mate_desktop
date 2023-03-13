@@ -240,6 +240,8 @@ void downloadVideoWindow::on_pushButton_clicked()
     }
 
     QByteArray response = replyPost->readAll();
+    replyPost->deleteLater();
+
     QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
 
     QString downloadLink;
@@ -255,8 +257,6 @@ void downloadVideoWindow::on_pushButton_clicked()
     }
 
     downloadDialog dd;
-    dd.setModal(true);
-
     dd.appVersion = downloadVideoWindow::appVersion;
     dd.userAgent = downloadVideoWindow::userAgent;
     dd.downloadLink = downloadLink;

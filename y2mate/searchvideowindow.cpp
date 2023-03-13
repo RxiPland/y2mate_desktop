@@ -157,6 +157,8 @@ void searchVideoWindow::checkUpdate()
     }
 
     QByteArray response = replyGet->readAll();
+    replyGet->deleteLater();
+
     QJsonDocument jsonResponse = QJsonDocument::fromJson(response);
     QJsonObject jsonObject = jsonResponse.object();
 
@@ -291,6 +293,8 @@ void searchVideoWindow::on_pushButton_clicked()
     }
 
     QByteArray response = replyPost->readAll();
+    replyPost->deleteLater();
+
     QJsonObject loadedJson = QJsonDocument::fromJson(response).object();
 
     QString status = loadedJson["status"].toString().toLower();
