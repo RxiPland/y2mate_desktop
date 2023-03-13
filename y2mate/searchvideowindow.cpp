@@ -508,7 +508,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         dataFile.close();
 
         if (status == -1){
-            QMessageBox::critical(this, "Chyba", "Nastala chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+            QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
             return;
         }
