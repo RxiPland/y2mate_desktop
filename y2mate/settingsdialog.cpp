@@ -11,12 +11,15 @@
 #include <QJsonObject>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QFileDialog>
+
 
 settingsDialog::settingsDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::settingsDialog)
 {
     ui->setupUi(this);
+    this->setWindowModality(Qt::ApplicationModal);
 
     settingsDialog::loadSettings();
 
@@ -164,6 +167,7 @@ bool settingsDialog::saveSettings()
                 loadedJson["allow_history"] = settingsDialog::allowHistory;
                 loadedJson["check_for_updates"] = settingsDialog::checkForUpdates;
                 loadedJson["enable_last_path"] = settingsDialog::lastPathEnabled;
+                loadedJson["last_path"] = settingsDialog::lastSavePath;
                 loadedJson["replace_name_with_hash"] = settingsDialog::replaceNameWithHash;
                 loadedJson["replace_name_with_underscores"] = settingsDialog::replaceNameWithUnderscores;
 
@@ -189,6 +193,28 @@ bool settingsDialog::saveSettings()
     }
 
     return true;
+}
+
+void settingsDialog::on_pushButton_clicked()
+{
+    // set default path for downloading files
+
+    QString folderPath;
+    folderPath = QFileDialog::getExistingDirectory(this, "Vybrat složku", lastSavePath);
+
+    if(folderPath.isEmpty()){
+        return;
+
+    } else if (folderPath.contains(lastSavePath) || lastSavePath.contains(folderPath)){
+        QMessageBox::information(this, "Oznámení", "Lokace nebyla změněna, protože se shoduje s předchozí");
+
+    } else{
+        settingsDialog::lastSavePath = folderPath;
+        ui->label->setHidden(false);
+        settingsDialog::settingsChanged = true;
+
+        QMessageBox::information(this, "Oznámení", "Byla nastavena nová lokace");
+    }
 }
 
 void settingsDialog::on_pushButton_2_clicked()
