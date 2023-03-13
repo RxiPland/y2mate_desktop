@@ -15,8 +15,16 @@ public:
     explicit settingsDialog(QWidget *parent = nullptr);
     ~settingsDialog();
 
+    bool settingsChanged = false;
+
+private slots:
+    void on_checkBox_3_clicked();
+    void on_pushButton_3_clicked();
+
 private:
     Ui::settingsDialog *ui;
+
+    void closeEvent(QCloseEvent *bar = nullptr);
 };
 
 #endif // SETTINGSDIALOG_H
