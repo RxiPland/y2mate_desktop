@@ -13,7 +13,7 @@ downloadDialog::downloadDialog(QWidget *parent) :
     this->setWindowFlags(windowFlags() &(~Qt::WindowMinimizeButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
-    this->show();
+    this->setWindowModality(Qt::ApplicationModal);
 }
 
 downloadDialog::~downloadDialog()
