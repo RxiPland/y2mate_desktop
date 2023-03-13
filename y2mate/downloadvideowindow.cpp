@@ -55,6 +55,58 @@ void downloadVideoWindow::disableWidgets(bool disable)
     ui->pushButton_2->setDisabled(disable);
 }
 
+void downloadVideoWindow::saveLastPath(QString lastpath)
+{
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
+                return;
+
+            } else{
+                QStringList temp = lastpath.split('/');
+                temp.pop_back();
+                loadedJson["last_path"] = temp.join('/');
+
+                QJsonDocument docData(loadedJson);
+
+                dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+                int status = dataFile.write(docData.toJson());
+                dataFile.close();
+
+                if (status == -1){
+                    QMessageBox::critical(this, "Chyba", "Nastala nezmámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+
+                    return;
+                }
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
+        return;
+    }
+}
+
 void downloadVideoWindow::loadData()
 {
     // set data to widgets
@@ -277,6 +329,9 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     dd.startDownload();
     dd.exec();
+
+    // save last path to file with settings
+    downloadVideoWindow::saveLastPath(filePath);
 
     // download was canceled
     if(dd.canceled){
