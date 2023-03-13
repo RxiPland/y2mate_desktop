@@ -85,6 +85,7 @@ void searchVideoWindow::loadSettings()
                 searchVideoWindow::userAgent = loadedJson["user_agent"].toString().toUtf8();
                 searchVideoWindow::checkForUpdates = loadedJson["check_for_updates"].toBool();
                 searchVideoWindow::allowHistory = loadedJson["allow_history"].toBool();
+                searchVideoWindow::lastSavePath = loadedJson["last_path"].toString();
 
                 // disable/enable history tab
 
@@ -394,7 +395,7 @@ void searchVideoWindow::on_pushButton_clicked()
             tempName.append(c);
         }
     }
-    videoName = tempName;
+    videoName = tempName.trimmed();
 
     downloadVideoWindow dvw(nullptr);
     dvw.appVersion = searchVideoWindow::appVersion;
@@ -404,6 +405,7 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.videoName = videoName;
     dvw.videoID = videoId;
     dvw.videoUrl = videoUrl;
+    dvw.lastSavePath = searchVideoWindow::lastSavePath;
 
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;

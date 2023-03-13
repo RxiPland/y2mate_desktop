@@ -23,6 +23,7 @@ public:
     QByteArray userAgent;
     bool allowHistory;
     bool checkForUpdates;
+    QString lastSavePath;
 
 private slots:
     void on_action_menu1_1_triggered();
