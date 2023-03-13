@@ -33,6 +33,26 @@ private slots:
     void on_lineEdit_returnPressed();
     void on_action_menu2_6_triggered();
 
+    void on_action_menu_2_1_1_triggered();
+
+    void on_action_menu_2_1_2_triggered();
+
+    void on_action_menu_2_2_1_triggered();
+
+    void on_action_menu_2_2_2_triggered();
+
+    void on_action_menu_2_3_1_triggered();
+
+    void on_action_menu_2_3_2_triggered();
+
+    void on_action_menu_2_4_1_triggered();
+
+    void on_action_menu_2_4_2_triggered();
+
+    void on_action_menu_2_5_1_triggered();
+
+    void on_action_menu_2_5_2_triggered();
+
 private:
     Ui::SearchVideoWindow *ui;
     QNetworkAccessManager manager;
@@ -40,6 +60,7 @@ private:
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);
     void saveToHistory(QString videoName, QString videoDuration, QString videoUrl);
+    QJsonObject getVideoFromHistory(QString index);
 
 };
 #endif // SEARCHVIDEOWINDOW_H

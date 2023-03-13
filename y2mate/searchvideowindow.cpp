@@ -285,6 +285,47 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
 
 }
 
+QJsonObject searchVideoWindow::getVideoFromHistory(QString index)
+{
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
+            return QJsonObject();
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
+                return QJsonObject();
+
+            } else{
+                // read video info
+                QJsonObject history = loadedJson["search_history"].toObject();
+
+                return history[index].toObject();
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
+        return QJsonObject();
+    }
+}
+
 void searchVideoWindow::on_action_menu1_1_triggered()
 {
     // open y2mate's website
@@ -652,5 +693,114 @@ void searchVideoWindow::on_action_menu2_6_triggered()
     }
 
     searchVideoWindow::loadSettings();
+}
+
+
+void searchVideoWindow::on_action_menu_2_1_1_triggered()
+{
+    // #1 video - apply
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("1");
+
+    ui->lineEdit->setText(videoInfo["video_url"].toString());
+    searchVideoWindow::on_pushButton_clicked();
+}
+
+
+void searchVideoWindow::on_action_menu_2_1_2_triggered()
+{
+    // #1 video - open in browser
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("1");
+    std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
+
+    ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
+}
+
+
+void searchVideoWindow::on_action_menu_2_2_1_triggered()
+{
+    // #2 video - apply
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("2");
+
+    ui->lineEdit->setText(videoInfo["video_url"].toString());
+    searchVideoWindow::on_pushButton_clicked();
+}
+
+void searchVideoWindow::on_action_menu_2_2_2_triggered()
+{
+    // #2 video - open in browser
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("2");
+    std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
+
+    ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
+}
+
+
+void searchVideoWindow::on_action_menu_2_3_1_triggered()
+{
+    // #3 video - apply
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("3");
+
+    ui->lineEdit->setText(videoInfo["video_url"].toString());
+    searchVideoWindow::on_pushButton_clicked();
+}
+
+
+void searchVideoWindow::on_action_menu_2_3_2_triggered()
+{
+    // #3 video - open in browser
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("3");
+    std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
+
+    ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
+}
+
+
+void searchVideoWindow::on_action_menu_2_4_1_triggered()
+{
+    // #4 video - apply
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("4");
+
+    ui->lineEdit->setText(videoInfo["video_url"].toString());
+    searchVideoWindow::on_pushButton_clicked();
+}
+
+
+void searchVideoWindow::on_action_menu_2_4_2_triggered()
+{
+    // #4 video - open in browser
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("4");
+    std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
+
+    ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
+}
+
+
+void searchVideoWindow::on_action_menu_2_5_1_triggered()
+{
+    // #5 video - apply
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("5");
+
+    ui->lineEdit->setText(videoInfo["video_url"].toString());
+    searchVideoWindow::on_pushButton_clicked();
+}
+
+
+void searchVideoWindow::on_action_menu_2_5_2_triggered()
+{
+    // #5 video - open in browser
+
+    QJsonObject videoInfo = searchVideoWindow::getVideoFromHistory("5");
+    std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
+
+    ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
 }
 
