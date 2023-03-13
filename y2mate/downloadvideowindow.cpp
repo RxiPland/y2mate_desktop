@@ -267,12 +267,10 @@ void downloadVideoWindow::on_pushButton_clicked()
     }
 
     if(downloadVideoWindow::replaceNameWithHash){
-        // generate random 32chars string as replacement for video name
-
-        QByteArray generatedId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+        // replace video name with md5 hash
 
         QCryptographicHash hash(QCryptographicHash::Md5);
-        hash.addData(generatedId);
+        hash.addData(videoName.toUtf8());
 
         videoName = hash.result().toHex();
 
