@@ -112,42 +112,41 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     if (ui->lineEdit->text().isEmpty()){
         QMessageBox::warning(this, "Chyba", "Název nemůže být prázdný!");
+        return;
 
     } else if(timeStart > timeEnd){
-        QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Nemůže být čas začátku větší, jak čas konce");
+        QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Čas začátku nemůže být větší, jak čas konce.");
+        return;
     }
-
-    return;
-
-    editVideoDialog::startHours = timeStart.hour();
-    editVideoDialog::startMinutes = timeStart.minute();
-    editVideoDialog::startSeconds = timeStart.second();
-
-    editVideoDialog::endHours = timeEnd.hour();
-    editVideoDialog::endMinutes = timeEnd.minute();
-    editVideoDialog::endSeconds = timeEnd.second();
 
 
     qint64 totalMicroSecondsStart = 0;
     qint64 totalMicroSecondsEnd = 0;
 
     // start time
-    totalMicroSecondsStart += editVideoDialog::startHours * 3600000000;
-    totalMicroSecondsStart += editVideoDialog::startMinutes * 60000000;
-    totalMicroSecondsStart += editVideoDialog::startSeconds * 1000000;
+    totalMicroSecondsStart += timeStart.hour() * 3600000000;
+    totalMicroSecondsStart += timeStart.minute() * 60000000;
+    totalMicroSecondsStart += timeStart.second() * 1000000;
+    totalMicroSecondsStart += timeStart.msec() * 1000;
 
     // end time
-    totalMicroSecondsEnd += editVideoDialog::endHours * 3600000000;
-    totalMicroSecondsEnd += editVideoDialog::endMinutes * 60000000;
-    totalMicroSecondsEnd += editVideoDialog::endSeconds * 1000000;
+    totalMicroSecondsEnd += timeEnd.hour() * 3600000000;
+    totalMicroSecondsEnd += timeEnd.minute() * 60000000;
+    totalMicroSecondsEnd += timeEnd.second() * 1000000;
+    totalMicroSecondsEnd += timeEnd.msec() * 1000;
 
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(totalMicroSecondsEnd - totalMicroSecondsStart);
     ui->progressBar->setValue(0);
 
 
-    QString startTime = QString("%1:%2:%3").arg(QString::number(startHours), QString::number(startMinutes), QString::number(startSeconds));
-    QString endTime = QString("%1:%2:%3").arg(QString::number(endHours), QString::number(endMinutes), QString::number(endSeconds));
+    QString startTime = timeStart.toString("HH:mm:ss.zzz");
+    QString endTime = timeEnd.toString("HH:mm:ss.zzz");
+
+    qInfo() << startTime;
+    qInfo() << endTime;
+
+    return;
 
     QString command = QString("/C ffmpeg.exe -y -progress - -nostats -loglevel error -i test.mp4 -ss %1 -to %2 test2.mp4").arg(startTime, endTime);
 

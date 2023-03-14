@@ -24,17 +24,6 @@ public:
     QString filePath;
     qint64 videoDuration = 0;
 
-    // start time
-    int startHours = 0;
-    int startMinutes = 0;
-    float startSeconds = 0.0;
-
-    // end time
-    int endHours = 0;
-    int endMinutes = 0;
-    float endSeconds = 0.0;
-
-
 private slots:
     void readyReadStandardOutput();
     void finished();
