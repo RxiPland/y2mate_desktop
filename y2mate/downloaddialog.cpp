@@ -1,5 +1,6 @@
 #include "downloaddialog.h"
 #include "ui_downloaddialog.h"
+#include "editvideodialog.h"
 
 #include <QFileInfo>
 #include <QMessageBox>
@@ -10,7 +11,8 @@ downloadDialog::downloadDialog(QWidget *parent) :
     ui(new Ui::downloadDialog)
 {
     ui->setupUi(this);
-    this->setWindowFlags(Qt::Dialog | Qt::WindowMinimizeButtonHint| Qt::WindowMaximizeButtonHint | Qt::MSWindowsFixedSizeDialogHint);
+    this->setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    this->setWindowFlags(windowFlags() &(~Qt::WindowCloseButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMinimizeButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
@@ -31,7 +33,6 @@ void downloadDialog::startDownload()
         QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + downloadDialog::filePath);
         return;
     }
-
 
     QNetworkRequest request;
     request.setUrl(QUrl(downloadDialog::downloadLink));
@@ -119,10 +120,14 @@ void downloadDialog::httpFinished()
     ui->pushButton->setText("Hotovo");
     ui->pushButton_2->setDisabled(false);
     ui->pushButton_4->setDisabled(false);
+
+    this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
+    this->show();
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
 {
+    // set progress to progress bar
 
     ui->progressBar->setRange(0,max);
     ui->progressBar->setValue(ist);
@@ -162,3 +167,30 @@ void downloadDialog::on_pushButton_3_clicked()
         downloadDialog::on_pushButton_clicked();
     }
 }
+
+void downloadDialog::on_pushButton_4_clicked()
+{
+    // edit video button
+
+    editVideoDialog evd;
+    evd.filePath = downloadDialog::filePath;
+    evd.loadData();
+
+    this->hide();
+    evd.show();
+
+    // wait for close
+    while(!evd.isHidden()){
+        qApp->processEvents();
+    }
+
+    // close if converted
+    if(evd.converted){
+        this->close();
+
+    } else{
+        this->show();
+    }
+
+}
+

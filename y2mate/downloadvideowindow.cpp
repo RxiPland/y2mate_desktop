@@ -409,7 +409,12 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.filePath = filePath;
 
     dd.startDownload();
-    dd.exec();
+    dd.show();
+
+    // wait for close
+    while(!dd.isHidden()){
+        qApp->processEvents();
+    }
 
     // save last path to file with settings
     downloadVideoWindow::savePath();
