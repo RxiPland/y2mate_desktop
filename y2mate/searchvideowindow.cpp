@@ -517,6 +517,7 @@ void searchVideoWindow::on_pushButton_clicked()
         disableWidgets(false);
         return;
     }
+    videoName = videoName.trimmed();
 
     // remove duplicated whitespaces
     QString tempName;
