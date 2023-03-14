@@ -17,11 +17,28 @@ public:
     explicit editVideoDialog(QWidget *parent = nullptr);
     ~editVideoDialog();
 
-    void startEdit();
+    void loadData();
+
+    bool converted = false;
+
+    QString filePath;
+
+    // start time
+    int startHours = 0;
+    int startMinutes = 0;
+    float startSeconds = 0.0;
+
+    // end time
+    int endHours = 0;
+    int endMinutes = 0;
+    float endSeconds = 0.0;
+
 
 private slots:
     void readyReadStandardOutput();
     void finished();
+    void on_pushButton_clicked();
+    void on_pushButton_2_clicked();
 
 private:
     Ui::editVideoDialog *ui;
@@ -33,6 +50,7 @@ private:
     qint64 microSeconds = 0;
 
     QProcess process;
+    void startEdit();
 
 };
 

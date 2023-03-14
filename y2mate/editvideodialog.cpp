@@ -3,19 +3,35 @@
 
 #include <QProcess>
 #include <QCloseEvent>
-#include <QThread>
+
 
 editVideoDialog::editVideoDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::editVideoDialog)
 {
     ui->setupUi(this);
+    this->setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    this->setWindowModality(Qt::ApplicationModal);
+
     this->show();
 }
 
 editVideoDialog::~editVideoDialog()
 {
     delete ui;
+}
+
+void editVideoDialog::loadData()
+{
+    // load data to widgets
+
+    QString fullVideoName = editVideoDialog::filePath.split('/').last();
+
+    QStringList videoName = fullVideoName.split('.');
+    videoName.pop_back();
+
+    ui->lineEdit->setText(videoName.join('.'));
+    ui->comboBox->setCurrentText('.' + fullVideoName.split('.').last());
 }
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)
@@ -52,40 +68,32 @@ void editVideoDialog::readyReadStandardOutput()
 
 void editVideoDialog::finished()
 {
+    // set progress bar to 100 %
+
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
 }
 
 void editVideoDialog::startEdit()
 {
-    // start process
+    // start ffpmeg.exe
 
     qint64 totalMicrosecondsStart = 0;
     qint64 totalMicrosecondsEnd = 0;
 
     // start time
-    int startHours = 0;
-    totalMicrosecondsStart += startHours * 3600000000;
-
-    int startMinutes = 0;
-    totalMicrosecondsStart += startMinutes * 60000000;
-
-    float startSeconds = 0.0;
-    totalMicrosecondsStart += startSeconds * 1000000;
+    totalMicrosecondsStart += editVideoDialog::startHours * 3600000000;
+    totalMicrosecondsStart += editVideoDialog::startMinutes * 60000000;
+    totalMicrosecondsStart += editVideoDialog::startSeconds * 1000000;
 
     // end time
-    int endHours = 0;
-    totalMicrosecondsEnd += endHours * 3600000000;
-
-    int endMinutes = 1;
-    totalMicrosecondsEnd += endMinutes * 60000000;
-
-    float endSeconds = 1.5;
-    totalMicrosecondsEnd += endMinutes * 1000000;
-
+    totalMicrosecondsEnd += editVideoDialog::endHours * 3600000000;
+    totalMicrosecondsEnd += editVideoDialog::endMinutes * 60000000;
+    totalMicrosecondsEnd += editVideoDialog::endSeconds * 1000000;
 
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(totalMicrosecondsEnd - totalMicrosecondsStart);
+    ui->progressBar->setValue(0);
 
 
     QString startTime = QString("%1:%2:%3").arg(QString::number(startHours), QString::number(startMinutes), QString::number(startSeconds));
@@ -97,5 +105,20 @@ void editVideoDialog::startEdit()
 
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
+}
+
+void editVideoDialog::on_pushButton_clicked()
+{
+    // reset values
+
+    editVideoDialog::loadData();
+}
+
+
+void editVideoDialog::on_pushButton_2_clicked()
+{
+    // exit
+
+    this->close();
 }
 
