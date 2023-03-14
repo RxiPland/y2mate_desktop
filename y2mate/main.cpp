@@ -7,7 +7,7 @@
 #include <QJsonDocument>
 
 
-QString appVersion = "v2.0.0 beta";
+QString appVersion = "v2.0.0 beta (adam)";
 
 bool checkSettings(){
 
