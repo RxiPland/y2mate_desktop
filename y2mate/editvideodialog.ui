@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>283</height>
+    <height>289</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -138,8 +138,11 @@
              <property name="focusPolicy">
               <enum>Qt::WheelFocus</enum>
              </property>
+             <property name="currentSection">
+              <enum>QDateTimeEdit::HourSection</enum>
+             </property>
              <property name="displayFormat">
-              <string>HH:mm:ss</string>
+              <string>HH:mm:ss.zzz</string>
              </property>
             </widget>
            </item>
@@ -173,8 +176,11 @@
                <property name="focusPolicy">
                 <enum>Qt::WheelFocus</enum>
                </property>
+               <property name="currentSection">
+                <enum>QDateTimeEdit::HourSection</enum>
+               </property>
                <property name="displayFormat">
-                <string>HH:mm:ss</string>
+                <string>HH:mm:ss.zzz</string>
                </property>
               </widget>
              </item>
