@@ -21,6 +21,7 @@ public:
 
 private slots:
     void readyReadStandardOutput();
+    void finished();
 
 private:
     Ui::editVideoDialog *ui;

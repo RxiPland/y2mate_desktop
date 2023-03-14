@@ -45,16 +45,57 @@ void editVideoDialog::readyReadStandardOutput()
 
     if(re.indexIn(processOutput) != -1){
         editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
+        ui->progressBar->setValue(editVideoDialog::microSeconds);
         qInfo() << microSeconds;
     }
+}
+
+void editVideoDialog::finished()
+{
+    ui->progressBar->setMaximum(100);
+    ui->progressBar->setValue(100);
 }
 
 void editVideoDialog::startEdit()
 {
     // start process
 
-    process.start("cmd", QStringList("/C ffmpeg.exe -y -progress - -nostats -loglevel error -i test.mp4 -ss 0:0:0 -to 0:1:10 test2.mp4"));
+    qint64 totalMicrosecondsStart = 0;
+    qint64 totalMicrosecondsEnd = 0;
 
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readyReadStandardOutput()));
+    // start time
+    int startHours = 0;
+    totalMicrosecondsStart += startHours * 3600000000;
+
+    int startMinutes = 0;
+    totalMicrosecondsStart += startMinutes * 60000000;
+
+    float startSeconds = 0.0;
+    totalMicrosecondsStart += startSeconds * 1000000;
+
+    // end time
+    int endHours = 0;
+    totalMicrosecondsEnd += endHours * 3600000000;
+
+    int endMinutes = 1;
+    totalMicrosecondsEnd += endMinutes * 60000000;
+
+    float endSeconds = 1.5;
+    totalMicrosecondsEnd += endMinutes * 1000000;
+
+
+    ui->progressBar->setMinimum(0);
+    ui->progressBar->setMaximum(totalMicrosecondsEnd - totalMicrosecondsStart);
+
+
+    QString startTime = QString("%1:%2:%3").arg(QString::number(startHours), QString::number(startMinutes), QString::number(startSeconds));
+    QString endTime = QString("%1:%2:%3").arg(QString::number(endHours), QString::number(endMinutes), QString::number(endSeconds));
+
+    QString command = QString("/C ffmpeg.exe -y -progress - -nostats -loglevel error -i test.mp4 -ss %1 -to %2 test2.mp4").arg(startTime, endTime);
+
+    process.start("cmd", QStringList(command));
+
+    connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
+    connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
 }
 
