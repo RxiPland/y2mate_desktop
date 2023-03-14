@@ -497,7 +497,7 @@ void searchVideoWindow::on_pushButton_clicked()
         return;
     }
 
-    int videoDuration = loadedJson["t"].toInt();
+    qint64 videoDuration = loadedJson["t"].toInt();
     if(videoDuration == 0){
         QMessageBox::warning(this, "Chyba", "Nepodařilo se získat délku videa z odpovědi serveru!");
         disableWidgets(false);
