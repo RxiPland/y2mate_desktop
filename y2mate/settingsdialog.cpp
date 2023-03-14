@@ -287,7 +287,16 @@ void settingsDialog::on_pushButton_5_clicked()
         qApp->processEvents();
     }
 
-    if(replyGet->error() != QNetworkReply::NoError){
+    QNetworkReply::NetworkError error = replyGet->error();
+
+    if (error == QNetworkReply::HostNotFoundError || error == QNetworkReply::UnknownNetworkError){
+        // no internet connection available
+
+        QMessageBox::critical(this, "Aktualizace", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("api.github.com"));
+        return;
+
+    } else if (error != QNetworkReply::NoError){
+        QMessageBox::critical(this, "Aktualizace", QString("Nastala chyba: %1").arg(replyGet->errorString()));
         return;
     }
 
@@ -404,4 +413,16 @@ void settingsDialog::on_toolButton_3_clicked()
 {
     // help - default location
     QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, dialog s ukládáním souboru se vždy otevře do předem vybrané lokace, kterou v nastavení vybere uživatel.\n\nPo zakázání se lokace bude dynamicky měnit.\n\nAktuální: " + lastSavePath);
+}
+
+void settingsDialog::on_toolButton_4_clicked()
+{
+    // help - save history
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude se zaznamenávat historie 5ti naposled hledaných videí.");
+}
+
+void settingsDialog::on_toolButton_5_clicked()
+{
+    // help - check version
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při spuštění aplikace automaticky zkontroluje, zda nevyšla nová verze programu. Kontrolovat aktualizace jde i manuálně.");
 }

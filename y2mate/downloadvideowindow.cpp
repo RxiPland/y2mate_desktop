@@ -368,7 +368,7 @@ void downloadVideoWindow::on_pushButton_clicked()
         // no internet connection available
 
         disableWidgets(false);
-        QMessageBox::critical(this, "Chyba", "Nelze se připojit k internetu nebo server není dostupný!");
+        QMessageBox::critical(this, "Chyba", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("y2mate.com"));
 
         replyPost->deleteLater();
         return;
