@@ -185,13 +185,12 @@ void downloadDialog::on_pushButton_4_clicked()
         qApp->processEvents();
     }
 
-    // close if converted
-    if(evd.converted){
-        this->close();
-
-    } else{
-        this->show();
+    // update label
+    if(evd.changed){
+        downloadDialog::filePath = evd.newFilePath;
+        ui->label_2->setText(evd.newFilePath.split('/').last());
     }
 
+    this->show();
 }
 
