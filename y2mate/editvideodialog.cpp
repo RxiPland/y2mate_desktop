@@ -6,6 +6,8 @@
 #include <QTime>
 #include <QMessageBox>
 #include <QFile>
+#include <QCryptographicHash>
+#include <QUuid>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent) :
@@ -88,12 +90,9 @@ void editVideoDialog::readyReadStandardOutput()
 
     processOutput = process.readAll();
 
-    qInfo() << processOutput;
-
     if(re.indexIn(processOutput) != -1){
         editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
         ui->progressBar->setValue(editVideoDialog::microSeconds);
-        qInfo() << microSeconds;
     }
 }
 
@@ -109,12 +108,26 @@ void editVideoDialog::finished()
     if(error.isEmpty()){
         changed = true;
 
-        QMessageBox::information(this, "Oznámení", "Video bylo úspěšně překonvertováno");
+        QFile videoFile(editVideoDialog::filePath);
+        bool success = videoFile.remove(editVideoDialog::filePath);
+
+        if(success){
+            QMessageBox::information(this, "Oznámení", "Video bylo úspěšně překonvertováno");
+
+        } else{
+            QMessageBox::warning(this, "Oznámení", "Video bylo úspěšně překonvertováno, ale nepovedlo se odstranit původní soubor:\n" + editVideoDialog::filePath);
+        }
+
 
     } else{
-        QMessageBox::critical(this, "Chyba", "Video se nepodařilo konvertovat. FFmpeg vrátil:\n\n" + error);
-        ui->progressBar->setValue(0);
 
+        if(error.contains("is not recognized as an internal or external command")){
+            QMessageBox::critical(this, "Chyba", "FFmpeg.exe nebyl nalezen! Reinstalujte program.");
+
+        } else{
+            QMessageBox::critical(this, "Chyba", "Video se nepodařilo konvertovat. FFmpeg vrátil:\n\n" + error);
+        }
+        ui->progressBar->setValue(0);
     }
 
 
@@ -183,20 +196,28 @@ void editVideoDialog::on_pushButton_3_clicked()
     QString fullVideoName = editVideoDialog::filePath.split('/').last();
     QStringList videoNameTemp = fullVideoName.split('.');
     videoNameTemp.pop_back();
-    QString videoName = videoNameTemp.join('.');
 
-    QStringList newPath = editVideoDialog::filePath.split('/');
-    newPath.pop_back();
-    newPath.append(ui->lineEdit->text().trimmed() + ui->comboBox->currentText());
-    QString newVideoPath = newPath.join('/');
+    // original
+    QString originalPath = editVideoDialog::filePath;
+    QString originalVideoName = videoNameTemp.join('.');
+    QString originalVideoNameWithFileType = fullVideoName;
+    QString originalFileType = '.' + editVideoDialog::filePath.split('.').last();
 
-    QString fileType = '.' + editVideoDialog::filePath.split('.').last();
+    // final
+    QString finalVideoName = ui->lineEdit->text().trimmed();
+    QString finalFileType = ui->comboBox->currentText();
+    QString finalVideoNameWithFileType = finalVideoName + finalFileType;
+
+    QStringList temp = editVideoDialog::filePath.split('/');
+    temp.pop_back();
+    QString finalPath = temp.join('/') + '/' + finalVideoNameWithFileType;
+
 
     // bool variables
     bool startTimeChanged = ui->timeEdit->time() != QTime(0,0,0,0);
     bool endTimeChanged = ui->timeEdit_2->time() != QTime(hours, minutes, seconds);
-    bool nameChanged = ui->lineEdit->text().trimmed() != videoName;
-    bool fileTypeChanged = ui->comboBox->currentText() != fileType;
+    bool nameChanged = finalVideoName != originalVideoName;
+    bool fileTypeChanged = finalFileType != originalFileType;
 
     if(!nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
         // nothing changed
@@ -224,11 +245,11 @@ void editVideoDialog::on_pushButton_3_clicked()
         // only rename
 
         QFile videoFile = QFile(editVideoDialog::filePath);
-        bool success = videoFile.rename(newVideoPath);
+        bool success = videoFile.rename(finalPath);
 
         if (success){
             QMessageBox::information(this, "Oznámení", "Soubor byl úspěšně přejmenován");
-            editVideoDialog::newFilePath = newVideoPath;
+            editVideoDialog::newFilePath = finalPath;
 
             changed = true;
 
@@ -236,10 +257,9 @@ void editVideoDialog::on_pushButton_3_clicked()
             return;
 
         } else{
-            QFile temp(newVideoPath);
-
             // file with this name may already exist
-            if(temp.exists()){
+
+            if(videoFile.exists()){
                 QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
 
             } else{
@@ -248,11 +268,31 @@ void editVideoDialog::on_pushButton_3_clicked()
 
             return;
         }
+
+    } else if (!nameChanged && !fileTypeChanged){
+        // replace file
+
+        // generate random name
+        QByteArray random = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+        QCryptographicHash hash(QCryptographicHash::Md5);
+        hash.addData(random);
+
+        random = hash.result().toHex();
+
+        QStringList tempPath = editVideoDialog::filePath.split('/');
+        tempPath.pop_back();
+        QString tempFilePath = tempPath.join('/') + '/' + random + originalFileType;
+
+        QFile tempFile(originalPath);
+        tempFile.rename(tempFilePath);
+
+        originalPath = tempFilePath;
     }
 
-    QFile temp(newVideoPath);
+    QFile videoFile(finalPath);
     // file with this name may already exist
-    if(temp.exists()){
+    if(videoFile.exists()){
         QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
         editVideoDialog::disableWidgets(false);
         return;
@@ -260,6 +300,11 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     // preparation for convert
     QStringList arguments;
+    arguments << "/C";
+    arguments << "cd";
+    arguments << "./Data";
+    arguments << "&";
+    arguments << "ffmpeg.exe";
     arguments << "-y";
     arguments << "-progress";
     arguments << "-";
@@ -267,7 +312,10 @@ void editVideoDialog::on_pushButton_3_clicked()
     arguments << "-loglevel";
     arguments << "error";
     arguments << "-i";
-    arguments << editVideoDialog::filePath;
+    arguments << originalPath;
+
+    // put path for original file deletion
+    editVideoDialog::filePath = originalPath;
 
     if(startTimeChanged){
         // add start time
@@ -304,12 +352,12 @@ void editVideoDialog::on_pushButton_3_clicked()
     }
 
     arguments << "-hide_banner";
-    arguments << newVideoPath;
+    arguments << finalPath;
 
-    editVideoDialog::newFilePath = newVideoPath;
+    editVideoDialog::newFilePath = finalPath;
 
 
-    process.start("ffmpeg.exe", QStringList(arguments));
+    process.start("cmd.exe", QStringList(arguments));
 
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
