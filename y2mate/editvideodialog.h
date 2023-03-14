@@ -19,7 +19,8 @@ public:
 
     void loadData();
 
-    bool converted = false;
+    bool changed = false;
+    QString newFilePath;
 
     QString filePath;
     qint64 videoDuration = 0;
@@ -30,6 +31,8 @@ private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
+
+    void on_lineEdit_returnPressed();
 
 private:
     Ui::editVideoDialog *ui;

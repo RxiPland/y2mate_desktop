@@ -69,6 +69,19 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
     }
 }
 
+void editVideoDialog::disableWidgets(bool disable)
+{
+    // disable widgets
+
+    ui->comboBox->setDisabled(disable);
+    ui->lineEdit->setDisabled(disable);
+    ui->timeEdit->setDisabled(disable);
+    ui->timeEdit_2->setDisabled(disable);
+    ui->pushButton->setDisabled(disable);
+    ui->pushButton_2->setDisabled(disable);
+    ui->pushButton_3->setDisabled(disable);
+}
+
 void editVideoDialog::readyReadStandardOutput()
 {
     // update progress bar
@@ -88,6 +101,22 @@ void editVideoDialog::finished()
 
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
+
+    QString error = process.readAllStandardError();
+
+    if(error.isEmpty()){
+        changed = true;
+
+        QMessageBox::information(this, "Oznámení", "Video bylo úspěšně překonvertováno");
+
+    } else{
+        QMessageBox::critical(this, "Chyba", "Video se nepodařilo konvertovat. FFmpeg vrátil:\n\n" + error);
+        ui->progressBar->setValue(0);
+
+    }
+
+
+    this->close();
 }
 
 void editVideoDialog::on_pushButton_clicked()
@@ -150,19 +179,25 @@ void editVideoDialog::on_pushButton_3_clicked()
     videoNameTemp.pop_back();
     QString videoName = videoNameTemp.join('.');
 
+    QStringList newPath = editVideoDialog::filePath.split('/');
+    newPath.pop_back();
+    newPath.append(ui->lineEdit->text().trimmed() + ui->comboBox->currentText());
+    QString newVideoPath = newPath.join('/');
+
+    QString fileType = '.' + editVideoDialog::filePath.split('.').last();
+
     // bool variables
-    bool startTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
-    bool endTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
+    bool startTimeChanged = ui->timeEdit->time() != QTime(0,0,0,0);
+    bool endTimeChanged = ui->timeEdit_2->time() != QTime(hours, minutes, seconds);
     bool nameChanged = ui->lineEdit->text().trimmed() != videoName;
-    bool formatChanged = ui->comboBox->currentText() != '.' + videoNameTemp.last();
+    bool fileTypeChanged = ui->comboBox->currentText() != fileType;
 
-
-    if(!nameChanged && !startTimeChanged && !endTimeChanged && !formatChanged){
+    if(!nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
         // nothing changed
 
         QMessageBox msgBox;
         msgBox.setWindowTitle("Upozornění");
-        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Nebyly provedeny žádné změny. Chcete odejít?");
         msgBox.addButton(" Ano ", QMessageBox::YesRole);
         QAbstractButton* pButtonNo = msgBox.addButton(" Ne ", QMessageBox::NoRole);
@@ -178,23 +213,32 @@ void editVideoDialog::on_pushButton_3_clicked()
             return;
         }
 
-    } else if (nameChanged && !startTimeChanged && !endTimeChanged && !formatChanged){
+    } else if (nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
         // only rename
 
         QFile videoFile = QFile(editVideoDialog::filePath);
-
-        bool success = videoFile.rename(ui->lineEdit->text().trimmed());
+        bool success = videoFile.rename(newVideoPath);
 
         if (success){
             QMessageBox::information(this, "Oznámení", "Soubor byl úspěšně přejmenován");
+            editVideoDialog::newFilePath = newVideoPath;
 
-            converted = true;
+            changed = true;
 
             this->close();
             return;
 
         } else{
-            QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
+            QFile temp(newVideoPath);
+
+            // file with this name may already exist
+            if(temp.exists()){
+                QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
+
+            } else{
+                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
+            }
+
             return;
         }
     }
@@ -202,7 +246,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     // preparation for convert
 
     QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i ";
-    command += '\"' + editVideoDialog::filePath + '\"' + ' ';
+    command += editVideoDialog::filePath + ' ';
 
     if(startTimeChanged){
         // add start time
@@ -218,18 +262,39 @@ void editVideoDialog::on_pushButton_3_clicked()
         command += QString("-to %1 ").arg(endTime);
     }
 
-    // command += "-c:a copy ";
+    if(fileTypeChanged){
+        QString audioParameters;
 
+        if (fileType == ".ogg"){
 
+            audioParameters = "-codec:a libvorbis ";
 
-    // filename + format (.mp4 / .mp3 ...)
-    command += ui->lineEdit->text().trimmed() + ui->comboBox->currentText();
+        } else if(fileType == ".wav"){
 
+            audioParameters = "-acodec pcm_s16le ";
 
+        } else {
+            audioParameters = "-c:a libmp3lame ";
+        }
 
+        command += audioParameters;
+    }
+
+    command += "-c:a copy ";
+    command += newVideoPath;
+
+    editVideoDialog::newFilePath = newVideoPath;
 
     process.start("cmd", QStringList(command));
 
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
 }
+
+void editVideoDialog::on_lineEdit_returnPressed()
+{
+    // return pressed
+
+    editVideoDialog::on_pushButton_3_clicked();
+}
+
