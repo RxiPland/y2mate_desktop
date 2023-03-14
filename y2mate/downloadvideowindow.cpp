@@ -319,7 +319,7 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     // get path for saving file
     QString filePath;
-    filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", lastSavePath + videoName, fileExtension);
+    filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", lastSavePath + videoName, fileExtension).replace("\\", "/");
 
     if(filePath.isEmpty()){
         downloadVideoWindow::disableWidgets(false);
