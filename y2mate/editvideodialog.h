@@ -19,8 +19,14 @@ public:
 
     void loadData();
 
+    bool running = false;
+    bool terminated = false;
+
     bool changed = false;
     QString newFilePath;
+
+    bool nameChanged;
+    QString originalPath;
 
     QString filePath;
     qint64 videoDuration = 0;

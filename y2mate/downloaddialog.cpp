@@ -188,6 +188,16 @@ void downloadDialog::on_pushButton_4_clicked()
         qApp->processEvents();
     }
 
+    // rename back and delete temp
+    if(evd.running){
+        QFile::remove(evd.newFilePath);
+
+        if(!evd.nameChanged){
+            QFile temp(evd.originalPath);
+            temp.rename(evd.newFilePath);
+        }
+    }
+
     // update label
     if(evd.changed){
         downloadDialog::filePath = evd.newFilePath;

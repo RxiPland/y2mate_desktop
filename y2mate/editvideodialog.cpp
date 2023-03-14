@@ -54,6 +54,10 @@ void editVideoDialog::loadData()
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)
 {
+    // before close
+
+    terminated = true;
+
     if(process.state() == QProcess::Running){
         QProcess::startDetached("cmd", QStringList("/C taskkill /IM ffmpeg.exe /F"));
         process.kill();
@@ -98,8 +102,12 @@ void editVideoDialog::readyReadStandardOutput()
 
 void editVideoDialog::finished()
 {
-    // set progress bar to 100 %
+    if (terminated){
+        QMessageBox::warning(this, "Oznámení", "Operace byla zrušena uživatelem!");
+        return;
+    }
 
+    // set progress bar to 100 %
     ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(100);
 
@@ -108,8 +116,7 @@ void editVideoDialog::finished()
     if(error.isEmpty()){
         changed = true;
 
-        QFile videoFile(editVideoDialog::filePath);
-        bool success = videoFile.remove(editVideoDialog::filePath);
+        bool success = QFile::remove(editVideoDialog::filePath);
 
         if(success){
             QMessageBox::information(this, "Oznámení", "Video bylo úspěšně překonvertováno");
@@ -118,6 +125,7 @@ void editVideoDialog::finished()
             QMessageBox::warning(this, "Oznámení", "Video bylo úspěšně překonvertováno, ale nepovedlo se odstranit původní soubor:\n" + editVideoDialog::filePath);
         }
 
+        running = false;
 
     } else{
 
@@ -151,6 +159,8 @@ void editVideoDialog::on_pushButton_2_clicked()
 void editVideoDialog::on_pushButton_3_clicked()
 {
     // start ffpmeg.exe
+
+    editVideoDialog::running = true;
 
     editVideoDialog::disableWidgets();
 
@@ -198,7 +208,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     videoNameTemp.pop_back();
 
     // original
-    QString originalPath = editVideoDialog::filePath;
+    editVideoDialog::originalPath = editVideoDialog::filePath;
     QString originalVideoName = videoNameTemp.join('.');
     QString originalVideoNameWithFileType = fullVideoName;
     QString originalFileType = '.' + editVideoDialog::filePath.split('.').last();
@@ -216,7 +226,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     // bool variables
     bool startTimeChanged = ui->timeEdit->time() != QTime(0,0,0,0);
     bool endTimeChanged = ui->timeEdit_2->time() != QTime(hours, minutes, seconds);
-    bool nameChanged = finalVideoName != originalVideoName;
+    editVideoDialog::nameChanged = finalVideoName != originalVideoName;
     bool fileTypeChanged = finalFileType != originalFileType;
 
     if(!nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
