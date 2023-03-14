@@ -560,8 +560,11 @@ void searchVideoWindow::on_pushButton_clicked()
     }
     timeDuration.append(QString("%1").arg(seconds));
 
-    searchVideoWindow::saveToHistory(videoName, timeDuration, videoUrl);
 
+    // save to history if enabled
+    if(searchVideoWindow::allowHistory){
+        searchVideoWindow::saveToHistory(videoName, timeDuration, videoUrl);
+    }
 
     downloadVideoWindow dvw(nullptr);
     dvw.ytChannel = ytChannel;
