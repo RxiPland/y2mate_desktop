@@ -28,6 +28,7 @@ class Ui_editVideoDialog
 {
 public:
     QHBoxLayout *horizontalLayout_3;
+    QSpacerItem *horizontalSpacer_2;
     QVBoxLayout *verticalLayout;
     QLabel *label;
     QHBoxLayout *horizontalLayout;
@@ -54,14 +55,20 @@ public:
     QSpacerItem *verticalSpacer_7;
     QSpacerItem *verticalSpacer_5;
     QProgressBar *progressBar;
+    QSpacerItem *verticalSpacer_8;
+    QSpacerItem *horizontalSpacer_3;
 
     void setupUi(QDialog *editVideoDialog)
     {
         if (editVideoDialog->objectName().isEmpty())
             editVideoDialog->setObjectName("editVideoDialog");
-        editVideoDialog->resize(435, 271);
+        editVideoDialog->resize(435, 283);
         horizontalLayout_3 = new QHBoxLayout(editVideoDialog);
         horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalSpacer_2 = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_2);
+
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
         label = new QLabel(editVideoDialog);
@@ -120,7 +127,7 @@ public:
 
         timeEdit = new QTimeEdit(editVideoDialog);
         timeEdit->setObjectName("timeEdit");
-        timeEdit->setFocusPolicy(Qt::NoFocus);
+        timeEdit->setFocusPolicy(Qt::WheelFocus);
 
         verticalLayout_3->addWidget(timeEdit);
 
@@ -137,7 +144,7 @@ public:
 
         timeEdit_2 = new QTimeEdit(editVideoDialog);
         timeEdit_2->setObjectName("timeEdit_2");
-        timeEdit_2->setFocusPolicy(Qt::NoFocus);
+        timeEdit_2->setFocusPolicy(Qt::WheelFocus);
 
         verticalLayout_4->addWidget(timeEdit_2);
 
@@ -212,8 +219,16 @@ public:
 
         verticalLayout->addWidget(progressBar);
 
+        verticalSpacer_8 = new QSpacerItem(20, 5, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout->addItem(verticalSpacer_8);
+
 
         horizontalLayout_3->addLayout(verticalLayout);
+
+        horizontalSpacer_3 = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_3);
 
 
         retranslateUi(editVideoDialog);
