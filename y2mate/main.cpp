@@ -1,4 +1,5 @@
 #include "searchvideowindow.h"
+#include "editvideodialog.h"
 
 #include <QApplication>
 #include <QFile>
@@ -95,6 +96,11 @@ int main(int argc, char *argv[])
     a.setQuitOnLastWindowClosed(true);
 
     bool jsonCorrupted = checkSettings();
+
+    editVideoDialog evd;
+    evd.startEdit();
+    evd.exec();
+
 
     searchVideoWindow svw(nullptr, jsonCorrupted);
     svw.show();
