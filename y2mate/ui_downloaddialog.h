@@ -52,7 +52,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(257, 255);
+        downloadDialog->resize(270, 255);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -85,26 +85,26 @@ public:
         gridLayout = new QGridLayout();
         gridLayout->setObjectName("gridLayout");
         gridLayout->setContentsMargins(-1, 0, -1, -1);
-        horizontalSpacer_3 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_3 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_3, 1, 2, 1, 1);
 
         pushButton_3 = new QPushButton(downloadDialog);
         pushButton_3->setObjectName("pushButton_3");
-        pushButton_3->setMinimumSize(QSize(0, 0));
+        pushButton_3->setMinimumSize(QSize(160, 0));
         pushButton_3->setFocusPolicy(Qt::NoFocus);
 
         gridLayout->addWidget(pushButton_3, 2, 1, 1, 1);
 
-        horizontalSpacer_6 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_6 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_6, 2, 2, 1, 1);
 
-        horizontalSpacer_4 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_4 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_4, 1, 0, 1, 1);
 
-        horizontalSpacer_5 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_5 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_5, 2, 0, 1, 1);
 
@@ -115,7 +115,7 @@ public:
         pushButton_2 = new QPushButton(downloadDialog);
         pushButton_2->setObjectName("pushButton_2");
         pushButton_2->setEnabled(false);
-        pushButton_2->setMinimumSize(QSize(0, 0));
+        pushButton_2->setMinimumSize(QSize(160, 0));
         pushButton_2->setFocusPolicy(Qt::NoFocus);
 
         gridLayout->addWidget(pushButton_2, 1, 1, 1, 1);
@@ -123,15 +123,16 @@ public:
         pushButton_4 = new QPushButton(downloadDialog);
         pushButton_4->setObjectName("pushButton_4");
         pushButton_4->setEnabled(false);
+        pushButton_4->setMinimumSize(QSize(160, 0));
         pushButton_4->setFocusPolicy(Qt::NoFocus);
 
         gridLayout->addWidget(pushButton_4, 0, 1, 1, 1);
 
-        horizontalSpacer_7 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_7 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_7, 0, 0, 1, 1);
 
-        horizontalSpacer_8 = new QSpacerItem(25, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_8 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_8, 0, 2, 1, 1);
 
@@ -141,7 +142,7 @@ public:
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setObjectName("horizontalLayout_2");
         horizontalLayout_2->setContentsMargins(-1, 0, -1, -1);
-        horizontalSpacer = new QSpacerItem(50, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer);
 
@@ -152,12 +153,12 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
         pushButton->setSizePolicy(sizePolicy);
-        pushButton->setMinimumSize(QSize(0, 27));
+        pushButton->setMinimumSize(QSize(175, 27));
         pushButton->setFocusPolicy(Qt::NoFocus);
 
         horizontalLayout_2->addWidget(pushButton);
 
-        horizontalSpacer_2 = new QSpacerItem(50, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer_2 = new QSpacerItem(25, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_2);
 
