@@ -61,6 +61,20 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
     }
 }
 
+void settingsDialog::disableWidgets(bool disable)
+{
+    ui->pushButton_2->setDisabled(disable);
+    ui->pushButton_3->setDisabled(disable);
+    ui->pushButton_4->setDisabled(disable);
+    ui->pushButton_5->setDisabled(disable);
+
+    ui->toolButton->setDisabled(disable);
+    ui->toolButton_2->setDisabled(disable);
+    ui->toolButton_3->setDisabled(disable);
+    ui->toolButton_4->setDisabled(disable);
+    ui->toolButton_5->setDisabled(disable);
+}
+
 void settingsDialog::loadSettings()
 {
     // load settings from file and set checkboxes
@@ -199,10 +213,14 @@ void settingsDialog::on_pushButton_clicked()
 {
     // set default path for downloading files
 
+    settingsDialog::disableWidgets();
+
     QString folderPath;
     folderPath = QFileDialog::getExistingDirectory(this, "Vybrat složku", lastSavePath);
 
+
     if(folderPath.isEmpty()){
+        settingsDialog::disableWidgets(false);
         return;
 
     } else if (folderPath.contains(lastSavePath) || lastSavePath.contains(folderPath)){
@@ -215,6 +233,8 @@ void settingsDialog::on_pushButton_clicked()
 
         QMessageBox::information(this, "Oznámení", "Byla nastavena nová lokace");
     }
+
+    settingsDialog::disableWidgets(false);
 }
 
 void settingsDialog::on_pushButton_2_clicked()
@@ -275,6 +295,8 @@ void settingsDialog::on_pushButton_5_clicked()
 {
     // check new version
 
+    settingsDialog::disableWidgets();
+
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
@@ -293,10 +315,13 @@ void settingsDialog::on_pushButton_5_clicked()
         // no internet connection available
 
         QMessageBox::critical(this, "Aktualizace", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("api.github.com"));
+        settingsDialog::disableWidgets(false);
         return;
 
     } else if (error != QNetworkReply::NoError){
         QMessageBox::critical(this, "Aktualizace", QString("Nastala chyba: %1").arg(replyGet->errorString()));
+
+        settingsDialog::disableWidgets(false);
         return;
     }
 
@@ -326,6 +351,8 @@ void settingsDialog::on_pushButton_5_clicked()
     } else{
         QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(newestVersion));
     }
+
+    settingsDialog::disableWidgets(false);
 }
 
 void settingsDialog::on_checkBox_clicked()

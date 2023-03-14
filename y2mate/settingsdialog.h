@@ -45,6 +45,7 @@ private:
     QNetworkAccessManager manager;
 
     void closeEvent(QCloseEvent *bar = nullptr);
+    void disableWidgets(bool disable = true);
 
     QString appVersion;
     QByteArray userAgent;
