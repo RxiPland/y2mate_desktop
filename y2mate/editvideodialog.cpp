@@ -149,9 +149,11 @@ void editVideoDialog::on_pushButton_3_clicked()
     videoNameTemp.pop_back();
     QString videoName = videoNameTemp.join('.');
 
+    // bool variables
     bool startTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
     bool endTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
     bool nameChanged = ui->lineEdit->text().trimmed() != videoName;
+    bool formatChanged = ui->comboBox->currentText() != '.' + videoNameTemp.last();
 
 
     QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i "; //test.mp4 -ss %1 -to %2 test2.mp4";
