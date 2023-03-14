@@ -128,21 +128,21 @@ void editVideoDialog::on_pushButton_3_clicked()
     editVideoDialog::endSeconds = timeEnd.second();
 
 
-    qint64 totalMicrosecondsStart = 0;
-    qint64 totalMicrosecondsEnd = 0;
+    qint64 totalMicroSecondsStart = 0;
+    qint64 totalMicroSecondsEnd = 0;
 
     // start time
-    totalMicrosecondsStart += editVideoDialog::startHours * 3600000000;
-    totalMicrosecondsStart += editVideoDialog::startMinutes * 60000000;
-    totalMicrosecondsStart += editVideoDialog::startSeconds * 1000000;
+    totalMicroSecondsStart += editVideoDialog::startHours * 3600000000;
+    totalMicroSecondsStart += editVideoDialog::startMinutes * 60000000;
+    totalMicroSecondsStart += editVideoDialog::startSeconds * 1000000;
 
     // end time
-    totalMicrosecondsEnd += editVideoDialog::endHours * 3600000000;
-    totalMicrosecondsEnd += editVideoDialog::endMinutes * 60000000;
-    totalMicrosecondsEnd += editVideoDialog::endSeconds * 1000000;
+    totalMicroSecondsEnd += editVideoDialog::endHours * 3600000000;
+    totalMicroSecondsEnd += editVideoDialog::endMinutes * 60000000;
+    totalMicroSecondsEnd += editVideoDialog::endSeconds * 1000000;
 
     ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(totalMicrosecondsEnd - totalMicrosecondsStart);
+    ui->progressBar->setMaximum(totalMicroSecondsEnd - totalMicroSecondsStart);
     ui->progressBar->setValue(0);
 
 
