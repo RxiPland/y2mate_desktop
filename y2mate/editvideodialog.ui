@@ -139,10 +139,10 @@
               <enum>Qt::WheelFocus</enum>
              </property>
              <property name="currentSection">
-              <enum>QDateTimeEdit::HourSection</enum>
+              <enum>QDateTimeEdit::SecondSection</enum>
              </property>
              <property name="displayFormat">
-              <string>HH:mm:ss.zzz</string>
+              <string>HH:mm:ss.z</string>
              </property>
             </widget>
            </item>
@@ -177,10 +177,10 @@
                 <enum>Qt::WheelFocus</enum>
                </property>
                <property name="currentSection">
-                <enum>QDateTimeEdit::HourSection</enum>
+                <enum>QDateTimeEdit::SecondSection</enum>
                </property>
                <property name="displayFormat">
-                <string>HH:mm:ss.zzz</string>
+                <string>HH:mm:ss.z</string>
                </property>
               </widget>
              </item>

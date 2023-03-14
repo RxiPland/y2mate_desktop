@@ -128,7 +128,7 @@ public:
         timeEdit = new QTimeEdit(editVideoDialog);
         timeEdit->setObjectName("timeEdit");
         timeEdit->setFocusPolicy(Qt::WheelFocus);
-        timeEdit->setCurrentSection(QDateTimeEdit::HourSection);
+        timeEdit->setCurrentSection(QDateTimeEdit::SecondSection);
 
         verticalLayout_3->addWidget(timeEdit);
 
@@ -146,7 +146,7 @@ public:
         timeEdit_2 = new QTimeEdit(editVideoDialog);
         timeEdit_2->setObjectName("timeEdit_2");
         timeEdit_2->setFocusPolicy(Qt::WheelFocus);
-        timeEdit_2->setCurrentSection(QDateTimeEdit::HourSection);
+        timeEdit_2->setCurrentSection(QDateTimeEdit::SecondSection);
 
         verticalLayout_4->addWidget(timeEdit_2);
 
@@ -248,9 +248,9 @@ public:
         comboBox->setItemText(3, QCoreApplication::translate("editVideoDialog", ".ogg", nullptr));
 
         label_2->setText(QCoreApplication::translate("editVideoDialog", "Za\304\215\303\241tek:", nullptr));
-        timeEdit->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.zzz", nullptr));
+        timeEdit->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.z", nullptr));
         label_3->setText(QCoreApplication::translate("editVideoDialog", "Konec:", nullptr));
-        timeEdit_2->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.zzz", nullptr));
+        timeEdit_2->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.z", nullptr));
         pushButton->setText(QCoreApplication::translate("editVideoDialog", "Reset hodnot", nullptr));
         pushButton_2->setText(QCoreApplication::translate("editVideoDialog", "Odej\303\255t", nullptr));
         pushButton_3->setText(QCoreApplication::translate("editVideoDialog", "Potvrdit", nullptr));
