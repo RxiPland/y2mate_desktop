@@ -223,7 +223,7 @@ public:
 
     void retranslateUi(QDialog *editVideoDialog)
     {
-        editVideoDialog->setWindowTitle(QCoreApplication::translate("editVideoDialog", "Dialog", nullptr));
+        editVideoDialog->setWindowTitle(QCoreApplication::translate("editVideoDialog", "\303\232prava videa", nullptr));
         label->setText(QCoreApplication::translate("editVideoDialog", "N\303\241zev:", nullptr));
         comboBox->setItemText(0, QCoreApplication::translate("editVideoDialog", ".mp3", nullptr));
         comboBox->setItemText(1, QCoreApplication::translate("editVideoDialog", ".mp4", nullptr));

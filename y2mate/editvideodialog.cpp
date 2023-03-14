@@ -114,7 +114,6 @@ void editVideoDialog::on_pushButton_clicked()
     editVideoDialog::loadData();
 }
 
-
 void editVideoDialog::on_pushButton_2_clicked()
 {
     // exit
