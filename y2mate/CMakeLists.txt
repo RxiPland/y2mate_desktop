@@ -33,6 +33,10 @@ set(PROJECT_SOURCES
         downloaddialog.h
         downloaddialog.cpp
         downloaddialog.ui
+
+        editvideodialog.h
+        editvideodialog.cpp
+        editvideodialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
