@@ -174,6 +174,7 @@ void downloadDialog::on_pushButton_4_clicked()
 
     editVideoDialog evd;
     evd.filePath = downloadDialog::filePath;
+    evd.videoDuration = downloadDialog::videoDuration;
     evd.loadData();
 
     this->hide();

@@ -32,7 +32,7 @@ public:
     QString videoName;
     QString videoID;
     QString ytChannel;
-    int videoDuration=0;
+    qint64 videoDuration = 0;
     QString videoUrl;
 
     bool lastPathEnabled = true;

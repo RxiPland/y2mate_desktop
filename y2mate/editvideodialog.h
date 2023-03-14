@@ -22,6 +22,7 @@ public:
     bool converted = false;
 
     QString filePath;
+    qint64 videoDuration = 0;
 
     // start time
     int startHours = 0;
