@@ -41,10 +41,11 @@ void editVideoDialog::readyReadStandardOutput()
 {
     // update progress bar
 
-    outTimeMs = process.readAll();
+    processOutput = process.readAll();
 
-    if(re.indexIn(outTimeMs) != -1){
-        qInfo() << re.cap(1).trimmed();
+    if(re.indexIn(processOutput) != -1){
+        editVideoDialog::seconds = re.cap(1).trimmed().toInt() / 1000000;
+        qInfo() << seconds;
     }
 }
 

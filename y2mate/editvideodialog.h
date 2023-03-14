@@ -28,7 +28,8 @@ private:
     void closeEvent(QCloseEvent *bar = nullptr);
 
     QRegExp re = QRegExp("out_time_ms=(\\d+)");
-    QString outTimeMs;
+    QString processOutput;
+    qint64 seconds = 0;
 
     QProcess process;
 
