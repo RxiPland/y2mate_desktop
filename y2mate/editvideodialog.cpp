@@ -44,8 +44,8 @@ void editVideoDialog::readyReadStandardOutput()
     processOutput = process.readAll();
 
     if(re.indexIn(processOutput) != -1){
-        editVideoDialog::seconds = re.cap(1).trimmed().toInt() / 1000000;
-        qInfo() << seconds;
+        editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
+        qInfo() << microSeconds;
     }
 }
 
