@@ -284,28 +284,26 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << "-to";
         arguments << endTime;
     }
-    /*
+
     if(fileTypeChanged){
-        QString audioParameters;
+        QString currentFileType = ui->comboBox->currentText();
 
-        if (fileType == ".ogg"){
+        if (currentFileType == ".ogg"){
 
-            audioParameters = "-codec:a libvorbis ";
+            arguments << "-c:a";
+            arguments << "libvorbis";
 
-        } else if(fileType == ".wav"){
-
-            audioParameters = "-acodec pcm_s16le ";
-
-        } else {
-            audioParameters = "-c:a libmp3lame ";
+        } else{
+            arguments << "-c:a";
+            arguments << "copy";
         }
 
-        command += audioParameters;
+    } else{
+        arguments << "-c:a";
+        arguments << "copy";
     }
-    */
 
-    arguments << "-c:a";
-    arguments << "copy";
+    arguments << "-hide_banner";
     arguments << newVideoPath;
 
     editVideoDialog::newFilePath = newVideoPath;
