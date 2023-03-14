@@ -3,6 +3,8 @@
 
 #include <QProcess>
 #include <QCloseEvent>
+#include <QTime>
+#include <QMessageBox>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent) :
@@ -87,9 +89,44 @@ void editVideoDialog::finished()
     ui->progressBar->setValue(100);
 }
 
-void editVideoDialog::startEdit()
+void editVideoDialog::on_pushButton_clicked()
+{
+    // reset values
+
+    editVideoDialog::loadData();
+}
+
+void editVideoDialog::on_pushButton_2_clicked()
+{
+    // exit
+
+    this->close();
+}
+
+void editVideoDialog::on_pushButton_3_clicked()
 {
     // start ffpmeg.exe
+
+    QTime timeStart = ui->timeEdit->time();
+    QTime timeEnd = ui->timeEdit_2->time();
+
+    if (ui->lineEdit->text().isEmpty()){
+        QMessageBox::warning(this, "Chyba", "Název nemůže být prázdný!");
+
+    } else if(timeStart > timeEnd){
+        QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Nemůže být čas začátku větší, jak čas konce");
+    }
+
+    return;
+
+    editVideoDialog::startHours = timeStart.hour();
+    editVideoDialog::startMinutes = timeStart.minute();
+    editVideoDialog::startSeconds = timeStart.second();
+
+    editVideoDialog::endHours = timeEnd.hour();
+    editVideoDialog::endMinutes = timeEnd.minute();
+    editVideoDialog::endSeconds = timeEnd.second();
+
 
     qint64 totalMicrosecondsStart = 0;
     qint64 totalMicrosecondsEnd = 0;
@@ -119,18 +156,3 @@ void editVideoDialog::startEdit()
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
 }
-
-void editVideoDialog::on_pushButton_clicked()
-{
-    // reset values
-
-    editVideoDialog::loadData();
-}
-
-void editVideoDialog::on_pushButton_2_clicked()
-{
-    // exit
-
-    this->close();
-}
-
