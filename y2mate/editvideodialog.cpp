@@ -32,6 +32,19 @@ void editVideoDialog::loadData()
 
     ui->lineEdit->setText(videoName.join('.'));
     ui->comboBox->setCurrentText('.' + fullVideoName.split('.').last());
+
+
+    int hours = videoDuration/(60*60);
+    int minutes = (videoDuration/60)-(hours*60);
+    int seconds = videoDuration-(hours*(60*60)+minutes*60);
+
+    ui->timeEdit->setMinimumTime(QTime(0,0,0,0));
+    ui->timeEdit->setMaximumTime(QTime(hours, minutes, seconds));
+    ui->timeEdit->setTime(QTime(0,0,0,0));
+
+    ui->timeEdit_2->setMinimumTime(QTime(0,0,0,0));
+    ui->timeEdit_2->setMaximumTime(QTime(hours, minutes, seconds));
+    ui->timeEdit_2->setTime(QTime(hours, minutes, seconds));
 }
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)
