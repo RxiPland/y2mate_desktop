@@ -159,7 +159,10 @@ void downloadDialog::on_pushButton_3_clicked()
 {
     // open folder with downloaded file
 
-    QString folderPathCommand = "/select, \"" + filePath.replace('/', '\\') + "\"";
+    QString path = filePath;
+    path.replace('/', '\\');
+
+    QString folderPathCommand = "/select, \"" + path + "\"";
 
     ShellExecute(0, L"open", L"explorer.exe", folderPathCommand.toStdWString().c_str(), 0, SW_RESTORE);
 
