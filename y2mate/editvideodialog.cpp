@@ -140,15 +140,50 @@ void editVideoDialog::on_pushButton_3_clicked()
     ui->progressBar->setValue(0);
 
 
-    QString startTime = timeStart.toString("HH:mm:ss.zzz");
-    QString endTime = timeEnd.toString("HH:mm:ss.zzz");
+    int hours = videoDuration/(60*60);
+    int minutes = (videoDuration/60)-(hours*60);
+    int seconds = videoDuration-(hours*(60*60)+minutes*60);
 
-    qInfo() << startTime;
-    qInfo() << endTime;
+    QString fullVideoName = editVideoDialog::filePath.split('/').last();
+    QStringList videoNameTemp = fullVideoName.split('.');
+    videoNameTemp.pop_back();
+    QString videoName = videoNameTemp.join('.');
+
+    bool startTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
+    bool endTimeChanged = ui->timeEdit->time() != QTime(hours, minutes, seconds);
+    bool nameChanged = ui->lineEdit->text().trimmed() != videoName;
+
+
+    QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i "; //test.mp4 -ss %1 -to %2 test2.mp4";
+    command += '\"' + editVideoDialog::filePath + '\"' + ' ';
+
+    qInfo() << command;
 
     return;
 
-    QString command = QString("/C ffmpeg.exe -y -progress - -nostats -loglevel error -i test.mp4 -ss %1 -to %2 test2.mp4").arg(startTime, endTime);
+    if(startTimeChanged){
+        // add start time
+
+        QString startTime = timeStart.toString("HH:mm:ss.zzz");
+        command += QString("-ss %1 ").arg(startTime);
+    }
+
+    if(endTimeChanged){
+        // add end time
+
+        QString endTime = timeEnd.toString("HH:mm:ss.zzz");
+        command += QString("-to %1 ").arg(endTime);
+    }
+
+    // command += "-c:a copy ";
+
+
+
+    // filename + format (.mp4 / .mp3 ...)
+    command += ui->lineEdit->text().trimmed() + ui->comboBox->currentText();
+
+
+
 
     process.start("cmd", QStringList(command));
 
