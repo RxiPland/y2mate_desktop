@@ -38,6 +38,7 @@ private:
     Ui::editVideoDialog *ui;
 
     void closeEvent(QCloseEvent *bar = nullptr);
+    void disableWidgets(bool disable = true);
 
     QRegExp re = QRegExp("out_time_ms=(\\d+)");
     QString processOutput;

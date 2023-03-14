@@ -88,6 +88,8 @@ void editVideoDialog::readyReadStandardOutput()
 
     processOutput = process.readAll();
 
+    qInfo() << processOutput;
+
     if(re.indexIn(processOutput) != -1){
         editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
         ui->progressBar->setValue(editVideoDialog::microSeconds);
@@ -137,15 +139,19 @@ void editVideoDialog::on_pushButton_3_clicked()
 {
     // start ffpmeg.exe
 
+    editVideoDialog::disableWidgets();
+
     QTime timeStart = ui->timeEdit->time();
     QTime timeEnd = ui->timeEdit_2->time();
 
     if (ui->lineEdit->text().isEmpty()){
         QMessageBox::warning(this, "Chyba", "Název nemůže být prázdný!");
+        editVideoDialog::disableWidgets(false);
         return;
 
     } else if(timeStart > timeEnd){
         QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Čas začátku nemůže být větší, jak čas konce.");
+        editVideoDialog::disableWidgets(false);
         return;
     }
 
@@ -204,6 +210,7 @@ void editVideoDialog::on_pushButton_3_clicked()
         msgBox.exec();
 
         if (msgBox.clickedButton() == pButtonNo){
+            editVideoDialog::disableWidgets(false);
             return;
 
         } else{
@@ -243,25 +250,41 @@ void editVideoDialog::on_pushButton_3_clicked()
         }
     }
 
-    // preparation for convert
+    QFile temp(newVideoPath);
+    // file with this name may already exist
+    if(temp.exists()){
+        QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
+        editVideoDialog::disableWidgets(false);
+        return;
+    }
 
-    QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i ";
-    command += editVideoDialog::filePath + ' ';
+    // preparation for convert
+    QStringList arguments;
+    arguments << "-y";
+    arguments << "-progress";
+    arguments << "-";
+    arguments << "-nostats";
+    arguments << "-loglevel";
+    arguments << "error";
+    arguments << "-i";
+    arguments << editVideoDialog::filePath;
 
     if(startTimeChanged){
         // add start time
 
         QString startTime = timeStart.toString("HH:mm:ss.zzz");
-        command += QString("-ss %1 ").arg(startTime);
+        arguments << "-ss";
+        arguments << startTime;
     }
 
     if(endTimeChanged){
         // add end time
 
         QString endTime = timeEnd.toString("HH:mm:ss.zzz");
-        command += QString("-to %1 ").arg(endTime);
+        arguments << "-to";
+        arguments << endTime;
     }
-
+    /*
     if(fileTypeChanged){
         QString audioParameters;
 
@@ -279,13 +302,16 @@ void editVideoDialog::on_pushButton_3_clicked()
 
         command += audioParameters;
     }
+    */
 
-    command += "-c:a copy ";
-    command += newVideoPath;
+    arguments << "-c:a";
+    arguments << "copy";
+    arguments << newVideoPath;
 
     editVideoDialog::newFilePath = newVideoPath;
 
-    process.start("cmd", QStringList(command));
+
+    process.start("ffmpeg.exe", QStringList(arguments));
 
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
     connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished()));
