@@ -36,7 +36,7 @@ void downloadVideoWindow::sortQualities(QStringList *list)
 
     for(i=0; i<tempList.length(); i++){
 
-        tempList[i] = tempList[i].replace(re, "");
+        tempList[i].replace(re, "");
     }
 
     // source: https://stackoverflow.com/questions/65061873/sorting-a-qstring-list-by-numbers-c
@@ -313,7 +313,7 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     // replace whitespaceses with underscores (_)
     if(downloadVideoWindow::replaceNameWithUnderscores){
-        videoName = videoName.replace(" ", "_");
+        videoName.replace(" ", "_");
     }
 
 
