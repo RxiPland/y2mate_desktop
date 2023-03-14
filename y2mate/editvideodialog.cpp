@@ -5,6 +5,7 @@
 #include <QCloseEvent>
 #include <QTime>
 #include <QMessageBox>
+#include <QFile>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent) :
@@ -156,12 +157,52 @@ void editVideoDialog::on_pushButton_3_clicked()
     bool formatChanged = ui->comboBox->currentText() != '.' + videoNameTemp.last();
 
 
-    QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i "; //test.mp4 -ss %1 -to %2 test2.mp4";
+    if(!nameChanged && !startTimeChanged && !endTimeChanged && !formatChanged){
+        // nothing changed
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Upozornění");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Nebyly provedeny žádné změny. Chcete odejít?");
+        msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        QAbstractButton* pButtonNo = msgBox.addButton(" Ne ", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == pButtonNo){
+            return;
+
+        } else{
+            // exit
+
+            this->close();
+            return;
+        }
+
+    } else if (nameChanged && !startTimeChanged && !endTimeChanged && !formatChanged){
+        // only rename
+
+        QFile videoFile = QFile(editVideoDialog::filePath);
+
+        bool success = videoFile.rename(ui->lineEdit->text().trimmed());
+
+        if (success){
+            QMessageBox::information(this, "Oznámení", "Soubor byl úspěšně přejmenován");
+
+            converted = true;
+
+            this->close();
+            return;
+
+        } else{
+            QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
+            return;
+        }
+    }
+
+    // preparation for convert
+
+    QString command = "/C cd ./Data & ffmpeg.exe -y -progress - -nostats -loglevel error -i ";
     command += '\"' + editVideoDialog::filePath + '\"' + ' ';
-
-    qInfo() << command;
-
-    return;
 
     if(startTimeChanged){
         // add start time
