@@ -46,6 +46,7 @@ private slots:
     void on_action_menu_2_4_2_triggered();
     void on_action_menu_2_5_1_triggered();
     void on_action_menu_2_5_2_triggered();
+    void on_action_menu3_1_triggered();
 
 private:
     Ui::SearchVideoWindow *ui;

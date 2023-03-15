@@ -2,6 +2,7 @@
 #include "./ui_searchvideowindow.h"
 #include "settingsdialog.h"
 #include "downloadvideowindow.h"
+#include "editvideodialog.h"
 
 #include <Windows.h>
 #include <QFile>
@@ -14,6 +15,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QLabel>
+#include <QFileDialog>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -800,5 +802,82 @@ void searchVideoWindow::on_action_menu_2_5_2_triggered()
     std::wstring videoUrl = videoInfo["video_url"].toString().toStdWString();
 
     ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
+}
+
+
+void searchVideoWindow::on_action_menu3_1_triggered()
+{
+    // open video/audio file for edit
+
+    QString filePath;
+    filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg .*flac);;Všechny soubory (*.*)").replace("\\", "/");
+
+    if(filePath.isEmpty()){
+        return;
+    }
+
+    QStringList validFileTypes = {".mp3", ".mp4", ".wav", ".ogg", ".flac"};
+    QString fileType = '.' + filePath.split('.').last();
+
+    if(!validFileTypes.contains(fileType)){
+        // invalid file type
+
+        QMessageBox::critical(this, "Chyba", QString("Koncovka %1 není v tuto chvíli podporována!").arg(fileType));
+        return;
+    }
+
+    // preparation for getting video duration
+    QStringList arguments;
+    arguments << "/C";
+    arguments << "cd";
+    arguments << "./Data";
+    arguments << "&";
+    arguments << "ffmpeg.exe";
+    arguments << "-i";
+    arguments << filePath;
+
+    QProcess process;
+    process.start("cmd.exe", QStringList(arguments));
+
+    while(process.state() == QProcess::Running){
+        qApp->processEvents();
+    }
+
+    // ffmpeg will make error output (because output is missing)
+    QString processOutput = process.readAllStandardError();
+    QRegExp re = QRegExp("Duration: (\\d+):(\\d+):(\\d+).(\\d+)");
+
+    qint64 totalMiliSeconds = 0;
+
+    // get duration
+    if(re.indexIn(processOutput) != -1){
+        totalMiliSeconds += re.cap(1).toInt() * 3600000;
+        totalMiliSeconds += re.cap(2).toInt() * 60000;
+        totalMiliSeconds += re.cap(3).toInt() * 1000;
+
+        int miliSeconds = re.cap(4).toInt();
+
+        while(miliSeconds<100 && miliSeconds != 0){
+            miliSeconds *= 10;
+        }
+        totalMiliSeconds += miliSeconds;
+    }
+
+
+    if(totalMiliSeconds == 0){
+        QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se získat délku videa!");
+        return;
+    }
+
+    editVideoDialog evd;
+    evd.filePath = filePath;
+    evd.videoDurationMiliSec = totalMiliSeconds;
+    evd.loadData();
+    evd.show();
+
+    // wait for close
+    while(!evd.isHidden()){
+        qApp->processEvents();
+    }
 }
 

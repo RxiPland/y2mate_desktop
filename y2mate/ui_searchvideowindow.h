@@ -47,6 +47,7 @@ public:
     QAction *action_menu_2_5_1;
     QAction *action_menu_2_5_2;
     QAction *action_menu_2_5_3;
+    QAction *action_menu3_1;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_2;
@@ -66,6 +67,7 @@ public:
     QMenu *menu2_3;
     QMenu *menu2_4;
     QMenu *menu2_5;
+    QMenu *menu_3;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *SearchVideoWindow)
@@ -128,6 +130,11 @@ public:
         action_menu_2_5_3 = new QAction(SearchVideoWindow);
         action_menu_2_5_3->setObjectName("action_menu_2_5_3");
         action_menu_2_5_3->setEnabled(false);
+        action_menu3_1 = new QAction(SearchVideoWindow);
+        action_menu3_1->setObjectName("action_menu3_1");
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/images/open_file.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        action_menu3_1->setIcon(icon4);
         centralwidget = new QWidget(SearchVideoWindow);
         centralwidget->setObjectName("centralwidget");
         horizontalLayout_2 = new QHBoxLayout(centralwidget);
@@ -202,6 +209,8 @@ public:
         menu2_4->setObjectName("menu2_4");
         menu2_5 = new QMenu(menu_2);
         menu2_5->setObjectName("menu2_5");
+        menu_3 = new QMenu(menubar);
+        menu_3->setObjectName("menu_3");
         SearchVideoWindow->setMenuBar(menubar);
         statusBar = new QStatusBar(SearchVideoWindow);
         statusBar->setObjectName("statusBar");
@@ -209,6 +218,7 @@ public:
 
         menubar->addAction(menu_1->menuAction());
         menubar->addAction(menu_2->menuAction());
+        menubar->addAction(menu_3->menuAction());
         menu_1->addAction(action_menu1_1);
         menu_1->addAction(action_menu1_2);
         menu_1->addSeparator();
@@ -240,6 +250,7 @@ public:
         menu2_5->addAction(action_menu_2_5_2);
         menu2_5->addSeparator();
         menu2_5->addAction(action_menu_2_5_3);
+        menu_3->addAction(action_menu3_1);
 
         retranslateUi(SearchVideoWindow);
 
@@ -268,6 +279,7 @@ public:
         action_menu_2_5_1->setText(QCoreApplication::translate("SearchVideoWindow", "Pou\305\276\303\255t", nullptr));
         action_menu_2_5_2->setText(QCoreApplication::translate("SearchVideoWindow", "Otev\305\231\303\255t", nullptr));
         action_menu_2_5_3->setText(QCoreApplication::translate("SearchVideoWindow", "D\303\251lka:", nullptr));
+        action_menu3_1->setText(QCoreApplication::translate("SearchVideoWindow", "Otev\305\231\303\255t soubor", nullptr));
         lineEdit->setText(QString());
         lineEdit->setPlaceholderText(QCoreApplication::translate("SearchVideoWindow", "Vlo\305\276te URL videa", nullptr));
         pushButton->setText(QCoreApplication::translate("SearchVideoWindow", "Naj\303\255t", nullptr));
@@ -278,6 +290,7 @@ public:
         menu2_3->setTitle(QCoreApplication::translate("SearchVideoWindow", "3", nullptr));
         menu2_4->setTitle(QCoreApplication::translate("SearchVideoWindow", "4", nullptr));
         menu2_5->setTitle(QCoreApplication::translate("SearchVideoWindow", "5", nullptr));
+        menu_3->setTitle(QCoreApplication::translate("SearchVideoWindow", "\303\232prava videa", nullptr));
     } // retranslateUi
 
 };
