@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(y2mate VERSION 2.0.0 LANGUAGES CXX)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -43,6 +45,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(y2mate
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        ${APP_ICON_RESOURCE_WINDOWS}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET y2mate APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
