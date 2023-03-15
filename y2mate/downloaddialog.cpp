@@ -203,6 +203,7 @@ void downloadDialog::on_pushButton_4_clicked()
         downloadDialog::filePath = evd.newFilePath;
         downloadDialog::videoDurationMiliSec = evd.newVideoDurationMiliSec;
         ui->label_2->setText(evd.newFilePath.split('/').last());
+        ui->pushButton_4->setDisabled(true);
     }
 
     this->show();
