@@ -122,7 +122,12 @@ void editVideoDialog::finished()
     if(error.isEmpty()){
         changed = true;
 
-        bool success = QFile::remove(editVideoDialog::filePath);
+        bool success = true;
+
+        // keep or delete original file
+        if(deleteOriginalFile){
+            success = QFile::remove(editVideoDialog::filePath);
+        }
 
         if(success){
             QMessageBox::information(this, "Oznámení", "Video bylo úspěšně překonvertováno");
@@ -166,8 +171,6 @@ void editVideoDialog::on_pushButton_3_clicked()
 {
     // start ffpmeg.exe
 
-    editVideoDialog::running = true;
-
     editVideoDialog::disableWidgets();
 
     QTime timeStart = ui->timeEdit->time();
@@ -178,8 +181,8 @@ void editVideoDialog::on_pushButton_3_clicked()
         editVideoDialog::disableWidgets(false);
         return;
 
-    } else if(timeStart > timeEnd){
-        QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Čas začátku nemůže být větší, jak čas konce.");
+    } else if(timeStart >= timeEnd){
+        QMessageBox::warning(this, "Chyba", "Vybraný časový úsek není validní! Čas začátku nemůže být větší nebo roven času konce!");
         editVideoDialog::disableWidgets(false);
         return;
     }
@@ -254,8 +257,36 @@ void editVideoDialog::on_pushButton_3_clicked()
             this->close();
             return;
         }
+    }
 
-    } else if (nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
+    // ask if original file might be deleted
+    if(editVideoDialog::startedFromSeachMenu){
+
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Oznámení");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Chcete ponechat původní soubor?");
+        QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        msgBox.addButton(" Ne ", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == pButtonYes){
+
+            bool exists = QFile(finalPath).exists();
+
+            if(exists){
+                QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, tak název nemůže být stejný!");
+                editVideoDialog::disableWidgets(false);
+                return;
+            }
+            deleteOriginalFile = false;
+        }
+    }
+
+
+    editVideoDialog::running = true;
+
+    if (nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
         // only rename
 
         QFile videoFile = QFile(editVideoDialog::filePath);

@@ -19,6 +19,9 @@ public:
 
     void loadData();
 
+    bool startedFromSeachMenu = false;
+    bool deleteOriginalFile = true;
+
     bool running = false;
     bool terminated = false;
 
