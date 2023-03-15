@@ -81,11 +81,6 @@
          </item>
          <item>
           <property name="text">
-           <string>.mp4</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
            <string>.wav</string>
           </property>
          </item>

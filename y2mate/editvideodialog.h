@@ -17,6 +17,7 @@ public:
     explicit editVideoDialog(QWidget *parent = nullptr);
     ~editVideoDialog();
 
+    bool dataLoaded = false;
     void loadData();
 
     bool startedFromSeachMenu = false;

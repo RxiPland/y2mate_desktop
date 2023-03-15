@@ -94,7 +94,6 @@ public:
         comboBox->addItem(QString());
         comboBox->addItem(QString());
         comboBox->addItem(QString());
-        comboBox->addItem(QString());
         comboBox->setObjectName("comboBox");
         QSizePolicy sizePolicy1(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
@@ -244,10 +243,9 @@ public:
         editVideoDialog->setWindowTitle(QCoreApplication::translate("editVideoDialog", "\303\232prava videa", nullptr));
         label->setText(QCoreApplication::translate("editVideoDialog", "N\303\241zev:", nullptr));
         comboBox->setItemText(0, QCoreApplication::translate("editVideoDialog", ".mp3", nullptr));
-        comboBox->setItemText(1, QCoreApplication::translate("editVideoDialog", ".mp4", nullptr));
-        comboBox->setItemText(2, QCoreApplication::translate("editVideoDialog", ".wav", nullptr));
-        comboBox->setItemText(3, QCoreApplication::translate("editVideoDialog", ".ogg", nullptr));
-        comboBox->setItemText(4, QCoreApplication::translate("editVideoDialog", ".flac", nullptr));
+        comboBox->setItemText(1, QCoreApplication::translate("editVideoDialog", ".wav", nullptr));
+        comboBox->setItemText(2, QCoreApplication::translate("editVideoDialog", ".ogg", nullptr));
+        comboBox->setItemText(3, QCoreApplication::translate("editVideoDialog", ".flac", nullptr));
 
         label_2->setText(QCoreApplication::translate("editVideoDialog", "Za\304\215\303\241tek:", nullptr));
         timeEdit->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.z", nullptr));
