@@ -4,7 +4,7 @@
 - Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/) (I'am not owner of this website!)
 - Možnost sestříhat si délku videa
-- Možnost konverze do audio formátů jako .OGG, .WAV nebo [.FLAC](https://cs.wikipedia.org/wiki/Free_Lossless_Audio_Codec)
+- Možnost konverze do audio formátů jako .OGG, .WAV nebo <a href="https://cs.wikipedia.org/wiki/Free_Lossless_Audio_Codec" target="_blank">.FLAC</a>
 #
 - Video kvalita maximálně 1080p
 - Kvalita zvuku maximálně 320kbps
