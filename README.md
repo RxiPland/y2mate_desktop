@@ -2,9 +2,7 @@
 
 - Nenáročný program na stahování videí/hudby z youtube
 - Včetně videí omezených věkem
-- Program využívá stránku [y2mate.com](https://www.y2mate.com/)
-  - Nejsem vlastníkem této stránky!
-  - I'am not owner of this website!
+- Program využívá stránku [y2mate.com](https://www.y2mate.com/) (I'am not owner of this website!)
 - Možnost sestříhat si délku videa
 - Možnost konverze do formátů jako .OGG nebo .WAV
 #
