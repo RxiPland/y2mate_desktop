@@ -36,7 +36,14 @@ void editVideoDialog::loadData()
     videoName.pop_back();
 
     ui->lineEdit->setText(videoName.join('.'));
-    ui->comboBox->setCurrentText('.' + fullVideoName.split('.').last());
+
+    QString fileType = '.' + fullVideoName.split('.').last();
+
+    if(fileType != ".mp4"){
+        ui->comboBox->removeItem(1);
+    }
+
+    ui->comboBox->setCurrentText(fileType);
 
 
     int hours = videoDuration/(60*60);
@@ -345,29 +352,18 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << endTime;
     }
 
-    if(fileTypeChanged){
-        QString currentFileType = ui->comboBox->currentText();
+    arguments << "-q:a";
+    arguments << "0";
 
-        if (currentFileType == ".ogg"){
+    if(finalFileType != ".mp4"){
+        // remove video stream
+        arguments << "-vn";
 
-            arguments << "-c:a";
-            arguments << "libvorbis";
-
-        } else if (currentFileType == ".mp4"){
-            arguments << "-c:a";
-            arguments << "libmp3lame";
-
-        } else{
-            arguments << "-c:a";
-            arguments << "copy";
-        }
-
-    } else{
-        arguments << "-c:a";
-        arguments << "copy";
+        // remove subtitles
+        arguments << "-map";
+        arguments << "a";
     }
 
-    arguments << "-hide_banner";
     arguments << finalPath;
 
     editVideoDialog::newFilePath = finalPath;
