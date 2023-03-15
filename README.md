@@ -25,7 +25,7 @@
 
 # Odkazy ke stažení
 
-- Probíhá kompletní přepracování na verzi v2.x.x
+- Probíhá kompletní přepracování na verzi v2.x.x (nefunkčnost nižších verzí)
 
 <br/>
 
