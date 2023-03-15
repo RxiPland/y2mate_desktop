@@ -192,7 +192,7 @@ void downloadDialog::on_pushButton_4_clicked()
     if(evd.running){
         QFile::remove(evd.newFilePath);
 
-        if(!evd.nameChanged){
+        if(!evd.nameChanged && !evd.fileTypeChanged){
             QFile temp(evd.originalPath);
             temp.rename(evd.newFilePath);
         }
@@ -201,6 +201,7 @@ void downloadDialog::on_pushButton_4_clicked()
     // update label
     if(evd.changed){
         downloadDialog::filePath = evd.newFilePath;
+        downloadDialog::videoDuration = evd.newVideoDuration;
         ui->label_2->setText(evd.newFilePath.split('/').last());
     }
 

@@ -26,10 +26,12 @@ public:
     QString newFilePath;
 
     bool nameChanged;
+    bool fileTypeChanged;
     QString originalPath;
 
     QString filePath;
     qint64 videoDuration = 0;
+    qint64 newVideoDuration = 0;
 
 private slots:
     void readyReadStandardOutput();

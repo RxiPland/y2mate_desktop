@@ -194,6 +194,8 @@ void editVideoDialog::on_pushButton_3_clicked()
     totalMicroSecondsEnd += timeEnd.second() * 1000000;
     totalMicroSecondsEnd += timeEnd.msec() * 1000;
 
+    editVideoDialog::newVideoDuration = (totalMicroSecondsEnd - totalMicroSecondsStart)/1000000;
+
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(totalMicroSecondsEnd - totalMicroSecondsStart);
     ui->progressBar->setValue(0);
@@ -227,7 +229,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     bool startTimeChanged = ui->timeEdit->time() != QTime(0,0,0,0);
     bool endTimeChanged = ui->timeEdit_2->time() != QTime(hours, minutes, seconds);
     editVideoDialog::nameChanged = finalVideoName != originalVideoName;
-    bool fileTypeChanged = finalFileType != originalFileType;
+    editVideoDialog::fileTypeChanged = finalFileType != originalFileType;
 
     if(!nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
         // nothing changed
@@ -350,6 +352,10 @@ void editVideoDialog::on_pushButton_3_clicked()
 
             arguments << "-c:a";
             arguments << "libvorbis";
+
+        } else if (currentFileType == ".mp4"){
+            arguments << "-c:a";
+            arguments << "libmp3lame";
 
         } else{
             arguments << "-c:a";
