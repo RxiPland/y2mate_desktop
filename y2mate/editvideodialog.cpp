@@ -39,6 +39,7 @@ void editVideoDialog::loadData()
 
     QString fileType = '.' + fullVideoName.split('.').last();
 
+    // allow only (audio -> audio) && (video -> video | audio) conversion
     if(fileType != ".mp4"){
         ui->comboBox->removeItem(1);
     }
@@ -109,6 +110,8 @@ void editVideoDialog::readyReadStandardOutput()
 
 void editVideoDialog::finished()
 {
+    // conversion was finished / interrupted
+
     if (terminated){
         QMessageBox::warning(this, "Oznámení", "Operace byla zrušena uživatelem!");
         return;
@@ -219,7 +222,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     // original
     editVideoDialog::originalPath = editVideoDialog::filePath;
     QString originalVideoName = videoNameTemp.join('.');
-    QString originalVideoNameWithFileType = fullVideoName;
+    //QString originalVideoNameWithFileType = fullVideoName;
     QString originalFileType = '.' + editVideoDialog::filePath.split('.').last();
 
     // final
@@ -291,7 +294,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     } else if (!nameChanged && !fileTypeChanged){
         // replace file
 
-        // generate random name
+        // generate random temp name
         QByteArray random = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
         QCryptographicHash hash(QCryptographicHash::Md5);
@@ -355,6 +358,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     arguments << "-q:a";
     arguments << "0";
 
+    // apply only for non-video formats
     if(finalFileType != ".mp4"){
         // remove video stream
         arguments << "-vn";
@@ -364,11 +368,12 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << "a";
     }
 
+    // add destination (path + name + filetype)
     arguments << finalPath;
 
     editVideoDialog::newFilePath = finalPath;
 
-
+    // start conversion
     process.start("cmd.exe", QStringList(arguments));
 
     connect(&process, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));

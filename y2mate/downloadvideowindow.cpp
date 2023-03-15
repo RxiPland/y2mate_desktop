@@ -29,6 +29,8 @@ downloadVideoWindow::~downloadVideoWindow()
 
 void downloadVideoWindow::sortQualities(QStringList *list)
 {
+    // sort qualities descending (1080p to 144p) or (320kbps to 96kbps)
+
     QStringList tempList = list->toList();
 
     int i;
@@ -52,6 +54,8 @@ void downloadVideoWindow::sortQualities(QStringList *list)
 
 void downloadVideoWindow::disableWidgets(bool disable)
 {
+    // disable widgets
+
     ui->comboBox->setDisabled(disable);
     ui->comboBox_2->setDisabled(disable);
 
@@ -126,7 +130,6 @@ void downloadVideoWindow::loadData()
     int seconds = videoDuration-(hours*(60*60)+minutes*60);
 
     QString timeDuration;
-
     /*
     // alternative time format
 
@@ -229,6 +232,8 @@ void downloadVideoWindow::loadSettings()
 
 void downloadVideoWindow::on_pushButton_2_clicked()
 {
+    // exit window (not app)
+
     exitApp = false;
     this->close();
 }
@@ -267,7 +272,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     }
 
     if(downloadVideoWindow::replaceNameWithHash){
-        // replace video name with md5 hash
+        // replace video name with md5 hash if enabled
 
         QCryptographicHash hash(QCryptographicHash::Md5);
         hash.addData(videoName.toUtf8());
@@ -275,7 +280,9 @@ void downloadVideoWindow::on_pushButton_clicked()
         videoName = hash.result().toHex();
 
     } else{
-        // remove forbidden characters
+        // keep name
+
+        // replace forbidden characters with whitespaces
         QList<QChar> forbiddenChars = {'<', '>', ':', '\"', '/', '\\', '|', '?', '*'};
         QString temp;
         int i;
@@ -291,7 +298,7 @@ void downloadVideoWindow::on_pushButton_clicked()
         }
         videoName = temp.trimmed();
 
-        // remove double whitespaces
+        // remove double (triple, ...) whitespaces
         temp = "";
         QChar c;
         bool whitespace = false;
@@ -311,7 +318,7 @@ void downloadVideoWindow::on_pushButton_clicked()
         videoName = temp.trimmed();
     }
 
-    // replace whitespaceses with underscores (_)
+    // replace whitespaceses with underscores (_) if enabled
     if(downloadVideoWindow::replaceNameWithUnderscores){
         videoName.replace(" ", "_");
     }
@@ -417,8 +424,10 @@ void downloadVideoWindow::on_pushButton_clicked()
         qApp->processEvents();
     }
 
-    // save last path to file with settings
-    downloadVideoWindow::savePath();
+    // save last path to file with settings if enabled
+    if(lastPathEnabled){
+        downloadVideoWindow::savePath();
+    }
 
     // download was canceled
     if(dd.canceled){
