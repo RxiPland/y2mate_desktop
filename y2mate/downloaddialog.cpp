@@ -137,6 +137,8 @@ void downloadDialog::downloadProgress(qint64 ist, qint64 max)
 
 std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
 {
+    // open file
+
     std::unique_ptr<QFile> file = std::make_unique<QFile>(fileName);
 
     file->open(QIODevice::WriteOnly);
@@ -198,7 +200,7 @@ void downloadDialog::on_pushButton_4_clicked()
         }
     }
 
-    // update label
+    // update label & disable further editing
     if(evd.changed){
         downloadDialog::filePath = evd.newFilePath;
         downloadDialog::videoDurationMiliSec = evd.newVideoDurationMiliSec;
