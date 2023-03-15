@@ -3,6 +3,8 @@
 - Nenáročný program na stahování videí/hudby z youtube
 - Včetně videí omezených věkem
 - Program využívá stránku [y2mate.com](https://www.y2mate.com/)
+  - Nejsem vlastníkem této stránky!
+  - I'am not owner of this website!
 - Možnost sestříhat si délku videa
 - Možnost konverze do formátů jako .OGG nebo .WAV
 #
@@ -46,4 +48,4 @@
 - Verze knihovny Qt: 6.4.2
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
-- FFmpeg.exe je stahován z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/tools/ffmpeg.exe)
+- FFmpeg.exe je stahován z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
