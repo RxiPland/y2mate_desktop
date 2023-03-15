@@ -218,6 +218,10 @@ void searchVideoWindow::disableWidgets(bool disable)
     ui->lineEdit->setDisabled(disable);
     ui->lineEdit->setClearButtonEnabled(!disable);
     ui->pushButton->setDisabled(disable);
+
+    ui->menu_1->menuAction()->setDisabled(disable);
+    ui->menu_2->menuAction()->setDisabled(disable);
+    ui->menu_3->menuAction()->setDisabled(disable);
 }
 
 void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, QString videoUrl)
@@ -809,10 +813,13 @@ void searchVideoWindow::on_action_menu3_1_triggered()
 {
     // open video/audio file for edit
 
+    searchVideoWindow::disableWidgets();
+
     QString filePath;
     filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg .*flac);;Všechny soubory (*.*)").replace("\\", "/");
 
     if(filePath.isEmpty()){
+        searchVideoWindow::disableWidgets(false);
         return;
     }
 
@@ -823,8 +830,12 @@ void searchVideoWindow::on_action_menu3_1_triggered()
         // invalid file type
 
         QMessageBox::critical(this, "Chyba", QString("Koncovka %1 není v tuto chvíli podporována!").arg(fileType));
+        searchVideoWindow::disableWidgets(false);
         return;
     }
+
+    QLabel *label = new QLabel("Získávám délku videa ...   ");
+    ui->statusBar->addWidget(label);
 
     // preparation for getting video duration
     QStringList arguments;
@@ -842,6 +853,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     while(process.state() == QProcess::Running){
         qApp->processEvents();
     }
+    ui->statusBar->removeWidget(label);
 
     // ffmpeg will make error output (because output is missing)
     QString processOutput = process.readAllStandardError();
@@ -863,13 +875,14 @@ void searchVideoWindow::on_action_menu3_1_triggered()
         totalMiliSeconds += miliSeconds;
     }
 
-
     if(totalMiliSeconds == 0){
         QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se získat délku videa!");
+        searchVideoWindow::disableWidgets(false);
         return;
     }
 
     editVideoDialog evd;
+    evd.startedFromSeachMenu = true;
     evd.filePath = filePath;
     evd.videoDurationMiliSec = totalMiliSeconds;
     evd.loadData();
@@ -879,5 +892,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     while(!evd.isHidden()){
         qApp->processEvents();
     }
+
+    searchVideoWindow::disableWidgets(false);
 }
 
