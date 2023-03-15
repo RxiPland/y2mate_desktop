@@ -62,7 +62,7 @@ public:
     {
         if (editVideoDialog->objectName().isEmpty())
             editVideoDialog->setObjectName("editVideoDialog");
-        editVideoDialog->resize(435, 289);
+        editVideoDialog->resize(435, 302);
         horizontalLayout_3 = new QHBoxLayout(editVideoDialog);
         horizontalLayout_3->setObjectName("horizontalLayout_3");
         horizontalSpacer_2 = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
@@ -90,6 +90,7 @@ public:
         horizontalLayout->addWidget(lineEdit);
 
         comboBox = new QComboBox(editVideoDialog);
+        comboBox->addItem(QString());
         comboBox->addItem(QString());
         comboBox->addItem(QString());
         comboBox->addItem(QString());
@@ -128,7 +129,7 @@ public:
         timeEdit = new QTimeEdit(editVideoDialog);
         timeEdit->setObjectName("timeEdit");
         timeEdit->setFocusPolicy(Qt::WheelFocus);
-        timeEdit->setCurrentSection(QDateTimeEdit::SecondSection);
+        timeEdit->setCurrentSection(QDateTimeEdit::HourSection);
 
         verticalLayout_3->addWidget(timeEdit);
 
@@ -146,7 +147,7 @@ public:
         timeEdit_2 = new QTimeEdit(editVideoDialog);
         timeEdit_2->setObjectName("timeEdit_2");
         timeEdit_2->setFocusPolicy(Qt::WheelFocus);
-        timeEdit_2->setCurrentSection(QDateTimeEdit::SecondSection);
+        timeEdit_2->setCurrentSection(QDateTimeEdit::HourSection);
 
         verticalLayout_4->addWidget(timeEdit_2);
 
@@ -246,6 +247,7 @@ public:
         comboBox->setItemText(1, QCoreApplication::translate("editVideoDialog", ".mp4", nullptr));
         comboBox->setItemText(2, QCoreApplication::translate("editVideoDialog", ".wav", nullptr));
         comboBox->setItemText(3, QCoreApplication::translate("editVideoDialog", ".ogg", nullptr));
+        comboBox->setItemText(4, QCoreApplication::translate("editVideoDialog", ".flac", nullptr));
 
         label_2->setText(QCoreApplication::translate("editVideoDialog", "Za\304\215\303\241tek:", nullptr));
         timeEdit->setDisplayFormat(QCoreApplication::translate("editVideoDialog", "HH:mm:ss.z", nullptr));

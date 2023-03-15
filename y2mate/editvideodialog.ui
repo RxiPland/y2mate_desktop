@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>435</width>
-    <height>289</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -94,6 +94,11 @@
            <string>.ogg</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>.flac</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
@@ -139,7 +144,7 @@
               <enum>Qt::WheelFocus</enum>
              </property>
              <property name="currentSection">
-              <enum>QDateTimeEdit::SecondSection</enum>
+              <enum>QDateTimeEdit::HourSection</enum>
              </property>
              <property name="displayFormat">
               <string>HH:mm:ss.z</string>
@@ -177,7 +182,7 @@
                 <enum>Qt::WheelFocus</enum>
                </property>
                <property name="currentSection">
-                <enum>QDateTimeEdit::SecondSection</enum>
+                <enum>QDateTimeEdit::HourSection</enum>
                </property>
                <property name="displayFormat">
                 <string>HH:mm:ss.z</string>
