@@ -177,7 +177,7 @@ void downloadDialog::on_pushButton_4_clicked()
 
     editVideoDialog evd;
     evd.filePath = downloadDialog::filePath;
-    evd.videoDuration = downloadDialog::videoDuration;
+    evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
     evd.loadData();
 
     this->hide();
@@ -201,10 +201,9 @@ void downloadDialog::on_pushButton_4_clicked()
     // update label
     if(evd.changed){
         downloadDialog::filePath = evd.newFilePath;
-        downloadDialog::videoDuration = evd.newVideoDuration;
+        downloadDialog::videoDurationMiliSec = evd.newVideoDurationMiliSec;
         ui->label_2->setText(evd.newFilePath.split('/').last());
     }
 
     this->show();
 }
-

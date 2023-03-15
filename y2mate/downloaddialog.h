@@ -24,7 +24,7 @@ public:
 
     QString downloadLink;
     QString filePath;
-    qint64 videoDuration = 0;
+    qint64 videoDurationMiliSec = 0;
 
     bool canceled = false;
 

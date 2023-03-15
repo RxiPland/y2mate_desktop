@@ -47,17 +47,13 @@ void editVideoDialog::loadData()
     ui->comboBox->setCurrentText(fileType);
 
 
-    int hours = videoDuration/(60*60);
-    int minutes = (videoDuration/60)-(hours*60);
-    int seconds = videoDuration-(hours*(60*60)+minutes*60);
-
     ui->timeEdit->setMinimumTime(QTime(0,0,0,0));
-    ui->timeEdit->setMaximumTime(QTime(hours, minutes, seconds));
+    ui->timeEdit->setMaximumTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
     ui->timeEdit->setTime(QTime(0,0,0,0));
 
     ui->timeEdit_2->setMinimumTime(QTime(0,0,0,0));
-    ui->timeEdit_2->setMaximumTime(QTime(hours, minutes, seconds));
-    ui->timeEdit_2->setTime(QTime(hours, minutes, seconds));
+    ui->timeEdit_2->setMaximumTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
+    ui->timeEdit_2->setTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
 }
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)
@@ -204,16 +200,12 @@ void editVideoDialog::on_pushButton_3_clicked()
     totalMicroSecondsEnd += timeEnd.second() * 1000000;
     totalMicroSecondsEnd += timeEnd.msec() * 1000;
 
-    editVideoDialog::newVideoDuration = (totalMicroSecondsEnd - totalMicroSecondsStart)/1000000;
+    editVideoDialog::newVideoDurationMiliSec = (totalMicroSecondsEnd - totalMicroSecondsStart)/1000;
 
     ui->progressBar->setMinimum(0);
     ui->progressBar->setMaximum(totalMicroSecondsEnd - totalMicroSecondsStart);
     ui->progressBar->setValue(0);
 
-
-    int hours = videoDuration/(60*60);
-    int minutes = (videoDuration/60)-(hours*60);
-    int seconds = videoDuration-(hours*(60*60)+minutes*60);
 
     QString fullVideoName = editVideoDialog::filePath.split('/').last();
     QStringList videoNameTemp = fullVideoName.split('.');
@@ -237,7 +229,7 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     // bool variables
     bool startTimeChanged = ui->timeEdit->time() != QTime(0,0,0,0);
-    bool endTimeChanged = ui->timeEdit_2->time() != QTime(hours, minutes, seconds);
+    bool endTimeChanged = ui->timeEdit_2->time() != QTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
     editVideoDialog::nameChanged = finalVideoName != originalVideoName;
     editVideoDialog::fileTypeChanged = finalFileType != originalFileType;
 

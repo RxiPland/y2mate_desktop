@@ -414,7 +414,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.userAgent = downloadVideoWindow::userAgent;
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;
-    dd.videoDuration = downloadVideoWindow::videoDuration;
+    dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
 
     dd.startDownload();
     dd.show();
