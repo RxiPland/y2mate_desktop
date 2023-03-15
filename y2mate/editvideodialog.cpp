@@ -18,6 +18,8 @@ editVideoDialog::editVideoDialog(QWidget *parent) :
     this->setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowModality(Qt::ApplicationModal);
 
+    ui->comboBox->setDuplicatesEnabled(false);
+
     this->show();
 }
 
@@ -40,8 +42,9 @@ void editVideoDialog::loadData()
     QString fileType = '.' + fullVideoName.split('.').last();
 
     // allow only (audio -> audio) && (video -> video | audio) conversion
-    if(fileType != ".mp4"){
-        ui->comboBox->removeItem(1);
+    if(fileType == ".mp4" && !dataLoaded){
+        ui->comboBox->insertItem(1, ".mp4");
+        dataLoaded = true;
     }
 
     ui->comboBox->setCurrentText(fileType);
@@ -257,9 +260,41 @@ void editVideoDialog::on_pushButton_3_clicked()
             this->close();
             return;
         }
+
+    } else if (nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
+        // only rename
+
+        QFile videoFile = QFile(editVideoDialog::filePath);
+        bool success = videoFile.rename(finalPath);
+
+        if (success){
+            QMessageBox::information(this, "Oznámení", "Soubor byl úspěšně přejmenován");
+            editVideoDialog::newFilePath = finalPath;
+
+            deleteOriginalFile = false;
+            changed = true;
+            running = false;
+
+            this->close();
+            return;
+
+        } else{
+            // file with this name may already exist
+
+            if(videoFile.exists()){
+                QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
+
+            } else{
+                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
+            }
+
+            editVideoDialog::disableWidgets(false);
+            return;
+        }
     }
 
-    // ask if original file might be deleted
+
+    // ask if an original file can be keeped
     if(editVideoDialog::startedFromSeachMenu){
 
         QMessageBox msgBox;
@@ -283,38 +318,9 @@ void editVideoDialog::on_pushButton_3_clicked()
         }
     }
 
-
     editVideoDialog::running = true;
 
-    if (nameChanged && !startTimeChanged && !endTimeChanged && !fileTypeChanged){
-        // only rename
-
-        QFile videoFile = QFile(editVideoDialog::filePath);
-        bool success = videoFile.rename(finalPath);
-
-        if (success){
-            QMessageBox::information(this, "Oznámení", "Soubor byl úspěšně přejmenován");
-            editVideoDialog::newFilePath = finalPath;
-
-            changed = true;
-
-            this->close();
-            return;
-
-        } else{
-            // file with this name may already exist
-
-            if(videoFile.exists()){
-                QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
-
-            } else{
-                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
-            }
-
-            return;
-        }
-
-    } else if (!nameChanged && !fileTypeChanged){
+    if (!nameChanged && !fileTypeChanged){
         // replace file
 
         // generate random temp name
@@ -340,6 +346,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     if(videoFile.exists()){
         QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
         editVideoDialog::disableWidgets(false);
+        editVideoDialog::running = false;
         return;
     }
 
