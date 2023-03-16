@@ -309,8 +309,13 @@ void editVideoDialog::on_pushButton_3_clicked()
 
             bool exists = QFile(finalPath).exists();
 
-            if(exists){
+            if(originalVideoName == finalVideoName){
                 QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, tak název nemůže být stejný!");
+                editVideoDialog::disableWidgets(false);
+                return;
+
+            } else if(exists){
+                QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
                 editVideoDialog::disableWidgets(false);
                 return;
             }
