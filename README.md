@@ -25,7 +25,9 @@
 
 # Odkazy ke stažení
 
-- Probíhá kompletní přepracování na verzi v2.x.x (nefunkčnost nižších verzí)
+- Stáhnout instalačku exe (win64) md5:
+- Stáhnout zip (win64) md5:
+
 
 <br/>
 
