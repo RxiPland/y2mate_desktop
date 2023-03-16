@@ -294,6 +294,69 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
     }
 }
 
+void searchVideoWindow::savePath(QString path)
+{
+    // save path to settings
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            QApplication::quit();
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+
+                QApplication::quit();
+                return;
+
+            } else{
+                loadedJson["last_path"] = path;
+                QJsonDocument docData(loadedJson);
+
+                dataFile.open(QIODevice::WriteOnly | QIODevice::Text);
+                int status = dataFile.write(docData.toJson());
+                dataFile.close();
+
+                if (status == -1){
+                    QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+
+                    return;
+                }
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        QApplication::quit();
+        return;
+    }
+}
+
 QJsonObject searchVideoWindow::getVideoFromHistory(QString index)
 {
     QFile dataFile(QDir::currentPath() + "/Data/data.json");
@@ -699,6 +762,109 @@ void searchVideoWindow::on_action_menu2_6_triggered()
     searchVideoWindow::loadSettings();
 }
 
+void searchVideoWindow::on_action_menu3_1_triggered()
+{
+    // open video/audio file for edit
+
+    searchVideoWindow::disableWidgets();
+
+    QString filePath;
+    filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg .*flac);;Všechny soubory (*.*)").replace("\\", "/");
+
+    if(filePath.isEmpty()){
+        searchVideoWindow::disableWidgets(false);
+        return;
+    }
+
+    QStringList validFileTypes = {".mp3", ".mp4", ".wav", ".ogg", ".flac"};
+    QString fileType = '.' + filePath.split('.').last();
+
+    if(!validFileTypes.contains(fileType)){
+        // invalid file type
+
+        QMessageBox::critical(this, "Chyba", QString("Koncovka %1 není v tuto chvíli podporována!").arg(fileType));
+        searchVideoWindow::disableWidgets(false);
+        return;
+    }
+
+    QLabel *label = new QLabel("Získávám délku videa ...   ");
+    ui->statusBar->addWidget(label);
+
+    // preparation for getting video duration
+    QStringList arguments;
+    arguments << "/C";
+    arguments << "cd";
+    arguments << "./Data";
+    arguments << "&";
+    arguments << "ffmpeg.exe";
+    arguments << "-i";
+    arguments << filePath;
+
+    QProcess process;
+    process.start("cmd.exe", QStringList(arguments));
+
+    while(process.state() == QProcess::Running){
+        qApp->processEvents();
+    }
+    ui->statusBar->removeWidget(label);
+
+    // ffmpeg will make error output (because output is missing)
+    QString processOutput = process.readAllStandardError();
+    QRegExp re = QRegExp("Duration: (\\d+):(\\d+):(\\d+).(\\d+)");
+
+    qint64 totalMiliSeconds = 0;
+
+    // get duration
+    if(re.indexIn(processOutput) != -1){
+        totalMiliSeconds += re.cap(1).toInt() * 3600000;
+        totalMiliSeconds += re.cap(2).toInt() * 60000;
+        totalMiliSeconds += re.cap(3).toInt() * 1000;
+
+        int miliSeconds = re.cap(4).toInt();
+
+        while(miliSeconds<100 && miliSeconds != 0){
+            miliSeconds *= 10;
+        }
+        totalMiliSeconds += miliSeconds;
+    }
+
+    if(totalMiliSeconds == 0){
+        QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se získat délku videa!");
+        searchVideoWindow::disableWidgets(false);
+        return;
+    }
+
+    editVideoDialog evd;
+    evd.startedFromSeachMenu = true;
+    evd.filePath = filePath;
+    evd.videoDurationMiliSec = totalMiliSeconds;
+    evd.loadData();
+    evd.show();
+
+    // wait for close
+    while(!evd.isHidden()){
+        qApp->processEvents();
+    }
+
+    if(evd.changed && lastPathEnabled){
+        QStringList path = evd.originalPath.replace('\\', '/').split('/');
+        path.pop_back();
+
+        searchVideoWindow::savePath(path.join('/'));
+    }
+
+    if(evd.running){
+        QFile::remove(evd.newFilePath);
+
+        if(!evd.nameChanged && !evd.fileTypeChanged){
+            QFile temp(evd.originalPath);
+            temp.rename(evd.newFilePath);
+        }
+    }
+
+    searchVideoWindow::disableWidgets(false);
+}
+
 
 void searchVideoWindow::on_action_menu_2_1_1_triggered()
 {
@@ -807,92 +973,3 @@ void searchVideoWindow::on_action_menu_2_5_2_triggered()
 
     ShellExecute(0, 0, videoUrl.c_str(), 0, 0, SW_HIDE);
 }
-
-
-void searchVideoWindow::on_action_menu3_1_triggered()
-{
-    // open video/audio file for edit
-
-    searchVideoWindow::disableWidgets();
-
-    QString filePath;
-    filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg .*flac);;Všechny soubory (*.*)").replace("\\", "/");
-
-    if(filePath.isEmpty()){
-        searchVideoWindow::disableWidgets(false);
-        return;
-    }
-
-    QStringList validFileTypes = {".mp3", ".mp4", ".wav", ".ogg", ".flac"};
-    QString fileType = '.' + filePath.split('.').last();
-
-    if(!validFileTypes.contains(fileType)){
-        // invalid file type
-
-        QMessageBox::critical(this, "Chyba", QString("Koncovka %1 není v tuto chvíli podporována!").arg(fileType));
-        searchVideoWindow::disableWidgets(false);
-        return;
-    }
-
-    QLabel *label = new QLabel("Získávám délku videa ...   ");
-    ui->statusBar->addWidget(label);
-
-    // preparation for getting video duration
-    QStringList arguments;
-    arguments << "/C";
-    arguments << "cd";
-    arguments << "./Data";
-    arguments << "&";
-    arguments << "ffmpeg.exe";
-    arguments << "-i";
-    arguments << filePath;
-
-    QProcess process;
-    process.start("cmd.exe", QStringList(arguments));
-
-    while(process.state() == QProcess::Running){
-        qApp->processEvents();
-    }
-    ui->statusBar->removeWidget(label);
-
-    // ffmpeg will make error output (because output is missing)
-    QString processOutput = process.readAllStandardError();
-    QRegExp re = QRegExp("Duration: (\\d+):(\\d+):(\\d+).(\\d+)");
-
-    qint64 totalMiliSeconds = 0;
-
-    // get duration
-    if(re.indexIn(processOutput) != -1){
-        totalMiliSeconds += re.cap(1).toInt() * 3600000;
-        totalMiliSeconds += re.cap(2).toInt() * 60000;
-        totalMiliSeconds += re.cap(3).toInt() * 1000;
-
-        int miliSeconds = re.cap(4).toInt();
-
-        while(miliSeconds<100 && miliSeconds != 0){
-            miliSeconds *= 10;
-        }
-        totalMiliSeconds += miliSeconds;
-    }
-
-    if(totalMiliSeconds == 0){
-        QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se získat délku videa!");
-        searchVideoWindow::disableWidgets(false);
-        return;
-    }
-
-    editVideoDialog evd;
-    evd.startedFromSeachMenu = true;
-    evd.filePath = filePath;
-    evd.videoDurationMiliSec = totalMiliSeconds;
-    evd.loadData();
-    evd.show();
-
-    // wait for close
-    while(!evd.isHidden()){
-        qApp->processEvents();
-    }
-
-    searchVideoWindow::disableWidgets(false);
-}
-

@@ -55,6 +55,7 @@ private:
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);
     void saveToHistory(QString videoName, QString videoDuration, QString videoUrl);
+    void savePath(QString path);
     QJsonObject getVideoFromHistory(QString index);
 
 };
