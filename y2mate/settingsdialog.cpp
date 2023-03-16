@@ -427,7 +427,7 @@ void settingsDialog::on_checkBox_5_clicked()
 void settingsDialog::on_toolButton_clicked()
 {
     // help - replace with hash
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, název videa bude nahrazen hashem (<a href=\"https://cs.wikipedia.org/wiki/Message-Digest_algorithm\">algoritmus md5</a>) z původního názvu<br></br><br></br>Před: Lorem ipsum dolor sit amet.mp4<br></br>Po: fea80f2db003d4ebc4536023814aa885.mp4");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, bude název videa při ukládání nahrazen hashem (<a href=\"https://cs.wikipedia.org/wiki/Message-Digest_algorithm\">algoritmus md5</a>) z původního názvu<br></br><br></br>Před: Lorem ipsum dolor sit amet.mp4<br></br>Po: fea80f2db003d4ebc4536023814aa885.mp4");
 }
 
 void settingsDialog::on_toolButton_2_clicked()
