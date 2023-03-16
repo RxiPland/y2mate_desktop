@@ -25,8 +25,8 @@
 
 # Odkazy ke stažení
 
-- Stáhnout instalačku exe (win64) md5:
-- Stáhnout zip (win64) md5:
+- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.0.0/y2mate_setup.exe) exe (win64) `md5: c671362d348dd180a97c2d06b07243fe`
+- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.0.0/y2mate.zip) (win64) `md5: 2b40d4a5fb361a91603eed8f2a7ddc2e`
 
 
 <br/>
@@ -53,4 +53,4 @@
 - Verze knihovny Qt: 6.4.2
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
-- FFmpeg.exe je stahován z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
+- FFmpeg.exe je možné stáhnout z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
