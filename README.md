@@ -25,13 +25,20 @@
 
 # Odkazy ke stažení
 
-- Probíhá kompletní přepracování na verzi v2.x.x (nefunkčnost nižších verzí)
+- Stáhnout instalačku exe (win64) md5:
+- Stáhnout zip (win64) md5:
+
 
 <br/>
 
 # Náhled
-![1](https://user-images.githubusercontent.com/82058894/204152592-f25fbae1-a79a-48af-96fa-79e3bd0e8a24.png)
+![1](https://user-images.githubusercontent.com/82058894/225476708-53543cef-ffbd-40cd-95f1-556ec382208f.png)
 ##
+![3](https://user-images.githubusercontent.com/82058894/225476735-3afd7a9f-4ce0-4eab-8404-3d45a4ff1faf.png)
+##
+![4](https://user-images.githubusercontent.com/82058894/225476745-3c9b024e-3c1b-437b-b0b9-6e3e6f8a4b0b.png)
+##
+![2](https://user-images.githubusercontent.com/82058894/225476721-b1a4583c-81f2-452d-91c8-4446158b5806.png)
 
 <br/>
 
