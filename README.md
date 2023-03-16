@@ -53,4 +53,4 @@
 - Verze knihovny Qt: 6.4.2
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
-- FFmpeg.exe je možné stáhnout z tohoho githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
+- FFmpeg.exe je možné stáhnout z tohoto githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
