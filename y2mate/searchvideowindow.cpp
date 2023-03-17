@@ -645,11 +645,9 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;
 
+    this->hide();
     // set data to widgets
     dvw.loadData();
-
-    dvw.show();
-    this->hide();
 
     // wait until closed
     while(!dvw.isHidden()){
@@ -838,8 +836,8 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     evd.startedFromSeachMenu = true;
     evd.filePath = filePath;
     evd.videoDurationMiliSec = totalMiliSeconds;
+    evd.userAgent = searchVideoWindow::userAgent;
     evd.loadData();
-    evd.show();
 
     // wait for close
     while(!evd.isHidden()){

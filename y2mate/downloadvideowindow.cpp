@@ -20,6 +20,8 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
     downloadVideoWindow::loadSettings();
+
+    this->show();
 }
 
 downloadVideoWindow::~downloadVideoWindow()
@@ -417,7 +419,6 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
 
     dd.startDownload();
-    dd.show();
 
     // wait for close
     while(!dd.isHidden()){
