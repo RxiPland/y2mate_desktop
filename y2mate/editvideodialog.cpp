@@ -1,11 +1,13 @@
 #include "editvideodialog.h"
 #include "ui_editvideodialog.h"
+#include "downloaddialog.h"
 
 #include <QProcess>
 #include <QCloseEvent>
 #include <QTime>
 #include <QMessageBox>
 #include <QFile>
+#include <QDir>
 #include <QCryptographicHash>
 #include <QUuid>
 
@@ -19,7 +21,6 @@ editVideoDialog::editVideoDialog(QWidget *parent) :
     this->setWindowModality(Qt::ApplicationModal);
 
     ui->comboBox->setDuplicatesEnabled(false);
-
     this->show();
 }
 
@@ -30,7 +31,16 @@ editVideoDialog::~editVideoDialog()
 
 void editVideoDialog::loadData()
 {
-    // load data to widgets
+    // load data to widgets and check for program if downloaded
+
+    editVideoDialog::disableWidgets();
+    if(!editVideoDialog::ffmpegExists()){
+        this->close();
+        return;
+    }
+
+    editVideoDialog::disableWidgets(false);
+
 
     QString fullVideoName = editVideoDialog::filePath.split('/').last();
 
@@ -93,6 +103,54 @@ void editVideoDialog::disableWidgets(bool disable)
     ui->pushButton->setDisabled(disable);
     ui->pushButton_2->setDisabled(disable);
     ui->pushButton_3->setDisabled(disable);
+}
+
+bool editVideoDialog::ffmpegExists()
+{
+    QString ffmpegPath = QDir::currentPath() + "/Data/ffmpeg.exe";
+
+    if (QFile::exists(ffmpegPath)){
+        // OK
+        return true;
+
+    } else{
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Upozornění");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Program FFmpeg.exe pro úpravu videí nebyl nalezen. Chcete jej stáhnout?");
+        msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        QAbstractButton* pButtonNo = msgBox.addButton(" Odejít ", QMessageBox::NoRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() == pButtonNo){
+            // exit
+            return false;
+        }
+
+        // open download dialog
+        downloadDialog dd;
+        dd.ffmpegDownload = true;
+        dd.userAgent = editVideoDialog::userAgent;
+        dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
+        dd.filePath = ffmpegPath;
+
+        dd.startDownload();
+
+        // wait for close
+        while(!dd.isHidden()){
+            qApp->processEvents();
+        }
+
+        // download was canceled
+        if(dd.canceled){
+           return false;
+
+        } else{
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void editVideoDialog::readyReadStandardOutput()

@@ -29,6 +29,8 @@ public:
     bool changed = false;
     QString newFilePath;
 
+    QByteArray userAgent;
+
     bool nameChanged;
     bool fileTypeChanged;
     QString originalPath;
@@ -57,6 +59,7 @@ private:
 
     QProcess process;
     void startEdit();
+    bool ffmpegExists();
 
 };
 

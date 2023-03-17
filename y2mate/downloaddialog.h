@@ -19,6 +19,7 @@ public:
     ~downloadDialog();
 
     void startDownload();
+    bool ffmpegDownload = false;
 
     QByteArray userAgent;
 

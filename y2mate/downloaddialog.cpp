@@ -17,6 +17,8 @@ downloadDialog::downloadDialog(QWidget *parent) :
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
     this->setWindowModality(Qt::ApplicationModal);
+
+    this->show();
 }
 
 downloadDialog::~downloadDialog()
@@ -26,6 +28,12 @@ downloadDialog::~downloadDialog()
 
 void downloadDialog::startDownload()
 {
+    if(ffmpegDownload){
+        ui->pushButton_2->setHidden(true);
+        ui->pushButton_4->setHidden(true);
+    }
+
+
     ui->label_2->setText(downloadDialog::filePath.split('/').last());
 
     file = openFileForWrite(downloadDialog::filePath);
@@ -37,7 +45,10 @@ void downloadDialog::startDownload()
     QNetworkRequest request;
     request.setUrl(QUrl(downloadDialog::downloadLink));
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
-    request.setRawHeader("Referer", "https://www.y2mate.com/");
+
+    if(!ffmpegDownload){
+        request.setRawHeader("Referer", "https://www.y2mate.com/");
+    }
 
     reply.reset(manager.get(request));
 
@@ -118,8 +129,11 @@ void downloadDialog::httpFinished()
 
     this->setWindowTitle("Stahování - dokončeno");
     ui->pushButton->setText("Hotovo");
-    ui->pushButton_2->setDisabled(false);
-    ui->pushButton_4->setDisabled(false);
+
+    if(!ffmpegDownload){
+        ui->pushButton_2->setDisabled(false);
+        ui->pushButton_4->setDisabled(false);
+    }
 
     this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
     this->show();
@@ -180,10 +194,9 @@ void downloadDialog::on_pushButton_4_clicked()
     editVideoDialog evd;
     evd.filePath = downloadDialog::filePath;
     evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
-    evd.loadData();
-
+    evd.userAgent = downloadDialog::userAgent;
     this->hide();
-    evd.show();
+    evd.loadData();
 
     // wait for close
     while(!evd.isHidden()){
