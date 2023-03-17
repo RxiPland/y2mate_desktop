@@ -294,7 +294,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     }
 
 
-    // ask if an original file can be keeped
+    // ask if an original file can be kept
     if(editVideoDialog::startedFromSeachMenu){
 
         QMessageBox msgBox;
