@@ -28,7 +28,11 @@ public:
     QHBoxLayout *horizontalLayout;
     QVBoxLayout *verticalLayout;
     QLabel *label_2;
+    QSpacerItem *verticalSpacer_4;
+    QHBoxLayout *horizontalLayout_3;
     QLabel *label;
+    QPushButton *pushButton_5;
+    QSpacerItem *horizontalSpacer_9;
     QSpacerItem *verticalSpacer;
     QProgressBar *progressBar;
     QSpacerItem *verticalSpacer_2;
@@ -52,7 +56,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(259, 255);
+        downloadDialog->resize(259, 257);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -62,11 +66,42 @@ public:
 
         verticalLayout->addWidget(label_2);
 
+        verticalSpacer_4 = new QSpacerItem(20, 4, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        verticalLayout->addItem(verticalSpacer_4);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setContentsMargins(-1, 0, -1, -1);
         label = new QLabel(downloadDialog);
         label->setObjectName("label");
-        label->setMinimumSize(QSize(0, 20));
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
+        label->setMinimumSize(QSize(80, 20));
 
-        verticalLayout->addWidget(label);
+        horizontalLayout_3->addWidget(label);
+
+        pushButton_5 = new QPushButton(downloadDialog);
+        pushButton_5->setObjectName("pushButton_5");
+        QSizePolicy sizePolicy1(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(pushButton_5->sizePolicy().hasHeightForWidth());
+        pushButton_5->setSizePolicy(sizePolicy1);
+        pushButton_5->setMinimumSize(QSize(92, 0));
+        pushButton_5->setFocusPolicy(Qt::NoFocus);
+
+        horizontalLayout_3->addWidget(pushButton_5);
+
+        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout_3->addItem(horizontalSpacer_9);
+
+
+        verticalLayout->addLayout(horizontalLayout_3);
 
         verticalSpacer = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -148,11 +183,8 @@ public:
 
         pushButton = new QPushButton(downloadDialog);
         pushButton->setObjectName("pushButton");
-        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
-        pushButton->setSizePolicy(sizePolicy);
+        sizePolicy1.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy1);
         pushButton->setMinimumSize(QSize(175, 27));
         pushButton->setFocusPolicy(Qt::NoFocus);
 
@@ -179,6 +211,7 @@ public:
         downloadDialog->setWindowTitle(QCoreApplication::translate("downloadDialog", "Stahov\303\241n\303\255 - prob\303\255h\303\241", nullptr));
         label_2->setText(QCoreApplication::translate("downloadDialog", "N\303\241zev", nullptr));
         label->setText(QCoreApplication::translate("downloadDialog", "Sta\305\276eno", nullptr));
+        pushButton_5->setText(QCoreApplication::translate("downloadDialog", "Zobrazit odkaz", nullptr));
         pushButton_3->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t um\303\255st\304\233n\303\255", nullptr));
         pushButton_2->setText(QCoreApplication::translate("downloadDialog", "Otev\305\231\303\255t soubor", nullptr));
         pushButton_4->setText(QCoreApplication::translate("downloadDialog", "Upravit video", nullptr));

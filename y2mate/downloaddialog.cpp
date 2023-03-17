@@ -135,8 +135,12 @@ void downloadDialog::httpFinished()
         ui->pushButton_4->setDisabled(false);
     }
 
-    this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
-    this->show();
+    downloadDialog::finished = true;
+    if(!downloadDialog::dialogOpen){
+        this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
+        this->show();
+    }
+
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
@@ -223,3 +227,38 @@ void downloadDialog::on_pushButton_4_clicked()
 
     this->show();
 }
+
+void downloadDialog::on_pushButton_5_clicked()
+{
+    // show URL of downloaded file
+
+    downloadDialog::dialogOpen = true;
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Odkaz stahovaného souboru");
+
+    QString formatedDownloadLink;
+    int i;
+
+    // add every 60th character new line
+    for(i=0; i<downloadDialog::downloadLink.length(); i++){
+
+        if(i % 60 == 0){
+            formatedDownloadLink.append("\n");
+        }
+        formatedDownloadLink.append(downloadLink[i]);
+    }
+
+    msgBox.setText(formatedDownloadLink);
+    msgBox.addButton(" Ok ", QMessageBox::AcceptRole);
+    msgBox.exec();
+
+    downloadDialog::dialogOpen = false;
+
+    downloadDialog::finished = true;
+    if(downloadDialog::finished){
+        this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
+        this->show();
+    }
+}
+

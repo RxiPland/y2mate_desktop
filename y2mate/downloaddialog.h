@@ -28,6 +28,8 @@ public:
     qint64 videoDurationMiliSec = 0;
 
     bool canceled = false;
+    bool dialogOpen = false;
+    bool finished = false;
 
 private slots:
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
@@ -40,6 +42,8 @@ private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_3_clicked();
     void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
 
 private:
     Ui::downloadDialog *ui;
