@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <windows.h>
+#include <QClipboard>
 
 downloadDialog::downloadDialog(QWidget *parent) :
     QDialog(parent),
@@ -250,13 +251,24 @@ void downloadDialog::on_pushButton_5_clicked()
     }
 
     msgBox.setText(formatedDownloadLink);
-    msgBox.addButton(" Ok ", QMessageBox::AcceptRole);
+    QAbstractButton* pButtonCopy = msgBox.addButton(" Kopírovat ", QMessageBox::NoRole);
+    QAbstractButton* pButtonOk = msgBox.addButton(" Ok ", QMessageBox::NoRole);
+
+    pButtonCopy->setFocusPolicy(Qt::FocusPolicy::NoFocus);
+    pButtonOk->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     msgBox.exec();
+
+    if (msgBox.clickedButton() == pButtonCopy){
+        // copy to clipboard
+
+        QClipboard* clipboard = QApplication::clipboard();
+        clipboard->setText(downloadDialog::downloadLink);
+    }
 
     downloadDialog::dialogOpen = false;
 
     downloadDialog::finished = true;
-    if(downloadDialog::finished){
+    if (downloadDialog::finished){
         this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
         this->show();
     }
