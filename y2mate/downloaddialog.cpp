@@ -6,8 +6,9 @@
 #include <QMessageBox>
 #include <windows.h>
 #include <QClipboard>
+#include <QCloseEvent>
 
-downloadDialog::downloadDialog(QWidget *parent) :
+downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
     QDialog(parent),
     ui(new Ui::downloadDialog)
 {
@@ -19,7 +20,9 @@ downloadDialog::downloadDialog(QWidget *parent) :
 
     this->setWindowModality(Qt::ApplicationModal);
 
-    this->show();
+    if(!hidden){
+        this->show();
+    }
 }
 
 downloadDialog::~downloadDialog()
@@ -29,7 +32,9 @@ downloadDialog::~downloadDialog()
 
 void downloadDialog::startDownload()
 {
-    if(ffmpegDownload){
+    downloadDialog::finished = false;
+
+    if(otherDownload){
         ui->pushButton_2->setHidden(true);
         ui->pushButton_4->setHidden(true);
     }
@@ -47,7 +52,7 @@ void downloadDialog::startDownload()
     request.setUrl(QUrl(downloadDialog::downloadLink));
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
 
-    if(!ffmpegDownload){
+    if(!otherDownload){
         request.setRawHeader("Referer", "https://www.y2mate.com/");
     }
 
@@ -64,7 +69,7 @@ void downloadDialog::on_pushButton_clicked()
 
     QString buttonText = ui->pushButton->text();
 
-    if(buttonText == "Hotovo"){
+    if(!buttonText.contains("Zrušit")){
         // everything OK
 
     } else{
@@ -129,9 +134,15 @@ void downloadDialog::httpFinished()
     }
 
     this->setWindowTitle("Stahování - dokončeno");
-    ui->pushButton->setText("Hotovo");
 
-    if(!ffmpegDownload){
+    if(customFinishMessage.isEmpty()){
+        ui->pushButton->setText("Hotovo");
+
+    } else{
+        ui->pushButton->setText(customFinishMessage);
+    }
+
+    if(!otherDownload){
         ui->pushButton_2->setDisabled(false);
         ui->pushButton_4->setDisabled(false);
     }
@@ -163,6 +174,15 @@ std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
     file->open(QIODevice::WriteOnly);
 
     return file;
+}
+
+void downloadDialog::closeEvent(QCloseEvent *bar)
+{
+    downloadDialog::closed = true;
+
+    if(bar != nullptr){
+        bar->accept();
+    }
 }
 
 void downloadDialog::on_pushButton_2_clicked()
@@ -204,7 +224,7 @@ void downloadDialog::on_pushButton_4_clicked()
     evd.loadData();
 
     // wait for close
-    while(!evd.isHidden()){
+    while(!evd.closed){
         qApp->processEvents();
     }
 
@@ -267,7 +287,6 @@ void downloadDialog::on_pushButton_5_clicked()
 
     downloadDialog::dialogOpen = false;
 
-    downloadDialog::finished = true;
     if (downloadDialog::finished){
         this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
         this->show();
