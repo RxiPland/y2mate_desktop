@@ -64,7 +64,7 @@ bool checkSettings(){
     objData["user_agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
     objData["allow_history"] = true;
     objData["check_for_updates"] = true;
-    objData["last_path"] = "/";
+    objData["last_path"] = QDir::homePath();
     objData["enable_last_path"] = true;
     objData["replace_name_with_hash"] = false;
     objData["replace_name_with_underscores"] = false;
