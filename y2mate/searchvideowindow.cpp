@@ -3,6 +3,7 @@
 #include "settingsdialog.h"
 #include "downloadvideowindow.h"
 #include "editvideodialog.h"
+#include "downloaddialog.h"
 
 #include <Windows.h>
 #include <QFile>
@@ -16,6 +17,7 @@
 #include <QNetworkReply>
 #include <QLabel>
 #include <QFileDialog>
+#include <QApplication>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -31,10 +33,6 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
     }
 
     searchVideoWindow::loadSettings();
-
-    if(searchVideoWindow::checkForUpdates){
-        searchVideoWindow::checkUpdate();
-    }
 }
 
 searchVideoWindow::~searchVideoWindow()
@@ -172,6 +170,10 @@ void searchVideoWindow::loadSettings()
 void searchVideoWindow::checkUpdate()
 {
 
+    if(!searchVideoWindow::checkForUpdates){
+        return;
+    }
+
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
@@ -198,19 +200,86 @@ void searchVideoWindow::checkUpdate()
 
     if (newestVersion != appVersion && newestVersion != ""){
 
+        searchVideoWindow::disableWidgets(true);
+
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
 
-        QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
+        QAbstractButton* pButtonYes = msgBox.addButton("  Nainstalovat  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
-        msgBox.exec();
 
-        if (msgBox.clickedButton() == pButtonYes) {
-            ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
+        downloadDialog dd(nullptr, true);
+        dd.otherDownload = true;
+        dd.userAgent = searchVideoWindow::userAgent;
+        dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
+        dd.customFinishMessage = "Nainstalovat";
+
+        QDir downloadFolder(QDir::homePath() + "/Downloads/");
+        QString folderPath;
+        bool folderWarningRaised = false;
+
+        while(true){
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == pButtonYes) {
+                // download & run newer version
+
+                if(!downloadFolder.exists()){
+
+                    if(!folderWarningRaised){
+                        QMessageBox::warning(this, "Oznámení", "Nepodařilo se najít složku pro stahování! Vyberte, kam se má instalační soubor stáhnout (po instalaci může být soubor vymazán).");
+                        folderWarningRaised = true;
+                    }
+
+                    // select new path for download
+                    folderPath = QFileDialog::getExistingDirectory(this, "Vybrat složku pro stažení", lastSavePath);
+
+                    if(folderPath.isEmpty()){
+                        continue;
+                    }
+                } else{
+                    folderPath = downloadFolder.path();
+                }
+
+                if(!folderPath.endsWith('/')){
+                    folderPath.append('/');
+                }
+
+                dd.filePath = folderPath + "y2mate_setup.exe";
+                dd.show();
+
+                dd.startDownload();
+
+                // wait for close
+                while(!dd.closed){
+                    qApp->processEvents();
+                }
+
+                // download was canceled
+                if(dd.canceled){
+                    break;
+
+                } else{
+                    // download was successfull
+                    // run setup file
+
+                    QProcess::startDetached(dd.filePath);
+                    QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+                    return;
+                }
+
+            } else{
+                break;
+            }
         }
+
+    } else{
+        QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(newestVersion));
     }
+
+    searchVideoWindow::disableWidgets(false);
 }
 
 void searchVideoWindow::disableWidgets(bool disable)
@@ -419,9 +488,11 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     // open settings window
 
     settingsDialog sd;
-    sd.setModal(true);
-
     sd.exec();
+
+    while(!sd.closed){
+        qApp->processEvents();
+    }
 
     searchVideoWindow::loadSettings();
 }
@@ -650,7 +721,7 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.loadData();
 
     // wait until closed
-    while(!dvw.isHidden()){
+    while(!dvw.closed){
         qApp->processEvents();
     }
 
@@ -840,7 +911,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     evd.loadData();
 
     // wait for close
-    while(!evd.isHidden()){
+    while(!evd.closed){
         qApp->processEvents();
     }
 

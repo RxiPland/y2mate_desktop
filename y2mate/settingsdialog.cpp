@@ -1,5 +1,6 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include "downloaddialog.h"
 
 #include <QCloseEvent>
 #include <QMessageBox>
@@ -54,7 +55,7 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
         }
     }
 
-    this->close();
+    settingsDialog::closed = true;
 
     if(bar != nullptr){
         bar->accept();
@@ -293,7 +294,7 @@ void settingsDialog::on_pushButton_4_clicked()
 
 void settingsDialog::on_pushButton_5_clicked()
 {
-    // check new version
+    // check new version & download
 
     settingsDialog::disableWidgets();
 
@@ -340,12 +341,76 @@ void settingsDialog::on_pushButton_5_clicked()
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
 
-        QAbstractButton* pButtonYes = msgBox.addButton("  Otevřít odkaz  ", QMessageBox::YesRole);
+        QAbstractButton* pButtonYes = msgBox.addButton("  Nainstalovat  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::NoRole);
-        msgBox.exec();
 
-        if (msgBox.clickedButton() == pButtonYes) {
-            ShellExecute(0, 0, L"https://github.com/RxiPland/y2mate_desktop", 0, 0, SW_HIDE);
+        downloadDialog dd(nullptr, true);
+        dd.otherDownload = true;
+        dd.userAgent = settingsDialog::userAgent;
+        dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
+        dd.customFinishMessage = "Nainstalovat";
+
+        QDir downloadFolder(QDir::homePath() + "/Downloads/");
+        QString folderPath;
+        bool folderWarningRaised = false;
+
+        while(true){
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == pButtonYes) {
+                // download & run newer version
+
+                if(!downloadFolder.exists()){
+
+                    if(!folderWarningRaised){
+                        QMessageBox::warning(this, "Oznámení", "Nepodařilo se najít složku pro stahování! Vyberte, kam se má instalační soubor stáhnout (po instalaci může být soubor vymazán).");
+                        folderWarningRaised = true;
+                    }
+
+                    // select new path for download
+                    folderPath = QFileDialog::getExistingDirectory(this, "Vybrat složku pro stažení", lastSavePath);
+
+                    if(folderPath.isEmpty()){
+                        continue;
+                    }
+                } else{
+                    folderPath = downloadFolder.path();
+                }
+
+                if(!folderPath.endsWith('/')){
+                    folderPath.append('/');
+                }
+
+                dd.filePath = folderPath + "y2mate_setup.exe";
+                dd.show();
+                this->hide();
+
+                dd.startDownload();
+
+                // wait for close
+                while(!dd.closed){
+                    qApp->processEvents();
+                }
+                this->show();
+
+                // download was canceled
+                if(dd.canceled){
+                    break;
+
+                } else{
+                    // download successfull
+                    // run setup file
+
+                    QProcess::startDetached(dd.filePath);
+                    this->close();
+                    QApplication::quit();
+
+                    return;
+                }
+
+            } else{
+                break;
+            }
         }
 
     } else{
