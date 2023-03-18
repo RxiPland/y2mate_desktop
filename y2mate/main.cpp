@@ -7,7 +7,7 @@
 #include <QJsonDocument>
 
 
-QString appVersion = "v2.1.0";
+QString appVersion = "v2.2.0";
 
 bool checkSettings(){
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
 
     searchVideoWindow svw(nullptr, jsonCorrupted);
-    svw.show();
+    svw.checkUpdate();
 
     return a.exec();
 }
