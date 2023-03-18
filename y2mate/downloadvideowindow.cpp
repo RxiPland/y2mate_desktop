@@ -10,6 +10,7 @@
 #include <QFileDialog>
 #include <QCryptographicHash>
 #include <QProcess>
+#include <QCloseEvent>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -27,6 +28,15 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
 downloadVideoWindow::~downloadVideoWindow()
 {
     delete ui;
+}
+
+void downloadVideoWindow::closeEvent(QCloseEvent *bar)
+{
+    downloadVideoWindow::closed = true;
+
+    if(bar != nullptr){
+        bar->accept();
+    }
 }
 
 void downloadVideoWindow::sortQualities(QStringList *list)
@@ -421,7 +431,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.startDownload();
 
     // wait for close
-    while(!dd.isHidden()){
+    while(!dd.closed){
         qApp->processEvents();
     }
 
@@ -496,4 +506,3 @@ void downloadVideoWindow::on_comboBox_2_currentTextChanged(const QString &arg1)
         ui->pushButton->setDisabled(false);
     }
 }
-

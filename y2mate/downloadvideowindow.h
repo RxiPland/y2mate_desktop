@@ -20,6 +20,8 @@ public:
     void loadData();
     void loadSettings();
 
+    bool closed = false;
+
     QString appVersion;
     QByteArray userAgent;
 
@@ -51,6 +53,8 @@ private slots:
 private:
     Ui::downloadVideoWindow *ui;
     QNetworkAccessManager manager;
+
+    void closeEvent(QCloseEvent *bar = nullptr);
 
     void sortQualities(QStringList *list);
     void disableWidgets(bool disable = true);

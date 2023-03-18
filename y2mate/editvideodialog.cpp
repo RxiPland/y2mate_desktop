@@ -85,7 +85,7 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
         qApp->processEvents();
     }
 
-    this->close();
+    editVideoDialog::closed = true;
 
     if(bar != nullptr){
         bar->accept();
@@ -129,7 +129,7 @@ bool editVideoDialog::ffmpegExists()
 
         // open download dialog
         downloadDialog dd;
-        dd.ffmpegDownload = true;
+        dd.otherDownload = true;
         dd.userAgent = editVideoDialog::userAgent;
         dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
         dd.filePath = ffmpegPath;
@@ -137,7 +137,7 @@ bool editVideoDialog::ffmpegExists()
         dd.startDownload();
 
         // wait for close
-        while(!dd.isHidden()){
+        while(!dd.closed){
             qApp->processEvents();
         }
 

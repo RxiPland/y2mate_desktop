@@ -20,6 +20,8 @@ public:
     bool dataLoaded = false;
     void loadData();
 
+    bool closed = false;
+
     bool startedFromSeachMenu = false;
     bool deleteOriginalFile = true;
 
