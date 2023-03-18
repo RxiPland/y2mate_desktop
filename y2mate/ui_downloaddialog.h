@@ -56,7 +56,7 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(259, 257);
+        downloadDialog->resize(259, 271);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
@@ -66,7 +66,7 @@ public:
 
         verticalLayout->addWidget(label_2);
 
-        verticalSpacer_4 = new QSpacerItem(20, 4, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        verticalSpacer_4 = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout->addItem(verticalSpacer_4);
 
