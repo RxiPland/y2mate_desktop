@@ -15,11 +15,13 @@ class downloadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit downloadDialog(QWidget *parent = nullptr);
+    explicit downloadDialog(QWidget *parent = nullptr, bool hidden = false);
     ~downloadDialog();
 
     void startDownload();
-    bool ffmpegDownload = false;
+    bool otherDownload = false;
+
+    bool closed = false;
 
     QByteArray userAgent;
 
@@ -27,12 +29,16 @@ public:
     QString filePath;
     qint64 videoDurationMiliSec = 0;
 
+    QString customFinishMessage;
+
     bool canceled = false;
     bool dialogOpen = false;
     bool finished = false;
 
 private slots:
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
+
+    void closeEvent(QCloseEvent *bar = nullptr);
 
     void httpFinished();
     void httpReadyRead();
