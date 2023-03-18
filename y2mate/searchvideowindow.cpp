@@ -274,9 +274,6 @@ void searchVideoWindow::checkUpdate()
                 break;
             }
         }
-
-    } else{
-        QMessageBox::information(this, "Aktualizace", QString("Již máte nejnovější verzi (%1)").arg(newestVersion));
     }
 
     searchVideoWindow::disableWidgets(false);
