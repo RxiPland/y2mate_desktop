@@ -21,6 +21,8 @@ public:
 
     bool settingsChanged = false;
 
+    bool closed = false;
+
 private slots:
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
