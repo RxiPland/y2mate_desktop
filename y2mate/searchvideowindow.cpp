@@ -59,8 +59,7 @@ void searchVideoWindow::loadSettings()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            this->close();
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
 
         } else{
@@ -72,8 +71,7 @@ void searchVideoWindow::loadSettings()
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
-
-                this->close();
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
                 return;
 
             } else{
@@ -89,6 +87,7 @@ void searchVideoWindow::loadSettings()
                 searchVideoWindow::lastPathEnabled = loadedJson["enable_last_path"].toBool();
                 searchVideoWindow::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
                 searchVideoWindow::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
+                searchVideoWindow::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
 
                 // disable/enable history tab
 
@@ -215,6 +214,7 @@ void searchVideoWindow::checkUpdate()
         dd.userAgent = searchVideoWindow::userAgent;
         dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
         dd.customFinishMessage = "Nainstalovat";
+        dd.showDownloadUrlButton = searchVideoWindow::showDownloadUrlButton;
 
         QDir downloadFolder(QDir::homePath() + "/Downloads/");
         QString folderPath;
@@ -379,7 +379,7 @@ void searchVideoWindow::savePath(QString path)
 
             QProcess::startDetached(QApplication::applicationFilePath());
 
-            QApplication::quit();
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
 
         } else{
@@ -392,7 +392,7 @@ void searchVideoWindow::savePath(QString path)
 
                 QProcess::startDetached(QApplication::applicationFilePath());
 
-                QApplication::quit();
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
                 return;
 
             } else{
@@ -418,7 +418,7 @@ void searchVideoWindow::savePath(QString path)
 
         QProcess::startDetached(QApplication::applicationFilePath());
 
-        QApplication::quit();
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return;
     }
 }
@@ -773,8 +773,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            this->close();
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
         }
 
@@ -786,8 +785,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
             QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            this->close();
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
         }
 
@@ -820,8 +818,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
-
-        this->close();
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return;
     }
 
@@ -905,6 +902,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     evd.filePath = filePath;
     evd.videoDurationMiliSec = totalMiliSeconds;
     evd.userAgent = searchVideoWindow::userAgent;
+    evd.showDownloadUrlButton = searchVideoWindow::showDownloadUrlButton;
     evd.loadData();
 
     // wait for close
