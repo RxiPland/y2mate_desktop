@@ -24,6 +24,7 @@ public:
     bool closed = false;
 
     QByteArray userAgent;
+    bool showDownloadUrlButton = false;
 
     QString downloadLink;
     QString filePath;

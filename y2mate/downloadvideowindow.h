@@ -41,6 +41,7 @@ public:
     QString lastSavePath;
     bool replaceNameWithHash = false;
     bool replaceNameWithUnderscores = false;
+    bool showDownloadUrlButton = false;
 
     bool exitApp = true;
 

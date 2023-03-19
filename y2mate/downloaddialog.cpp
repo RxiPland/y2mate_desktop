@@ -32,6 +32,10 @@ downloadDialog::~downloadDialog()
 
 void downloadDialog::startDownload()
 {
+    if(!showDownloadUrlButton){
+        ui->pushButton_5->setHidden(true);
+    }
+
     downloadDialog::finished = false;
 
     if(otherDownload){
@@ -220,6 +224,7 @@ void downloadDialog::on_pushButton_4_clicked()
     evd.filePath = downloadDialog::filePath;
     evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
     evd.userAgent = downloadDialog::userAgent;
+    evd.showDownloadUrlButton = downloadDialog::showDownloadUrlButton;
     this->hide();
     evd.loadData();
 

@@ -227,6 +227,7 @@ void downloadVideoWindow::loadSettings()
                 downloadVideoWindow::lastPathEnabled = loadedJson["enable_last_path"].toBool();
                 downloadVideoWindow::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
                 downloadVideoWindow::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
+                downloadVideoWindow::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
             }
         }
 
@@ -427,6 +428,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;
     dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
+    dd.showDownloadUrlButton = downloadVideoWindow::showDownloadUrlButton;
 
     dd.startDownload();
 

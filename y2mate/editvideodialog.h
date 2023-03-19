@@ -32,6 +32,7 @@ public:
     QString newFilePath;
 
     QByteArray userAgent;
+    bool showDownloadUrlButton = false;
 
     bool nameChanged;
     bool fileTypeChanged;

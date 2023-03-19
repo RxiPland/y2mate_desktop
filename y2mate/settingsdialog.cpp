@@ -94,8 +94,7 @@ void settingsDialog::loadSettings()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            QApplication::quit();
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
 
         } else{
@@ -107,8 +106,7 @@ void settingsDialog::loadSettings()
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
-
-                QApplication::quit();
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
                 return;
 
             } else{
@@ -123,6 +121,7 @@ void settingsDialog::loadSettings()
                 settingsDialog::lastPathEnabled = loadedJson["enable_last_path"].toBool();
                 settingsDialog::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
                 settingsDialog::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
+                settingsDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
 
                 ui->label_2->setText("Aktuální verze: " + settingsDialog::appVersion);
 
@@ -134,6 +133,8 @@ void settingsDialog::loadSettings()
 
                 ui->checkBox_4->setChecked(allowHistory);
                 ui->checkBox_5->setChecked(checkForUpdates);
+
+                ui->checkBox_6->setChecked(showDownloadUrlButton);
             }
         }
 
@@ -143,8 +144,7 @@ void settingsDialog::loadSettings()
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
-
-        QApplication::quit();
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return;
     }
 }
@@ -185,6 +185,7 @@ bool settingsDialog::saveSettings()
                 loadedJson["last_path"] = settingsDialog::lastSavePath;
                 loadedJson["replace_name_with_hash"] = settingsDialog::replaceNameWithHash;
                 loadedJson["replace_name_with_underscores"] = settingsDialog::replaceNameWithUnderscores;
+                loadedJson["show_download_url_button"] = settingsDialog::showDownloadUrlButton;
 
                 QJsonDocument docData(loadedJson);
 
@@ -247,6 +248,7 @@ void settingsDialog::on_pushButton_2_clicked()
     settingsDialog::lastPathEnabled = true;
     settingsDialog::replaceNameWithHash = false;
     settingsDialog::replaceNameWithUnderscores = false;
+    settingsDialog::showDownloadUrlButton = false;
 
     ui->checkBox->setChecked(replaceNameWithHash);
     ui->checkBox_2->setChecked(replaceNameWithUnderscores);
@@ -256,6 +258,8 @@ void settingsDialog::on_pushButton_2_clicked()
 
     ui->checkBox_4->setChecked(allowHistory);
     ui->checkBox_5->setChecked(checkForUpdates);
+
+    ui->checkBox_6->setChecked(showDownloadUrlButton);
 
 
     settingsDialog::settingsChanged = true;
@@ -349,6 +353,7 @@ void settingsDialog::on_pushButton_5_clicked()
         dd.userAgent = settingsDialog::userAgent;
         dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
         dd.customFinishMessage = "Nainstalovat";
+        dd.showDownloadUrlButton = settingsDialog::showDownloadUrlButton;
 
         QDir downloadFolder(QDir::homePath() + "/Downloads/");
         QString folderPath;
@@ -402,8 +407,7 @@ void settingsDialog::on_pushButton_5_clicked()
                     // run setup file
 
                     QProcess::startDetached(dd.filePath);
-                    this->close();
-                    QApplication::quit();
+                    QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
 
                     return;
                 }
@@ -489,6 +493,18 @@ void settingsDialog::on_checkBox_5_clicked()
     }
 }
 
+void settingsDialog::on_checkBox_6_clicked()
+{
+    // show URL button
+
+    settingsDialog::showDownloadUrlButton = ui->checkBox_6->isChecked();
+
+    if(!settingsDialog::settingsChanged){
+        ui->label->setHidden(false);
+        settingsDialog::settingsChanged = true;
+    }
+}
+
 void settingsDialog::on_toolButton_clicked()
 {
     // help - replace with hash
@@ -518,3 +534,10 @@ void settingsDialog::on_toolButton_5_clicked()
     // help - check version
     QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při spuštění aplikace automaticky zkontroluje, zda nevyšla nová verze programu. Kontrolovat aktualizace jde i manuálně.");
 }
+
+void settingsDialog::on_toolButton_6_clicked()
+{
+    // help - allow show download url button
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při stahování objeví tlačítko: \"zobrazit odkaz\"\n\nToto nastavení nijak neovlivňuje chování aplikace. Primárně je určeno expertům, kteří se zajímají o fungování programu.");
+}
+

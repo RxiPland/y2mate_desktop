@@ -28,6 +28,7 @@ public:
     QString lastSavePath;
     bool replaceNameWithHash = false;
     bool replaceNameWithUnderscores = false;
+    bool showDownloadUrlButton = false;
 
 private slots:
     void on_action_menu1_1_triggered();

@@ -35,12 +35,14 @@ private slots:
     void on_checkBox_3_clicked();
     void on_checkBox_4_clicked();
     void on_checkBox_5_clicked();
+    void on_checkBox_6_clicked();
 
     void on_toolButton_clicked();
     void on_toolButton_2_clicked();
     void on_toolButton_3_clicked();
     void on_toolButton_4_clicked();
     void on_toolButton_5_clicked();
+    void on_toolButton_6_clicked();
 
 private:
     Ui::settingsDialog *ui;
@@ -58,6 +60,7 @@ private:
     bool lastPathEnabled = true;
     bool replaceNameWithHash = false;
     bool replaceNameWithUnderscores = false;
+    bool showDownloadUrlButton = false;
 };
 
 #endif // SETTINGSDIALOG_H
