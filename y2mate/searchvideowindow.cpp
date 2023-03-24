@@ -833,7 +833,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     searchVideoWindow::disableWidgets();
 
     QString filePath;
-    filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg .*flac);;Všechny soubory (*.*)").replace("\\", "/");
+    filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg *.flac);;Všechny soubory (*.*)").replace("\\", "/");
 
     if(filePath.isEmpty()){
         searchVideoWindow::disableWidgets(false);
