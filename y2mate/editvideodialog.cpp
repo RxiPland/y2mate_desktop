@@ -10,6 +10,8 @@
 #include <QDir>
 #include <QCryptographicHash>
 #include <QUuid>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent) :
@@ -67,6 +69,61 @@ void editVideoDialog::loadData()
     ui->timeEdit_2->setMinimumTime(QTime(0,0,0,0));
     ui->timeEdit_2->setMaximumTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
     ui->timeEdit_2->setTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
+}
+
+void editVideoDialog::loadSettings()
+{
+    // load settings to variables
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            QApplication::quit();
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+
+                QApplication::quit();
+                return;
+
+            } else{
+                // everything OK
+
+                editVideoDialog::userAgent = loadedJson["user_agent"].toString().toUtf8();
+                editVideoDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        QApplication::quit();
+        return;
+    }
 }
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)

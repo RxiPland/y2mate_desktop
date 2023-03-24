@@ -19,6 +19,7 @@ public:
 
     bool dataLoaded = false;
     void loadData();
+    void loadSettings();
 
     bool closed = false;
 

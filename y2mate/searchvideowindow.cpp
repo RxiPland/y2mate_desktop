@@ -902,8 +902,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     evd.startedFromSeachMenu = true;
     evd.filePath = filePath;
     evd.videoDurationMiliSec = totalMiliSeconds;
-    evd.userAgent = searchVideoWindow::userAgent;
-    evd.showDownloadUrlButton = searchVideoWindow::showDownloadUrlButton;
+    evd.loadSettings();
     evd.loadData();
 
     // wait for close

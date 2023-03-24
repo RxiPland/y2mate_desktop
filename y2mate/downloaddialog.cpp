@@ -282,8 +282,7 @@ void downloadDialog::on_pushButton_4_clicked()
     editVideoDialog evd;
     evd.filePath = downloadDialog::filePath;
     evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
-    evd.userAgent = downloadDialog::userAgent;
-    evd.showDownloadUrlButton = downloadDialog::showDownloadUrlButton;
+    evd.loadSettings();
     this->hide();
     evd.loadData();
 
