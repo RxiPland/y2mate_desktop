@@ -21,6 +21,8 @@ public:
     void startDownload();
     bool otherDownload = false;
 
+    void loadSettings();
+
     bool closed = false;
 
     QByteArray userAgent;

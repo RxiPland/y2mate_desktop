@@ -3,10 +3,14 @@
 #include "editvideodialog.h"
 
 #include <QFileInfo>
+#include <QDir>
+#include <QFile>
 #include <QMessageBox>
 #include <windows.h>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
     QDialog(parent),
@@ -65,6 +69,61 @@ void downloadDialog::startDownload()
     connect(reply.get(), &QNetworkReply::finished, this, &downloadDialog::httpFinished);
     connect(reply.get(), &QIODevice::readyRead, this, &downloadDialog::httpReadyRead);
     connect(reply.get(), &QNetworkReply::downloadProgress,this, &downloadDialog::downloadProgress);
+}
+
+void downloadDialog::loadSettings()
+{
+    // load settings to variables
+
+    QFile dataFile(QDir::currentPath() + "/Data/data.json");
+
+    if (dataFile.exists()){
+        dataFile.open(QIODevice::ReadOnly | QIODevice::Text);
+
+        QByteArray fileContent = dataFile.readAll();
+        dataFile.close();
+
+        if(fileContent.isEmpty()){
+            // File is empty
+
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+
+            QApplication::quit();
+            return;
+
+        } else{
+            QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
+
+            if(loadedJson.isEmpty()){
+                // JSON is corrupted
+
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+
+                QApplication::quit();
+                return;
+
+            } else{
+                // everything OK
+
+                downloadDialog::userAgent = loadedJson["user_agent"].toString().toUtf8();
+                downloadDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
+            }
+        }
+
+    } else{
+        // file with settings not found
+
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+
+        QApplication::quit();
+        return;
+    }
 }
 
 void downloadDialog::on_pushButton_clicked()
