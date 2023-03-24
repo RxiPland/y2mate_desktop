@@ -424,11 +424,10 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     // open download dialog
     downloadDialog dd;
-    dd.userAgent = downloadVideoWindow::userAgent;
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;
     dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
-    dd.showDownloadUrlButton = downloadVideoWindow::showDownloadUrlButton;
+    dd.loadSettings();
 
     dd.startDownload();
 

@@ -358,10 +358,9 @@ void settingsDialog::on_pushButton_5_clicked()
 
         downloadDialog dd(nullptr, true);
         dd.otherDownload = true;
-        dd.userAgent = settingsDialog::userAgent;
         dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
         dd.customFinishMessage = "Nainstalovat";
-        dd.showDownloadUrlButton = settingsDialog::showDownloadUrlButton;
+        dd.loadSettings();
 
         QDir downloadFolder(QDir::homePath() + "/Downloads/");
         QString folderPath;

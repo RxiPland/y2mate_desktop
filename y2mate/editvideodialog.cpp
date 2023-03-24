@@ -130,10 +130,9 @@ bool editVideoDialog::ffmpegExists()
         // open download dialog
         downloadDialog dd;
         dd.otherDownload = true;
-        dd.userAgent = editVideoDialog::userAgent;
         dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
         dd.filePath = ffmpegPath;
-        dd.showDownloadUrlButton = editVideoDialog::showDownloadUrlButton;
+        dd.loadSettings();
 
         dd.startDownload();
 
