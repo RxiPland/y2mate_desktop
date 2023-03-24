@@ -259,7 +259,7 @@ void editVideoDialog::finished()
     } else{
 
         if(error.contains("is not recognized as an internal or external command")){
-            QMessageBox::critical(this, "Chyba", "FFmpeg.exe nebyl nalezen! Reinstalujte program.");
+            QMessageBox::critical(this, "Chyba", "FFmpeg.exe nebyl nalezen! Restartujte aplikaci.\n\nPředpokládané umístění:\n" + QDir::currentPath() + "/Data/ffmpeg.exe");
 
         } else{
             QMessageBox::critical(this, "Chyba", "Video se nepodařilo konvertovat. FFmpeg vrátil:\n\n" + error);
