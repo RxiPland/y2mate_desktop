@@ -118,12 +118,12 @@ bool editVideoDialog::ffmpegExists()
         msgBox.setWindowTitle("Upozornění");
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Program FFmpeg.exe pro úpravu videí nebyl nalezen. Chcete jej stáhnout?");
-        msgBox.addButton(" Ano ", QMessageBox::YesRole);
-        QAbstractButton* pButtonNo = msgBox.addButton(" Odejít ", QMessageBox::NoRole);
+        QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        msgBox.addButton(" Odejít ", QMessageBox::YesRole);
         msgBox.exec();
 
-        if (msgBox.clickedButton() == pButtonNo){
-            // exit
+        if (msgBox.clickedButton() != pButtonYes){
+            // exit / cancel
             return false;
         }
 
@@ -305,18 +305,16 @@ void editVideoDialog::on_pushButton_3_clicked()
         msgBox.setWindowTitle("Upozornění");
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Nebyly provedeny žádné změny. Chcete odejít?");
-        msgBox.addButton(" Ano ", QMessageBox::YesRole);
-        QAbstractButton* pButtonNo = msgBox.addButton(" Ne ", QMessageBox::NoRole);
+        QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        msgBox.addButton(" Ne ", QMessageBox::YesRole);
         msgBox.exec();
 
-        if (msgBox.clickedButton() == pButtonNo){
-            editVideoDialog::disableWidgets(false);
+        if(msgBox.clickedButton() == pButtonYes){
+            this->close();
             return;
 
         } else{
-            // exit
-
-            this->close();
+            editVideoDialog::disableWidgets(false);
             return;
         }
 
@@ -361,7 +359,7 @@ void editVideoDialog::on_pushButton_3_clicked()
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Chcete ponechat původní soubor?");
         QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
-        msgBox.addButton(" Ne ", QMessageBox::NoRole);
+        msgBox.addButton(" Ne ", QMessageBox::YesRole);
         msgBox.exec();
 
         if (msgBox.clickedButton() == pButtonYes){

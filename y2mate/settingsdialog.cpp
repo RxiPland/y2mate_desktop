@@ -45,13 +45,11 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setText("Bylo zjištěno neuložené nastavení! Chcete uložit změny?");
         QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
-        msgBox.addButton(" Ne ", QMessageBox::NoRole);
+        msgBox.addButton(" Ne ", QMessageBox::YesRole);
         msgBox.exec();
 
         if (msgBox.clickedButton() == pButtonYes){
-
             settingsDialog::saveSettings();
-            return;
         }
     }
 
@@ -346,7 +344,7 @@ void settingsDialog::on_pushButton_5_clicked()
         msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
 
         QAbstractButton* pButtonYes = msgBox.addButton("  Nainstalovat  ", QMessageBox::YesRole);
-        msgBox.addButton("Zrušit", QMessageBox::NoRole);
+        msgBox.addButton("Zrušit", QMessageBox::YesRole);
 
         downloadDialog dd(nullptr, true);
         dd.otherDownload = true;

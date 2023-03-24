@@ -271,6 +271,8 @@ void searchVideoWindow::checkUpdate()
                 }
 
             } else{
+                // exit update
+
                 break;
             }
         }
@@ -751,11 +753,11 @@ void searchVideoWindow::on_action_menu2_6_triggered()
     QMessageBox msgBox;
     msgBox.setWindowTitle("Upozornění");
     msgBox.setText("Opravdu chcete smazat historii?");
-    msgBox.addButton("Ano", QMessageBox::YesRole);
-    QAbstractButton* pButtonNo = msgBox.addButton("Zrušit", QMessageBox::NoRole);
+    QAbstractButton* pButtonYes = msgBox.addButton("Ano", QMessageBox::YesRole);
+    msgBox.addButton("Zrušit", QMessageBox::YesRole);
     msgBox.exec();
 
-    if (msgBox.clickedButton() == pButtonNo) {
+    if (msgBox.clickedButton() != pButtonYes) {
         return;
     }
 
