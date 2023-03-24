@@ -49,7 +49,17 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
         msgBox.exec();
 
         if (msgBox.clickedButton() == pButtonYes){
-            settingsDialog::saveSettings();
+            // save settings
+
+            bool saved = settingsDialog::saveSettings();
+
+            if(!saved){
+                if(bar != nullptr){
+                    bar->ignore();
+                }
+
+                return;
+            }
         }
     }
 
