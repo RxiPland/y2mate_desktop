@@ -12,6 +12,7 @@
 #include <QUuid>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QApplication>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent) :

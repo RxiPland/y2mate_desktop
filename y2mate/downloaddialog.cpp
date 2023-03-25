@@ -12,6 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSoundEffect>
+#include <QApplication>
 
 
 downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
@@ -20,7 +21,6 @@ downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
-    this->setWindowFlags(windowFlags() &(~Qt::WindowCloseButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMinimizeButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
@@ -149,6 +149,7 @@ void downloadDialog::on_pushButton_clicked()
         }
     }
 
+    finished = true;
     this->close();
 }
 
@@ -238,10 +239,6 @@ void downloadDialog::httpFinished()
     }
 
     downloadDialog::finished = true;
-    if(!downloadDialog::dialogOpen){
-        this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
-        this->show();
-    }
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
@@ -267,6 +264,14 @@ std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
 
 void downloadDialog::closeEvent(QCloseEvent *bar)
 {
+    if(!downloadDialog::finished && !downloadDialog::canceled){
+
+        if(bar != nullptr){
+            bar->ignore();
+        }
+        return;
+    }
+
     downloadDialog::closed = true;
 
     if(bar != nullptr){
@@ -342,8 +347,6 @@ void downloadDialog::on_pushButton_5_clicked()
 {
     // show URL of downloaded file
 
-    downloadDialog::dialogOpen = true;
-
     QMessageBox msgBox;
     msgBox.setWindowTitle("Odkaz stahovaného souboru");
 
@@ -372,13 +375,6 @@ void downloadDialog::on_pushButton_5_clicked()
 
         QClipboard* clipboard = QApplication::clipboard();
         clipboard->setText(downloadDialog::downloadLink);
-    }
-
-    downloadDialog::dialogOpen = false;
-
-    if (downloadDialog::finished){
-        this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
-        this->show();
     }
 }
 

@@ -18,6 +18,7 @@
 #include <QLabel>
 #include <QFileDialog>
 #include <QApplication>
+#include <QCloseEvent>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -38,6 +39,23 @@ searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
 searchVideoWindow::~searchVideoWindow()
 {
     delete ui;
+}
+
+void searchVideoWindow::closeEvent(QCloseEvent *bar)
+{
+    // before window close
+
+    if(searchVideoWindow::running){
+
+        if(bar != nullptr){
+            bar->ignore();
+        }
+        return;
+    }
+
+    if(bar != nullptr){
+        bar->accept();
+    }
 }
 
 void searchVideoWindow::loadSettings()
@@ -173,6 +191,8 @@ void searchVideoWindow::checkUpdate()
         return;
     }
 
+    running = true;
+
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
@@ -186,6 +206,7 @@ void searchVideoWindow::checkUpdate()
     }
 
     if(replyGet->error() != QNetworkReply::NoError){
+        running = false;
         return;
     }
 
@@ -258,6 +279,7 @@ void searchVideoWindow::checkUpdate()
 
                 // download was canceled or closed by X
                 if(dd.canceled || !dd.closedWithButton){
+                    running = false;
                     break;
 
                 } else{
@@ -266,17 +288,20 @@ void searchVideoWindow::checkUpdate()
 
                     QProcess::startDetached(dd.filePath);
                     QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+                    running = false;
                     return;
                 }
 
             } else{
                 // exit update
 
+                running = false;
                 break;
             }
         }
     }
 
+    running = false;
     searchVideoWindow::disableWidgets(false);
 }
 
@@ -513,6 +538,8 @@ void searchVideoWindow::on_pushButton_clicked()
 {
     // search video button
 
+    running = true;
+
     searchVideoWindow::disableWidgets();
     QString videoUrl = ui->lineEdit->text().trimmed();
 
@@ -526,6 +553,8 @@ void searchVideoWindow::on_pushButton_clicked()
 
         searchVideoWindow::disableWidgets(false);
         ui->lineEdit->setFocus();
+
+        running = false;
         return;
 
     } else if (!rx.exactMatch(videoUrl)){
@@ -534,6 +563,8 @@ void searchVideoWindow::on_pushButton_clicked()
 
         searchVideoWindow::disableWidgets(false);
         ui->lineEdit->setFocus();
+
+        running = false;
         return;
     }
 
@@ -576,6 +607,8 @@ void searchVideoWindow::on_pushButton_clicked()
 
         disableWidgets(false);
         QMessageBox::critical(this, "Chyba", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("y2mate.com"));
+
+        running = false;
         return;
 
     } else if (error != QNetworkReply::NetworkError::NoError){
@@ -584,6 +617,8 @@ void searchVideoWindow::on_pushButton_clicked()
         disableWidgets(false);
         const QString &errorString = replyPost->errorString();
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
+
+        running = false;
         return;
     }
 
@@ -600,12 +635,16 @@ void searchVideoWindow::on_pushButton_clicked()
 
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba! y2mate vrátil:\n\n%1").arg(response));
         disableWidgets(false);
+
+        running = false;
         return;
 
     } else if (message.contains("Please enter valid video URL.") || message.contains("Sorry! An error has occurred.")){
 
         QMessageBox::warning(this, "Chyba", "Video pod tímto odkazem neexistuje!");
         disableWidgets(false);
+
+        running = false;
         return;
 
     } else if (message.isEmpty()){
@@ -614,6 +653,8 @@ void searchVideoWindow::on_pushButton_clicked()
     } else{
         QMessageBox::warning(this, "Chyba", QString("Nastala neznámá chyba! Server vrátil:\n\n%1").arg(response));
         disableWidgets(false);
+
+        running = false;
         return;
     }
 
@@ -646,6 +687,8 @@ void searchVideoWindow::on_pushButton_clicked()
     if(ytChannel.isEmpty()){
         QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název youtube kanálu z odpovědi serveru!");
         disableWidgets(false);
+
+        running = false;
         return;
     }
 
@@ -653,6 +696,8 @@ void searchVideoWindow::on_pushButton_clicked()
     if(videoDuration == 0){
         QMessageBox::warning(this, "Chyba", "Nepodařilo se získat délku videa z odpovědi serveru!");
         disableWidgets(false);
+
+        running = false;
         return;
     }
 
@@ -660,6 +705,8 @@ void searchVideoWindow::on_pushButton_clicked()
     if(videoId.isEmpty()){
         QMessageBox::warning(this, "Chyba", "Nepodařilo se získat ID videa z odpovědi serveru!");
         disableWidgets(false);
+
+        running = false;
         return;
     }
 
@@ -667,6 +714,8 @@ void searchVideoWindow::on_pushButton_clicked()
     if(videoId.isEmpty()){
         QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název videa z odpovědi serveru!");
         disableWidgets(false);
+
+        running = false;
         return;
     }
     videoName = videoName.trimmed();
@@ -740,11 +789,15 @@ void searchVideoWindow::on_pushButton_clicked()
     // exit if pressed X
     if(dvw.exitApp){
         qApp->setQuitOnLastWindowClosed(true);
+
+        running = false;
         this->close();
         return;
     }
 
     searchVideoWindow::loadSettings();
+
+    running = false;
 
     disableWidgets(false);
     ui->lineEdit->clear();
@@ -942,7 +995,6 @@ void searchVideoWindow::on_action_menu3_1_triggered()
 
     searchVideoWindow::disableWidgets(false);
 }
-
 
 void searchVideoWindow::on_action_menu_2_1_1_triggered()
 {

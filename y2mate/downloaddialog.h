@@ -36,7 +36,6 @@ public:
     QString customFinishMessage;
 
     bool canceled = false;
-    bool dialogOpen = false;
     bool finished = false;
     bool closedWithButton = false; // (install / complete) button
 

@@ -21,6 +21,7 @@ public:
     void loadSettings();
 
     bool closed = false;
+    bool running = false;
 
     QString appVersion;
     QByteArray userAgent;

@@ -30,6 +30,8 @@ public:
     bool replaceNameWithUnderscores = false;
     bool showDownloadUrlButton = false;
 
+    bool running = false;
+
 private slots:
     void on_action_menu1_1_triggered();
     void on_action_menu1_2_triggered();
@@ -52,6 +54,8 @@ private slots:
 private:
     Ui::SearchVideoWindow *ui;
     QNetworkAccessManager manager;
+
+    void closeEvent(QCloseEvent *bar = nullptr);
 
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);

@@ -11,6 +11,7 @@
 #include <QCryptographicHash>
 #include <QProcess>
 #include <QCloseEvent>
+#include <QApplication>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -32,6 +33,16 @@ downloadVideoWindow::~downloadVideoWindow()
 
 void downloadVideoWindow::closeEvent(QCloseEvent *bar)
 {
+    // before window close
+
+    if(downloadVideoWindow::running){
+
+        if(bar != nullptr){
+            bar->ignore();
+        }
+        return;
+    }
+
     downloadVideoWindow::closed = true;
 
     if(bar != nullptr){
@@ -258,12 +269,15 @@ void downloadVideoWindow::on_pushButton_2_clicked()
     // exit window (not app)
 
     exitApp = false;
+    running = false;
     this->close();
 }
 
 void downloadVideoWindow::on_pushButton_clicked()
 {
     // download video
+
+    running = true;
 
     downloadVideoWindow::disableWidgets();
 
@@ -286,6 +300,8 @@ void downloadVideoWindow::on_pushButton_clicked()
 
         QMessageBox::critical(this, "Chyba", "Nepodařilo se najít token pro stažení videa!");
         downloadVideoWindow::disableWidgets(false);
+
+        running = false;
         return;
     }
 
@@ -353,6 +369,8 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     if(filePath.isEmpty()){
         downloadVideoWindow::disableWidgets(false);
+
+        running = false;
         return;
 
     } else{
@@ -401,6 +419,8 @@ void downloadVideoWindow::on_pushButton_clicked()
         QMessageBox::critical(this, "Chyba", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("y2mate.com"));
 
         replyPost->deleteLater();
+
+        running = false;
         return;
 
     } else if (error != QNetworkReply::NetworkError::NoError){
@@ -411,6 +431,8 @@ void downloadVideoWindow::on_pushButton_clicked()
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
 
         replyPost->deleteLater();
+
+        running = false;
         return;
     }
 
@@ -428,6 +450,8 @@ void downloadVideoWindow::on_pushButton_clicked()
     if(downloadLink.isEmpty()){
         disableWidgets(false);
         QMessageBox::critical(this, "Chyba", QString("Nepodařilo se získat odkaz na stažení souboru! Server vrátil:\n\n%1").arg(response));
+
+        running = false;
         return;
     }
 
@@ -454,10 +478,13 @@ void downloadVideoWindow::on_pushButton_clicked()
     // download was canceled
     if(dd.canceled){
        disableWidgets(false);
+
+       running = false;
        return;
     }
 
     exitApp = false;
+    running = false;
     this->close();
 }
 
