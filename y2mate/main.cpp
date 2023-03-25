@@ -69,6 +69,7 @@ bool checkSettings(){
     objData["replace_name_with_hash"] = false;
     objData["replace_name_with_underscores"] = false;
     objData["show_download_url_button"] = false;
+    objData["download_finished_sound"] = true;
 
     QJsonObject history;
 

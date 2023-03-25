@@ -66,9 +66,12 @@ public:
     QHBoxLayout *horizontalLayout_7;
     QVBoxLayout *verticalLayout_4;
     QGridLayout *gridLayout_3;
-    QCheckBox *checkBox_6;
     QToolButton *toolButton_6;
     QSpacerItem *horizontalSpacer_17;
+    QCheckBox *checkBox_6;
+    QCheckBox *checkBox_7;
+    QSpacerItem *horizontalSpacer_3;
+    QToolButton *toolButton_7;
     QSpacerItem *verticalSpacer_13;
     QSpacerItem *verticalSpacer_4;
     QLabel *label;
@@ -264,12 +267,6 @@ public:
         verticalLayout_4->setObjectName("verticalLayout_4");
         gridLayout_3 = new QGridLayout();
         gridLayout_3->setObjectName("gridLayout_3");
-        checkBox_6 = new QCheckBox(tab_2);
-        checkBox_6->setObjectName("checkBox_6");
-        checkBox_6->setFocusPolicy(Qt::NoFocus);
-
-        gridLayout_3->addWidget(checkBox_6, 0, 0, 1, 1);
-
         toolButton_6 = new QToolButton(tab_2);
         toolButton_6->setObjectName("toolButton_6");
         toolButton_6->setMinimumSize(QSize(30, 25));
@@ -278,9 +275,30 @@ public:
 
         gridLayout_3->addWidget(toolButton_6, 0, 2, 1, 1);
 
-        horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_17 = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
 
         gridLayout_3->addItem(horizontalSpacer_17, 0, 1, 1, 1);
+
+        checkBox_6 = new QCheckBox(tab_2);
+        checkBox_6->setObjectName("checkBox_6");
+        checkBox_6->setFocusPolicy(Qt::NoFocus);
+
+        gridLayout_3->addWidget(checkBox_6, 0, 0, 1, 1);
+
+        checkBox_7 = new QCheckBox(tab_2);
+        checkBox_7->setObjectName("checkBox_7");
+
+        gridLayout_3->addWidget(checkBox_7, 1, 0, 1, 1);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::MinimumExpanding, QSizePolicy::Minimum);
+
+        gridLayout_3->addItem(horizontalSpacer_3, 1, 1, 1, 1);
+
+        toolButton_7 = new QToolButton(tab_2);
+        toolButton_7->setObjectName("toolButton_7");
+        toolButton_7->setMinimumSize(QSize(30, 25));
+
+        gridLayout_3->addWidget(toolButton_7, 1, 2, 1, 1);
 
 
         verticalLayout_4->addLayout(gridLayout_3);
@@ -377,8 +395,10 @@ public:
         pushButton_5->setText(QCoreApplication::translate("settingsDialog", "Zkontrolovat aktualizace", nullptr));
         label_2->setText(QCoreApplication::translate("settingsDialog", "Verze", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("settingsDialog", "Z\303\241kladn\303\255", nullptr));
-        checkBox_6->setText(QCoreApplication::translate("settingsDialog", "Tla\304\215\303\255tko pro zobrazen\303\255 odkazu", nullptr));
         toolButton_6->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
+        checkBox_6->setText(QCoreApplication::translate("settingsDialog", "Tla\304\215\303\255tko pro zobrazen\303\255 odkazu", nullptr));
+        checkBox_7->setText(QCoreApplication::translate("settingsDialog", "Povolit zvukovou notifikaci", nullptr));
+        toolButton_7->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("settingsDialog", "Pokro\304\215il\303\251", nullptr));
         label->setText(QCoreApplication::translate("settingsDialog", "Nastaven\303\255 nen\303\255 ulo\305\276eno", nullptr));
         pushButton_2->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255", nullptr));

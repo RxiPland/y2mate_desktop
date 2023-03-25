@@ -82,6 +82,8 @@ void settingsDialog::disableWidgets(bool disable)
     ui->toolButton_3->setDisabled(disable);
     ui->toolButton_4->setDisabled(disable);
     ui->toolButton_5->setDisabled(disable);
+    ui->toolButton_6->setDisabled(disable);
+    ui->toolButton_7->setDisabled(disable);
 }
 
 void settingsDialog::loadSettings()
@@ -203,6 +205,7 @@ bool settingsDialog::saveSettings()
                 loadedJson["replace_name_with_hash"] = settingsDialog::replaceNameWithHash;
                 loadedJson["replace_name_with_underscores"] = settingsDialog::replaceNameWithUnderscores;
                 loadedJson["show_download_url_button"] = settingsDialog::showDownloadUrlButton;
+                loadedJson["download_finished_sound"] = settingsDialog::downloadFinishedSound;
 
                 QJsonDocument docData(loadedJson);
 
@@ -266,6 +269,7 @@ void settingsDialog::on_pushButton_2_clicked()
     settingsDialog::replaceNameWithHash = false;
     settingsDialog::replaceNameWithUnderscores = false;
     settingsDialog::showDownloadUrlButton = false;
+    settingsDialog::downloadFinishedSound = true;
 
     ui->checkBox->setChecked(replaceNameWithHash);
     ui->checkBox_2->setChecked(replaceNameWithUnderscores);
@@ -277,6 +281,7 @@ void settingsDialog::on_pushButton_2_clicked()
     ui->checkBox_5->setChecked(checkForUpdates);
 
     ui->checkBox_6->setChecked(showDownloadUrlButton);
+    ui->checkBox_7->setChecked(downloadFinishedSound);
 
 
     settingsDialog::settingsChanged = true;
@@ -521,6 +526,18 @@ void settingsDialog::on_checkBox_6_clicked()
     }
 }
 
+void settingsDialog::on_checkBox_7_clicked()
+{
+    // download finished sound
+
+    settingsDialog::downloadFinishedSound = ui->checkBox_7->isChecked();
+
+    if(!settingsDialog::settingsChanged){
+        ui->label->setHidden(false);
+        settingsDialog::settingsChanged = true;
+    }
+}
+
 void settingsDialog::on_toolButton_clicked()
 {
     // help - replace with hash
@@ -557,3 +574,9 @@ void settingsDialog::on_toolButton_6_clicked()
     QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při stahování objeví tlačítko: \"zobrazit odkaz\"\n\nToto nastavení nijak neovlivňuje chování aplikace. Primárně je určeno expertům, kteří se zajímají o fungování programu.");
 }
 
+
+void settingsDialog::on_toolButton_7_clicked()
+{
+    // help - download finished sound notification
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při dokončeném stahování přehraje oznamovací zvuk.");
+}
