@@ -38,6 +38,7 @@ public:
     bool canceled = false;
     bool dialogOpen = false;
     bool finished = false;
+    bool closedWithButton = false; // (install / complete) button
 
 private slots:
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);

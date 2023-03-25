@@ -256,8 +256,8 @@ void searchVideoWindow::checkUpdate()
                     qApp->processEvents();
                 }
 
-                // download was canceled
-                if(dd.canceled){
+                // download was canceled or closed by X
+                if(dd.canceled || !dd.closedWithButton){
                     break;
 
                 } else{

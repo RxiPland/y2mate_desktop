@@ -138,6 +138,8 @@ void downloadDialog::on_pushButton_clicked()
     if(!buttonText.contains("Zrušit")){
         // everything OK
 
+        downloadDialog::closedWithButton = true;
+
     } else{
         downloadDialog::canceled = true;
 

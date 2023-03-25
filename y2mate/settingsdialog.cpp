@@ -421,8 +421,8 @@ void settingsDialog::on_pushButton_5_clicked()
                 }
                 this->show();
 
-                // download was canceled
-                if(dd.canceled){
+                // download was canceled or closed by X
+                if(dd.canceled || !dd.closedWithButton){
                     break;
 
                 } else{
