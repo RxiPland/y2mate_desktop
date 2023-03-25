@@ -217,16 +217,21 @@ void downloadDialog::httpFinished()
     // play sound if enabled
     if(downloadFinishedSound && canceled != true){
 
-        QSoundEffect effect;
-        effect.setSource(QUrl::fromLocalFile(QDir::currentPath() + "/Data/notification_sound.wav"));
+        QFile soundFile = QDir::currentPath() + "/Data/notification_sound.wav";
 
-        while(effect.status() == QSoundEffect::Loading){
-            qApp->processEvents();
-        }
-        effect.play();
+        if(soundFile.exists()){
+            QSoundEffect effect;
+            effect.setSource(QUrl::fromLocalFile(soundFile.fileName()));
+            effect.setVolume(0.5f);
 
-        while(effect.isPlaying()){
-            qApp->processEvents();
+            while(effect.status() == QSoundEffect::Loading){
+                qApp->processEvents();
+            }
+            effect.play();
+
+            while(effect.isPlaying()){
+                qApp->processEvents();
+            }
         }
     }
 
@@ -235,7 +240,6 @@ void downloadDialog::httpFinished()
         this->setWindowFlags(this->windowFlags() | Qt::WindowCloseButtonHint);
         this->show();
     }
-
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
