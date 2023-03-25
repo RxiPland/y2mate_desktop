@@ -103,6 +103,16 @@ void downloadVideoWindow::savePath()
                 return;
 
             } else{
+
+                lastSavePath.replace('\\', '/');
+
+                while(lastSavePath.endsWith('/')){
+                    QStringList temp;
+                    temp = lastSavePath.split('/');
+                    temp.pop_back();
+                    lastSavePath = temp.join('/');
+                }
+
                 loadedJson["last_path"] = downloadVideoWindow::lastSavePath;
                 QJsonDocument docData(loadedJson);
 

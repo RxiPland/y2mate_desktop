@@ -397,6 +397,16 @@ void searchVideoWindow::savePath(QString path)
                 return;
 
             } else{
+
+                path.replace('\\', '/');
+
+                while(path.endsWith('/')){
+                    QStringList temp;
+                    temp = path.split('/');
+                    temp.pop_back();
+                    path = temp.join('/');
+                }
+
                 loadedJson["last_path"] = path;
                 QJsonDocument docData(loadedJson);
 
@@ -408,6 +418,10 @@ void searchVideoWindow::savePath(QString path)
                     QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
                     return;
+                }
+
+                if(lastPathEnabled){
+                    lastSavePath = path;
                 }
             }
         }
