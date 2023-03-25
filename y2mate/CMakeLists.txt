@@ -88,3 +88,6 @@ target_link_libraries(y2mate PRIVATE Qt6::Network)
 
 find_package(Qt6 REQUIRED COMPONENTS Core5Compat)
 target_link_libraries(y2mate PRIVATE Qt6::Core5Compat)
+
+find_package(Qt6 REQUIRED COMPONENTS Multimedia)
+target_link_libraries(y2mate PRIVATE Qt6::Multimedia)

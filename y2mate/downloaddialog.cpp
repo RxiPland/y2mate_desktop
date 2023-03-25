@@ -11,6 +11,8 @@
 #include <QCloseEvent>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSoundEffect>
+
 
 downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
     QDialog(parent),
@@ -111,6 +113,7 @@ void downloadDialog::loadSettings()
 
                 downloadDialog::userAgent = loadedJson["user_agent"].toString().toUtf8();
                 downloadDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
+                downloadDialog::downloadFinishedSound = loadedJson["download_finished_sound"].toBool();
             }
         }
 
@@ -208,6 +211,23 @@ void downloadDialog::httpFinished()
     if(!otherDownload){
         ui->pushButton_2->setDisabled(false);
         ui->pushButton_4->setDisabled(false);
+    }
+
+
+    // play sound if enabled
+    if(downloadFinishedSound && canceled != true){
+
+        QSoundEffect effect;
+        effect.setSource(QUrl::fromLocalFile(QDir::currentPath() + "/Data/notification_sound.wav"));
+
+        while(effect.status() == QSoundEffect::Loading){
+            qApp->processEvents();
+        }
+        effect.play();
+
+        while(effect.isPlaying()){
+            qApp->processEvents();
+        }
     }
 
     downloadDialog::finished = true;
