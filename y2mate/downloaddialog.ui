@@ -7,11 +7,15 @@
     <x>0</x>
     <y>0</y>
     <width>259</width>
-    <height>271</height>
+    <height>275</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Stahování - probíhá</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/y2mate.ico</normaloff>:/images/y2mate.ico</iconset>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -377,6 +381,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

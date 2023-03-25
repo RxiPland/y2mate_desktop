@@ -10,6 +10,7 @@
 #define UI_DOWNLOADDIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QGridLayout>
@@ -56,7 +57,10 @@ public:
     {
         if (downloadDialog->objectName().isEmpty())
             downloadDialog->setObjectName("downloadDialog");
-        downloadDialog->resize(259, 271);
+        downloadDialog->resize(259, 275);
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/images/y2mate.ico"), QSize(), QIcon::Normal, QIcon::Off);
+        downloadDialog->setWindowIcon(icon);
         horizontalLayout = new QHBoxLayout(downloadDialog);
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
