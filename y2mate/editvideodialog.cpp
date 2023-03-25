@@ -394,11 +394,11 @@ void editVideoDialog::on_pushButton_3_clicked()
         } else{
             // file with this name may already exist
 
-            if(videoFile.exists()){
+            if(QFile(newFilePath).exists()){
                 QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
 
             } else{
-                QMessageBox::warning(this, "Chyba", "Nastala neznámá chyba! Nepodařilo se přejmenovat soubor");
+                QMessageBox::warning(this, "Chyba", "Kvůli neznámé chybě se soubor nepodařilo přejmenovat! Možná je soubor využíván jiným programem.");
             }
 
             editVideoDialog::disableWidgets(false);
