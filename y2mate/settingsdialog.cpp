@@ -132,6 +132,7 @@ void settingsDialog::loadSettings()
                 settingsDialog::replaceNameWithHash = loadedJson["replace_name_with_hash"].toBool();
                 settingsDialog::replaceNameWithUnderscores = loadedJson["replace_name_with_underscores"].toBool();
                 settingsDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
+                settingsDialog::downloadFinishedSound = loadedJson["download_finished_sound"].toBool();
 
                 lastSavePath.replace('\\', '/');
 
@@ -154,6 +155,7 @@ void settingsDialog::loadSettings()
                 ui->checkBox_5->setChecked(checkForUpdates);
 
                 ui->checkBox_6->setChecked(showDownloadUrlButton);
+                ui->checkBox_7->setChecked(downloadFinishedSound);
             }
         }
 
@@ -578,5 +580,5 @@ void settingsDialog::on_toolButton_6_clicked()
 void settingsDialog::on_toolButton_7_clicked()
 {
     // help - download finished sound notification
-    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při dokončeném stahování přehraje oznamovací zvuk.");
+    QMessageBox::information(this, "Nápověda", "Pokud bude povoleno, tak se při dokončeném stahování přehraje zvuková notifikace.");
 }
