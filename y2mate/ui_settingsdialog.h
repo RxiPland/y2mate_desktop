@@ -61,8 +61,7 @@ public:
     QHBoxLayout *horizontalLayout_5;
     QPushButton *pushButton_5;
     QSpacerItem *horizontalSpacer_14;
-    QLabel *label;
-    QSpacerItem *verticalSpacer_5;
+    QLabel *label_2;
     QWidget *tab_2;
     QHBoxLayout *horizontalLayout_7;
     QVBoxLayout *verticalLayout_4;
@@ -72,7 +71,7 @@ public:
     QSpacerItem *horizontalSpacer_17;
     QSpacerItem *verticalSpacer_13;
     QSpacerItem *verticalSpacer_4;
-    QLabel *label_2;
+    QLabel *label;
     QSpacerItem *verticalSpacer_3;
     QHBoxLayout *horizontalLayout_3;
     QPushButton *pushButton_2;
@@ -85,7 +84,7 @@ public:
     {
         if (settingsDialog->objectName().isEmpty())
             settingsDialog->setObjectName("settingsDialog");
-        settingsDialog->resize(503, 426);
+        settingsDialog->resize(428, 392);
         QIcon icon;
         icon.addFile(QString::fromUtf8(":/images/settings.ico"), QSize(), QIcon::Normal, QIcon::Off);
         settingsDialog->setWindowIcon(icon);
@@ -244,18 +243,14 @@ public:
 
         horizontalLayout_5->addItem(horizontalSpacer_14);
 
-        label = new QLabel(tab);
-        label->setObjectName("label");
-        label->setMinimumSize(QSize(0, 25));
+        label_2 = new QLabel(tab);
+        label_2->setObjectName("label_2");
+        label_2->setMinimumSize(QSize(0, 25));
 
-        horizontalLayout_5->addWidget(label);
+        horizontalLayout_5->addWidget(label_2);
 
 
         verticalLayout_3->addLayout(horizontalLayout_5);
-
-        verticalSpacer_5 = new QSpacerItem(20, 5, QSizePolicy::Minimum, QSizePolicy::Minimum);
-
-        verticalLayout_3->addItem(verticalSpacer_5);
 
 
         horizontalLayout_6->addLayout(verticalLayout_3);
@@ -301,22 +296,22 @@ public:
 
         verticalLayout->addWidget(tabWidget);
 
-        verticalSpacer_4 = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+        verticalSpacer_4 = new QSpacerItem(20, 10, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
 
         verticalLayout->addItem(verticalSpacer_4);
 
-        label_2 = new QLabel(settingsDialog);
-        label_2->setObjectName("label_2");
+        label = new QLabel(settingsDialog);
+        label->setObjectName("label");
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(label_2->sizePolicy().hasHeightForWidth());
-        label_2->setSizePolicy(sizePolicy);
+        sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy);
         QFont font1;
         font1.setPointSize(9);
-        label_2->setFont(font1);
+        label->setFont(font1);
 
-        verticalLayout->addWidget(label_2);
+        verticalLayout->addWidget(label);
 
         verticalSpacer_3 = new QSpacerItem(20, 8, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
@@ -380,12 +375,12 @@ public:
         toolButton_4->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         toolButton_5->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         pushButton_5->setText(QCoreApplication::translate("settingsDialog", "Zkontrolovat aktualizace", nullptr));
-        label->setText(QCoreApplication::translate("settingsDialog", "Verze", nullptr));
+        label_2->setText(QCoreApplication::translate("settingsDialog", "Verze", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QCoreApplication::translate("settingsDialog", "Z\303\241kladn\303\255", nullptr));
         checkBox_6->setText(QCoreApplication::translate("settingsDialog", "Tla\304\215\303\255tko pro zobrazen\303\255 odkazu", nullptr));
         toolButton_6->setText(QCoreApplication::translate("settingsDialog", "?", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QCoreApplication::translate("settingsDialog", "Pokro\304\215il\303\251", nullptr));
-        label_2->setText(QCoreApplication::translate("settingsDialog", "Nastaven\303\255 nen\303\255 ulo\305\276eno", nullptr));
+        label->setText(QCoreApplication::translate("settingsDialog", "Nastaven\303\255 nen\303\255 ulo\305\276eno", nullptr));
         pushButton_2->setText(QCoreApplication::translate("settingsDialog", "Defaultn\303\255", nullptr));
         pushButton_3->setText(QCoreApplication::translate("settingsDialog", "Zru\305\241it", nullptr));
         pushButton_4->setText(QCoreApplication::translate("settingsDialog", "Ulo\305\276it", nullptr));
