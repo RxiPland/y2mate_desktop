@@ -480,7 +480,6 @@ void editVideoDialog::on_pushButton_3_clicked()
     if(videoFile.exists()){
         QMessageBox::warning(this, "Chyba", "Soubor s tímto názvem již ve složce existuje!");
         editVideoDialog::disableWidgets(false);
-        editVideoDialog::running = false;
         return;
     }
 

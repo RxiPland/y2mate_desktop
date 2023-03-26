@@ -102,6 +102,7 @@ bool downloadVideoWindow::savePath()
             // File is empty
 
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+            disableWidgets(false);
 
             QProcess::startDetached(QApplication::applicationFilePath());
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -115,6 +116,7 @@ bool downloadVideoWindow::savePath()
                 // JSON is corrupted
 
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+                disableWidgets(false);
 
                 QProcess::startDetached(QApplication::applicationFilePath());
                 QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -141,6 +143,7 @@ bool downloadVideoWindow::savePath()
 
                 if (status == -1){
                     QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
+                    disableWidgets(false);
 
                     return false;
                 }
@@ -151,6 +154,7 @@ bool downloadVideoWindow::savePath()
         // file with settings not found
 
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+        disableWidgets(false);
 
         QProcess::startDetached(QApplication::applicationFilePath());
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -233,6 +237,7 @@ bool downloadVideoWindow::loadSettings()
             // File is empty
 
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+            disableWidgets(false);
 
             QProcess::startDetached(QApplication::applicationFilePath());
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -245,6 +250,7 @@ bool downloadVideoWindow::loadSettings()
                 // JSON is corrupted
 
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+                disableWidgets(false);
 
                 QProcess::startDetached(QApplication::applicationFilePath());
                 QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -268,6 +274,7 @@ bool downloadVideoWindow::loadSettings()
         // file with settings not found
 
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+        disableWidgets(false);
 
         QProcess::startDetached(QApplication::applicationFilePath());
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -282,15 +289,13 @@ void downloadVideoWindow::on_pushButton_2_clicked()
     // exit window (not app)
 
     exitApp = false;
-    running = false;
+    disableWidgets(false);
     this->close();
 }
 
 void downloadVideoWindow::on_pushButton_clicked()
 {
     // download video
-
-    running = true;
 
     downloadVideoWindow::disableWidgets();
 
@@ -313,8 +318,6 @@ void downloadVideoWindow::on_pushButton_clicked()
 
         QMessageBox::critical(this, "Chyba", "Nepodařilo se najít token pro stažení videa!");
         downloadVideoWindow::disableWidgets(false);
-
-        running = false;
         return;
     }
 
@@ -381,8 +384,6 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     if(filePath.isEmpty()){
         downloadVideoWindow::disableWidgets(false);
-
-        running = false;
         return;
 
     } else{
@@ -427,24 +428,21 @@ void downloadVideoWindow::on_pushButton_clicked()
     if(error == QNetworkReply::HostNotFoundError || error == QNetworkReply::UnknownNetworkError){
         // no internet connection available
 
-        disableWidgets(false);
         QMessageBox::critical(this, "Chyba", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("y2mate.com"));
+        disableWidgets(false);
 
         replyPost->deleteLater();
-
-        running = false;
         return;
 
     } else if (error != QNetworkReply::NetworkError::NoError){
         // an unknown error occured
 
-        disableWidgets(false);
         const QString &errorString = replyPost->errorString();
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
 
-        replyPost->deleteLater();
+        disableWidgets(false);
 
-        running = false;
+        replyPost->deleteLater();
         return;
     }
 
@@ -460,10 +458,9 @@ void downloadVideoWindow::on_pushButton_clicked()
     }
 
     if(downloadLink.isEmpty()){
-        disableWidgets(false);
         QMessageBox::critical(this, "Chyba", QString("Nepodařilo se získat odkaz na stažení souboru! Server vrátil:\n\n%1").arg(response));
 
-        running = false;
+        disableWidgets(false);
         return;
     }
 
@@ -475,7 +472,7 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     bool loaded = dd.loadSettings();
     if (!loaded){
-        running = false;
+        disableWidgets(false);
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
         return;
 
@@ -514,7 +511,7 @@ void downloadVideoWindow::on_pushButton_clicked()
 
 
     exitApp = false;
-    running = false;
+    disableWidgets(false);
     this->close();
 }
 
