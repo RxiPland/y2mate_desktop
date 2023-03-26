@@ -42,7 +42,7 @@ void downloadDialog::startDownload()
         ui->pushButton_5->setHidden(true);
     }
 
-    downloadDialog::finished = false;
+    downloadDialog::running = true;
 
     if(otherDownload){
         ui->pushButton_2->setHidden(true);
@@ -55,6 +55,8 @@ void downloadDialog::startDownload()
     file = openFileForWrite(downloadDialog::filePath);
     if (!file){
         QMessageBox::critical(this, "Problém", "Nastal problém při otevírání souboru.\n\n" + downloadDialog::filePath);
+
+        downloadDialog::running = false;
         return;
     }
 
@@ -149,7 +151,7 @@ void downloadDialog::on_pushButton_clicked()
         }
     }
 
-    finished = true;
+    running = false;
     this->close();
 }
 
@@ -238,7 +240,7 @@ void downloadDialog::httpFinished()
         }
     }
 
-    downloadDialog::finished = true;
+    downloadDialog::running = false;
 }
 
 void downloadDialog::downloadProgress(qint64 ist, qint64 max)
@@ -264,7 +266,7 @@ std::unique_ptr<QFile> downloadDialog::openFileForWrite(const QString &fileName)
 
 void downloadDialog::closeEvent(QCloseEvent *bar)
 {
-    if(!downloadDialog::finished && !downloadDialog::canceled){
+    if(downloadDialog::running && !downloadDialog::canceled){
 
         if(bar != nullptr){
             bar->ignore();

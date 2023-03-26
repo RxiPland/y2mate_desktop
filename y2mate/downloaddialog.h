@@ -36,7 +36,7 @@ public:
     QString customFinishMessage;
 
     bool canceled = false;
-    bool finished = false;
+    bool running = false;
     bool closedWithButton = false; // (install / complete) button
 
 private slots:
