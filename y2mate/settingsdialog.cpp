@@ -379,7 +379,7 @@ void settingsDialog::on_pushButton_5_clicked()
         QMessageBox msgBox;
         msgBox.setWindowTitle("Aktualizace");
         msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nDostupná verze: " + newestVersion + "\nVaše verze: " + appVersion  +"\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
+        msgBox.setText("Je dostupná novější verze y2mate desktop.\n\nVaše verze: " + appVersion  + "\nDostupná verze: " + newestVersion + "\n\nPři instalaci nové verze se předchozí automaticky odstraní.");
 
         QAbstractButton* pButtonYes = msgBox.addButton("  Nainstalovat  ", QMessageBox::YesRole);
         msgBox.addButton("Zrušit", QMessageBox::YesRole);
