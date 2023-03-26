@@ -57,6 +57,8 @@ private:
 
     void closeEvent(QCloseEvent *bar = nullptr);
 
+    bool ffmpegExists();
+
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);
     bool saveToHistory(QString videoName, QString videoDuration, QString videoUrl);

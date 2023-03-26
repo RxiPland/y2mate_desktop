@@ -58,6 +58,63 @@ void searchVideoWindow::closeEvent(QCloseEvent *bar)
     }
 }
 
+bool searchVideoWindow::ffmpegExists()
+{
+    QString ffmpegPath = QDir::currentPath() + "/Data/ffmpeg.exe";
+
+    if (QFile::exists(ffmpegPath)){
+        // OK
+        return true;
+
+    } else{
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Upozornění");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Program FFmpeg.exe pro úpravu videí nebyl nalezen. Chcete jej stáhnout?");
+        QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        msgBox.addButton(" Odejít ", QMessageBox::YesRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() != pButtonYes){
+            // exit / cancel
+            return false;
+        }
+
+        // open download dialog
+        downloadDialog dd(nullptr, true);
+        dd.otherDownload = true;
+        dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
+        dd.filePath = ffmpegPath;
+
+        bool loaded = dd.loadSettings();
+        if (!loaded){
+            running = false;
+            return false;
+
+        } else{
+            dd.show();
+        }
+
+        dd.startDownload();
+
+        // wait for close
+        while(!dd.closed){
+            qApp->processEvents();
+        }
+
+        // download was canceled
+        if(dd.canceled){
+           return false;
+
+        } else{
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 bool searchVideoWindow::loadSettings()
 {
     QLabel *label = new QLabel("Načítám nastavení ...   ");
@@ -933,6 +990,11 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     // open video/audio file for edit
 
     searchVideoWindow::disableWidgets();
+
+    if(!ffmpegExists()){
+        searchVideoWindow::disableWidgets(false);
+        return;
+    }
 
     QString filePath;
     filePath = QFileDialog::getOpenFileName(this, "Otevřít soubor", lastSavePath, "Soubory (*.mp3 *.mp4 *.wav *.ogg *.flac);;Všechny soubory (*.*)").replace("\\", "/");

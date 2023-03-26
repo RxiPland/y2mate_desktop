@@ -314,6 +314,11 @@ void downloadDialog::on_pushButton_4_clicked()
 {
     // edit video button
 
+    if(!ffmpegExists()){
+        running = false;
+        return;
+    }
+
     editVideoDialog evd(nullptr, true);
     evd.filePath = downloadDialog::filePath;
     evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
@@ -390,5 +395,64 @@ void downloadDialog::on_pushButton_5_clicked()
         QClipboard* clipboard = QApplication::clipboard();
         clipboard->setText(downloadDialog::downloadLink);
     }
+}
+
+bool downloadDialog::ffmpegExists()
+{
+
+    QString ffmpegPath = QDir::currentPath() + "/Data/ffmpeg.exe";
+
+    if (QFile::exists(ffmpegPath)){
+        // OK
+        return true;
+
+    } else{
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Upozornění");
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Program FFmpeg.exe pro úpravu videí nebyl nalezen. Chcete jej stáhnout?");
+        QAbstractButton* pButtonYes = msgBox.addButton(" Ano ", QMessageBox::YesRole);
+        msgBox.addButton(" Odejít ", QMessageBox::YesRole);
+        msgBox.exec();
+
+        if (msgBox.clickedButton() != pButtonYes){
+            // exit / cancel
+            return false;
+        }
+
+        // open download dialog
+        downloadDialog dd(nullptr, true);
+        dd.otherDownload = true;
+        dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
+        dd.filePath = ffmpegPath;
+
+        bool loaded = dd.loadSettings();
+        if (!loaded){
+            running = false;
+            return false;
+
+        } else{
+            this->hide();
+            dd.show();
+        }
+
+        dd.startDownload();
+
+        // wait for close
+        while(!dd.closed){
+            qApp->processEvents();
+        }
+        this->show();
+
+        // download was canceled
+        if(dd.canceled){
+           return false;
+
+        } else{
+            return true;
+        }
+    }
+
+    return false;
 }
 

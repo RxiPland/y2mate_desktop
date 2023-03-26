@@ -60,6 +60,8 @@ private:
     QNetworkAccessManager manager;
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply;
 
+    bool ffmpegExists();
+
 };
 
 #endif // DOWNLOADDIALOG_H
