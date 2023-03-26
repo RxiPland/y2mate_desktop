@@ -788,6 +788,15 @@ void searchVideoWindow::on_pushButton_clicked()
     dvw.mp3Qualities = mp3Qualities;
     dvw.mp4Qualities = mp4Qualities;
 
+    bool loaded = dvw.loadSettings();
+    if (!loaded){
+        searchVideoWindow::disableWidgets(false);
+        return;
+
+    } else{
+        dvw.show();
+    }
+
     this->hide();
     // set data to widgets
     dvw.loadData();
@@ -806,7 +815,13 @@ void searchVideoWindow::on_pushButton_clicked()
         return;
     }
 
-    bool loaded = searchVideoWindow::loadSettings();
+    if(QFile(QDir::currentPath() + "/Data/data.json").exists()){
+        loaded = searchVideoWindow::loadSettings();
+
+    } else{
+        loaded = false;
+    }
+
 
     disableWidgets(false);
     if(!loaded){

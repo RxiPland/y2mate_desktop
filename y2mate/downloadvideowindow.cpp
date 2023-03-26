@@ -21,8 +21,6 @@ downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));
 
-    downloadVideoWindow::loadSettings();
-
     this->show();
 }
 
@@ -377,7 +375,6 @@ void downloadVideoWindow::on_pushButton_clicked()
         videoName.replace(" ", "_");
     }
 
-
     // get path for saving file
     QString filePath;
     filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", lastSavePath + videoName, fileExtension).replace("\\", "/");
@@ -470,9 +467,8 @@ void downloadVideoWindow::on_pushButton_clicked()
         return;
     }
 
-
     // open download dialog
-    downloadDialog dd(nullptr, true);
+    downloadDialog dd(nullptr, true, videoName);
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;
     dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
