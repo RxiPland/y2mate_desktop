@@ -136,6 +136,16 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
 {
     // before close
 
+    /*
+    if(editVideoDialog::running){
+
+        if(bar != nullptr){
+            bar->ignore();
+        }
+        return;
+    }
+    */
+
     terminated = true;
 
     if(process.state() == QProcess::Running){

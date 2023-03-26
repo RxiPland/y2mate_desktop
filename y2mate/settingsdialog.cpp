@@ -38,6 +38,14 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
 {
     // Before application close
 
+    if(settingsDialog::running){
+        if(bar != nullptr){
+            bar->ignore();
+        }
+        return;
+    }
+
+
     if(settingsChanged){
 
         QMessageBox msgBox;
