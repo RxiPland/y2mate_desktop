@@ -15,11 +15,14 @@
 #include <QApplication>
 
 
-downloadDialog::downloadDialog(QWidget *parent, bool hidden) :
+downloadDialog::downloadDialog(QWidget *parent, bool hidden, QString fileName) :
     QDialog(parent),
     ui(new Ui::downloadDialog)
 {
     ui->setupUi(this);
+
+    ui->label_2->setText(fileName);
+
     this->setWindowFlags(Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowFlags(windowFlags() &(~Qt::WindowMinimizeButtonHint));
     this->setWindowFlags(windowFlags() &(~Qt::WindowMaximizeButtonHint));

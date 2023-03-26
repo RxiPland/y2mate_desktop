@@ -15,7 +15,7 @@ class downloadDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit downloadDialog(QWidget *parent = nullptr, bool hidden = false);
+    explicit downloadDialog(QWidget *parent = nullptr, bool hidden = false, QString fileName = "");
     ~downloadDialog();
 
     void startDownload();
