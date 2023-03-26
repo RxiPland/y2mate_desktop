@@ -16,7 +16,7 @@ public:
     searchVideoWindow(QWidget *parent = nullptr, bool jsonCorrupted = false);
     ~searchVideoWindow();
 
-    void loadSettings();
+    bool loadSettings();
     void checkUpdate();
 
     QString appVersion;
@@ -59,8 +59,8 @@ private:
 
     void disableWidgets(bool disable = true);
     void sortQualities(QStringList *list);
-    void saveToHistory(QString videoName, QString videoDuration, QString videoUrl);
-    void savePath(QString path);
+    bool saveToHistory(QString videoName, QString videoDuration, QString videoUrl);
+    bool savePath(QString path);
     QJsonObject getVideoFromHistory(QString index);
 
 };

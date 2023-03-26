@@ -22,6 +22,7 @@ public:
     bool settingsChanged = false;
 
     bool closed = false;
+    bool running = false;
 
 
 private slots:

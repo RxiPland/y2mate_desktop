@@ -15,7 +15,7 @@
 #include <QApplication>
 
 
-editVideoDialog::editVideoDialog(QWidget *parent) :
+editVideoDialog::editVideoDialog(QWidget *parent, bool hidden) :
     QDialog(parent),
     ui(new Ui::editVideoDialog)
 {
@@ -24,7 +24,10 @@ editVideoDialog::editVideoDialog(QWidget *parent) :
     this->setWindowModality(Qt::ApplicationModal);
 
     ui->comboBox->setDuplicatesEnabled(false);
-    this->show();
+
+    if(!hidden){
+        this->show();
+    }
 }
 
 editVideoDialog::~editVideoDialog()
@@ -72,7 +75,7 @@ void editVideoDialog::loadData()
     ui->timeEdit_2->setTime(QTime(0,0,0,0).addMSecs(videoDurationMiliSec));
 }
 
-void editVideoDialog::loadSettings()
+bool editVideoDialog::loadSettings()
 {
     // load settings to variables
 
@@ -90,9 +93,9 @@ void editVideoDialog::loadSettings()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
 
-            QApplication::quit();
-            return;
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -103,9 +106,9 @@ void editVideoDialog::loadSettings()
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
 
-                QApplication::quit();
-                return;
+                return false;
 
             } else{
                 // everything OK
@@ -121,10 +124,12 @@ void editVideoDialog::loadSettings()
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
 
-        QApplication::quit();
-        return;
+        return false;
     }
+
+    return true;
 }
 
 void editVideoDialog::closeEvent(QCloseEvent *bar)
@@ -153,6 +158,8 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
 void editVideoDialog::disableWidgets(bool disable)
 {
     // disable widgets
+
+    editVideoDialog::running = disable;
 
     ui->comboBox->setDisabled(disable);
     ui->lineEdit->setDisabled(disable);
@@ -186,11 +193,19 @@ bool editVideoDialog::ffmpegExists()
         }
 
         // open download dialog
-        downloadDialog dd;
+        downloadDialog dd(nullptr, true);
         dd.otherDownload = true;
         dd.downloadLink = "https://github.com/RxiPland/y2mate_desktop/releases/download/v1.8.0/ffmpeg.exe";
         dd.filePath = ffmpegPath;
-        dd.loadSettings();
+
+        bool loaded = dd.loadSettings();
+        if (!loaded){
+            running = false;
+            return false;
+
+        } else{
+            dd.show();
+        }
 
         dd.startDownload();
 

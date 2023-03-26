@@ -79,6 +79,8 @@ void downloadVideoWindow::disableWidgets(bool disable)
 {
     // disable widgets
 
+    downloadVideoWindow::running = disable;
+
     ui->comboBox->setDisabled(disable);
     ui->comboBox_2->setDisabled(disable);
 
@@ -86,7 +88,7 @@ void downloadVideoWindow::disableWidgets(bool disable)
     ui->pushButton_2->setDisabled(disable);
 }
 
-void downloadVideoWindow::savePath()
+bool downloadVideoWindow::savePath()
 {
     // save last path to settings file
 
@@ -101,8 +103,12 @@ void downloadVideoWindow::savePath()
         if(fileContent.isEmpty()){
             // File is empty
 
-            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
-            return;
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -110,8 +116,12 @@ void downloadVideoWindow::savePath()
             if(loadedJson.isEmpty()){
                 // JSON is corrupted
 
-                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
-                return;
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+
+                return false;
 
             } else{
 
@@ -134,7 +144,7 @@ void downloadVideoWindow::savePath()
                 if (status == -1){
                     QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
-                    return;
+                    return false;
                 }
             }
         }
@@ -142,9 +152,15 @@ void downloadVideoWindow::savePath()
     } else{
         // file with settings not found
 
-        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
-        return;
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+
+        return false;
     }
+
+    return true;
 }
 
 void downloadVideoWindow::loadData()
@@ -203,7 +219,7 @@ void downloadVideoWindow::loadData()
     sortQualities(&mp4QualitiesKeysSorted);
 }
 
-void downloadVideoWindow::loadSettings()
+bool downloadVideoWindow::loadSettings()
 {
     // load settings from file to variables
 
@@ -221,9 +237,8 @@ void downloadVideoWindow::loadSettings()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            QApplication::quit();
-            return;
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -234,9 +249,8 @@ void downloadVideoWindow::loadSettings()
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
-
-                QApplication::quit();
-                return;
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+                return false;
 
             } else{
                 // everything OK
@@ -258,10 +272,11 @@ void downloadVideoWindow::loadSettings()
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
-
-        QApplication::quit();
-        return;
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return false;
     }
+
+    return true;
 }
 
 void downloadVideoWindow::on_pushButton_2_clicked()
@@ -457,11 +472,20 @@ void downloadVideoWindow::on_pushButton_clicked()
 
 
     // open download dialog
-    downloadDialog dd;
+    downloadDialog dd(nullptr, true);
     dd.downloadLink = downloadLink;
     dd.filePath = filePath;
     dd.videoDurationMiliSec = downloadVideoWindow::videoDuration*1000;
-    dd.loadSettings();
+
+    bool loaded = dd.loadSettings();
+    if (!loaded){
+        running = false;
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return;
+
+    } else{
+        dd.show();
+    }
 
     dd.startDownload();
 
@@ -472,16 +496,26 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     // save last path to file with settings if enabled
     if(lastPathEnabled){
-        downloadVideoWindow::savePath();
+
+        bool saved = false;
+
+        if(QFile(QDir::currentPath() + "/Data/data.json").exists()){
+            saved = downloadVideoWindow::savePath();
+        }
+
+        if(!saved){
+            disableWidgets(false);
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+            return;
+        }
     }
 
     // download was canceled
     if(dd.canceled){
        disableWidgets(false);
-
-       running = false;
        return;
     }
+
 
     exitApp = false;
     running = false;

@@ -58,7 +58,7 @@ void searchVideoWindow::closeEvent(QCloseEvent *bar)
     }
 }
 
-void searchVideoWindow::loadSettings()
+bool searchVideoWindow::loadSettings()
 {
     QLabel *label = new QLabel("Načítám nastavení ...   ");
     ui->statusBar->addWidget(label);
@@ -78,7 +78,7 @@ void searchVideoWindow::loadSettings()
 
             QProcess::startDetached(QApplication::applicationFilePath());
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-            return;
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -90,7 +90,7 @@ void searchVideoWindow::loadSettings()
 
                 QProcess::startDetached(QApplication::applicationFilePath());
                 QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-                return;
+                return false;
 
             } else{
                 // everything OK
@@ -182,6 +182,8 @@ void searchVideoWindow::loadSettings()
     }
 
     ui->statusBar->removeWidget(label);
+
+    return true;
 }
 
 void searchVideoWindow::checkUpdate()
@@ -190,8 +192,6 @@ void searchVideoWindow::checkUpdate()
     if(!searchVideoWindow::checkForUpdates){
         return;
     }
-
-    running = true;
 
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
@@ -206,7 +206,8 @@ void searchVideoWindow::checkUpdate()
     }
 
     if(replyGet->error() != QNetworkReply::NoError){
-        running = false;
+
+        searchVideoWindow::disableWidgets(false);
         return;
     }
 
@@ -234,7 +235,13 @@ void searchVideoWindow::checkUpdate()
         dd.otherDownload = true;
         dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
         dd.customFinishMessage = "Nainstalovat";
-        dd.loadSettings();
+
+        bool loaded = dd.loadSettings();
+        if (!loaded){
+
+            searchVideoWindow::disableWidgets(false);
+            return;
+        }
 
         QDir downloadFolder(QDir::homePath() + "/Downloads/");
         QString folderPath;
@@ -279,34 +286,34 @@ void searchVideoWindow::checkUpdate()
 
                 // download was canceled or closed by X
                 if(dd.canceled || !dd.closedWithButton){
-                    running = false;
                     break;
 
                 } else{
                     // download was successfull
                     // run setup file
 
+                    searchVideoWindow::disableWidgets(false);
+
                     QProcess::startDetached(dd.filePath);
                     QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-                    running = false;
                     return;
                 }
 
             } else{
                 // exit update
 
-                running = false;
                 break;
             }
         }
     }
 
-    running = false;
     searchVideoWindow::disableWidgets(false);
 }
 
 void searchVideoWindow::disableWidgets(bool disable)
 {
+    searchVideoWindow::running = disable;
+
     ui->lineEdit->setDisabled(disable);
     ui->lineEdit->setClearButtonEnabled(!disable);
     ui->pushButton->setDisabled(disable);
@@ -316,7 +323,7 @@ void searchVideoWindow::disableWidgets(bool disable)
     ui->menu_3->menuAction()->setDisabled(disable);
 }
 
-void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, QString videoUrl)
+bool searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, QString videoUrl)
 {
     // save searched video to settings file
 
@@ -331,8 +338,11 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
         if(fileContent.isEmpty()){
             // File is empty
 
-            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Při příštím zapnutí programu bude problém vyřešen.");
-            return;
+            QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
+
+            QProcess::startDetached(QApplication::applicationFilePath());
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -340,8 +350,11 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
             if(loadedJson.isEmpty()){
                 // JSON is corrupted
 
-                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Při příštím zapnutí programu bude problém vyřešen.");
-                return;
+                QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+                QProcess::startDetached(QApplication::applicationFilePath());
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+                return false;
 
             } else{
                 // make space for new record
@@ -372,7 +385,7 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
                     if (status == -1){
                         QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
-                        return;
+                        return false;
                     }
                 }
             }
@@ -381,12 +394,17 @@ void searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, 
     } else{
         // file with settings not found
 
-        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Při příštím zapnutí programu bude problém vyřešen.");
-        return;
+        QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        QProcess::startDetached(QApplication::applicationFilePath());
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return false;
     }
+
+    return true;
 }
 
-void searchVideoWindow::savePath(QString path)
+bool searchVideoWindow::savePath(QString path)
 {
     // save path to settings
 
@@ -404,9 +422,8 @@ void searchVideoWindow::savePath(QString path)
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-            return;
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -417,9 +434,8 @@ void searchVideoWindow::savePath(QString path)
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
-
                 QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-                return;
+                return false;
 
             } else{
 
@@ -442,7 +458,7 @@ void searchVideoWindow::savePath(QString path)
                 if (status == -1){
                     QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
-                    return;
+                    return false;
                 }
 
                 if(lastPathEnabled){
@@ -457,10 +473,11 @@ void searchVideoWindow::savePath(QString path)
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
-
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
-        return;
+        return false;
     }
+
+    return true;
 }
 
 QJsonObject searchVideoWindow::getVideoFromHistory(QString index)
@@ -538,8 +555,6 @@ void searchVideoWindow::on_pushButton_clicked()
 {
     // search video button
 
-    running = true;
-
     searchVideoWindow::disableWidgets();
     QString videoUrl = ui->lineEdit->text().trimmed();
 
@@ -553,8 +568,6 @@ void searchVideoWindow::on_pushButton_clicked()
 
         searchVideoWindow::disableWidgets(false);
         ui->lineEdit->setFocus();
-
-        running = false;
         return;
 
     } else if (!rx.exactMatch(videoUrl)){
@@ -563,8 +576,6 @@ void searchVideoWindow::on_pushButton_clicked()
 
         searchVideoWindow::disableWidgets(false);
         ui->lineEdit->setFocus();
-
-        running = false;
         return;
     }
 
@@ -605,20 +616,18 @@ void searchVideoWindow::on_pushButton_clicked()
     if(error == QNetworkReply::HostNotFoundError || error == QNetworkReply::UnknownNetworkError){
         // no internet connection available
 
-        disableWidgets(false);
         QMessageBox::critical(this, "Chyba", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("y2mate.com"));
 
-        running = false;
+        disableWidgets(false);
         return;
 
     } else if (error != QNetworkReply::NetworkError::NoError){
         // an unknown error occured
 
-        disableWidgets(false);
         const QString &errorString = replyPost->errorString();
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba při komunikaci s webem!\n\nChyba: %1").arg(errorString));
 
-        running = false;
+        disableWidgets(false);
         return;
     }
 
@@ -634,17 +643,15 @@ void searchVideoWindow::on_pushButton_clicked()
     if (status != "ok"){
 
         QMessageBox::warning(this, "Chyba", QString("Nastala chyba! y2mate vrátil:\n\n%1").arg(response));
-        disableWidgets(false);
 
-        running = false;
+        disableWidgets(false);
         return;
 
     } else if (message.contains("Please enter valid video URL.") || message.contains("Sorry! An error has occurred.")){
 
         QMessageBox::warning(this, "Chyba", "Video pod tímto odkazem neexistuje!");
-        disableWidgets(false);
 
-        running = false;
+        disableWidgets(false);
         return;
 
     } else if (message.isEmpty()){
@@ -652,9 +659,8 @@ void searchVideoWindow::on_pushButton_clicked()
 
     } else{
         QMessageBox::warning(this, "Chyba", QString("Nastala neznámá chyba! Server vrátil:\n\n%1").arg(response));
-        disableWidgets(false);
 
-        running = false;
+        disableWidgets(false);
         return;
     }
 
@@ -685,37 +691,37 @@ void searchVideoWindow::on_pushButton_clicked()
 
     QString ytChannel = loadedJson["a"].toString();
     if(ytChannel.isEmpty()){
-        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název youtube kanálu z odpovědi serveru!");
-        disableWidgets(false);
 
-        running = false;
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název youtube kanálu z odpovědi serveru!");
+
+        disableWidgets(false);
         return;
     }
 
     qint64 videoDuration = loadedJson["t"].toInt();
     if(videoDuration == 0){
-        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat délku videa z odpovědi serveru!");
-        disableWidgets(false);
 
-        running = false;
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat délku videa z odpovědi serveru!");
+
+        disableWidgets(false);
         return;
     }
 
     QString videoId = loadedJson["vid"].toString();
     if(videoId.isEmpty()){
-        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat ID videa z odpovědi serveru!");
-        disableWidgets(false);
 
-        running = false;
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat ID videa z odpovědi serveru!");
+
+        disableWidgets(false);
         return;
     }
 
     QString videoName = loadedJson["title"].toString();
     if(videoId.isEmpty()){
-        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název videa z odpovědi serveru!");
-        disableWidgets(false);
 
-        running = false;
+        QMessageBox::warning(this, "Chyba", "Nepodařilo se získat název videa z odpovědi serveru!");
+
+        disableWidgets(false);
         return;
     }
     videoName = videoName.trimmed();
@@ -764,7 +770,12 @@ void searchVideoWindow::on_pushButton_clicked()
 
     // save to history if enabled
     if(searchVideoWindow::allowHistory){
-        searchVideoWindow::saveToHistory(videoName, timeDuration, videoUrl);
+        bool saved = searchVideoWindow::saveToHistory(videoName, timeDuration, videoUrl);
+
+        if(!saved){
+            disableWidgets(false);
+            return;
+        }
     }
 
     downloadVideoWindow dvw(nullptr);
@@ -789,17 +800,19 @@ void searchVideoWindow::on_pushButton_clicked()
     // exit if pressed X
     if(dvw.exitApp){
         qApp->setQuitOnLastWindowClosed(true);
+        searchVideoWindow::disableWidgets(false);
 
-        running = false;
         this->close();
         return;
     }
 
-    searchVideoWindow::loadSettings();
-
-    running = false;
+    bool loaded = searchVideoWindow::loadSettings();
 
     disableWidgets(false);
+    if(!loaded){
+        return;
+    }
+
     ui->lineEdit->clear();
     this->show();
 }
@@ -840,6 +853,8 @@ void searchVideoWindow::on_action_menu2_6_triggered()
 
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
+            disableWidgets(false);
+
             QProcess::startDetached(QApplication::applicationFilePath());
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
             return;
@@ -851,6 +866,8 @@ void searchVideoWindow::on_action_menu2_6_triggered()
             // JSON cannot be loaded
 
             QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
+
+            disableWidgets(false);
 
             QProcess::startDetached(QApplication::applicationFilePath());
             QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -875,6 +892,7 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         if (status == -1){
             QMessageBox::critical(this, "Chyba", "Nastala neznámá chyba při zapisování do souboru s nastavením!\n\n" + dataFile.fileName());
 
+            disableWidgets(false);
             return;
         }
 
@@ -884,6 +902,8 @@ void searchVideoWindow::on_action_menu2_6_triggered()
         // file with settings not found
 
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
+
+        disableWidgets(false);
 
         QProcess::startDetached(QApplication::applicationFilePath());
         QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
@@ -965,11 +985,22 @@ void searchVideoWindow::on_action_menu3_1_triggered()
         return;
     }
 
-    editVideoDialog evd;
+    editVideoDialog evd(nullptr, true);
     evd.startedFromSeachMenu = true;
     evd.filePath = filePath;
     evd.videoDurationMiliSec = totalMiliSeconds;
-    evd.loadSettings();
+
+    bool loaded = evd.loadSettings();
+    if (!loaded){
+        disableWidgets(false);
+
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return;
+
+    } else{
+        evd.show();
+    }
+
     evd.loadData();
 
     // wait for close
@@ -981,7 +1012,12 @@ void searchVideoWindow::on_action_menu3_1_triggered()
         QStringList path = evd.originalPath.replace('\\', '/').split('/');
         path.pop_back();
 
-        searchVideoWindow::savePath(path.join('/'));
+        bool saved = searchVideoWindow::savePath(path.join('/'));
+
+        if(!saved){
+            disableWidgets(false);
+            return;
+        }
     }
 
     if(evd.running){

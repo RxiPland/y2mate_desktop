@@ -75,7 +75,7 @@ void downloadDialog::startDownload()
     connect(reply.get(), &QNetworkReply::downloadProgress,this, &downloadDialog::downloadProgress);
 }
 
-void downloadDialog::loadSettings()
+bool downloadDialog::loadSettings()
 {
     // load settings to variables
 
@@ -93,9 +93,8 @@ void downloadDialog::loadSettings()
             QMessageBox::critical(this, "Chyba", "Soubor s nastavením je prázdný! Program bude restartován pro opravu.");
 
             QProcess::startDetached(QApplication::applicationFilePath());
-
-            QApplication::quit();
-            return;
+            QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+            return false;
 
         } else{
             QJsonObject loadedJson = QJsonDocument::fromJson(fileContent).object();
@@ -106,9 +105,8 @@ void downloadDialog::loadSettings()
                 QMessageBox::critical(this, "Chyba", "JSON v souboru s nastavením je poškozený! Program bude restartován pro opravu.");
 
                 QProcess::startDetached(QApplication::applicationFilePath());
-
-                QApplication::quit();
-                return;
+                QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+                return false;
 
             } else{
                 // everything OK
@@ -116,6 +114,8 @@ void downloadDialog::loadSettings()
                 downloadDialog::userAgent = loadedJson["user_agent"].toString().toUtf8();
                 downloadDialog::showDownloadUrlButton = loadedJson["show_download_url_button"].toBool();
                 downloadDialog::downloadFinishedSound = loadedJson["download_finished_sound"].toBool();
+
+                return true;
             }
         }
 
@@ -125,9 +125,8 @@ void downloadDialog::loadSettings()
         QMessageBox::critical(this, "Chyba", "Soubor s nastavením neexistuje! Program bude restartován pro opravu.");
 
         QProcess::startDetached(QApplication::applicationFilePath());
-
-        QApplication::quit();
-        return;
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return false;
     }
 }
 
@@ -312,10 +311,20 @@ void downloadDialog::on_pushButton_4_clicked()
 {
     // edit video button
 
-    editVideoDialog evd;
+    editVideoDialog evd(nullptr, true);
     evd.filePath = downloadDialog::filePath;
     evd.videoDurationMiliSec = downloadDialog::videoDurationMiliSec;
-    evd.loadSettings();
+
+    bool loaded = evd.loadSettings();
+    if (!loaded){
+        running = false;
+        QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+        return;
+
+    } else{
+        evd.show();
+    }
+
     this->hide();
     evd.loadData();
 

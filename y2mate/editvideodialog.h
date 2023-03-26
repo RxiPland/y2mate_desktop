@@ -14,12 +14,12 @@ class editVideoDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit editVideoDialog(QWidget *parent = nullptr);
+    explicit editVideoDialog(QWidget *parent = nullptr, bool hidden = false);
     ~editVideoDialog();
 
     bool dataLoaded = false;
     void loadData();
-    void loadSettings();
+    bool loadSettings();
 
     bool closed = false;
 

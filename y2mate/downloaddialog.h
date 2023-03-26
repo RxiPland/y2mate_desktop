@@ -21,7 +21,7 @@ public:
     void startDownload();
     bool otherDownload = false;
 
-    void loadSettings();
+    bool loadSettings();
 
     bool closed = false;
 

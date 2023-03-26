@@ -18,7 +18,7 @@ public:
     ~downloadVideoWindow();
 
     void loadData();
-    void loadSettings();
+    bool loadSettings();
 
     bool closed = false;
     bool running = false;
@@ -60,7 +60,7 @@ private:
 
     void sortQualities(QStringList *list);
     void disableWidgets(bool disable = true);
-    void savePath();
+    bool savePath();
 };
 
 #endif // DOWNLOADVIDEOWINDOW_H

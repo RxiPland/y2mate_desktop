@@ -72,6 +72,8 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
 
 void settingsDialog::disableWidgets(bool disable)
 {
+    settingsDialog::running = disable;
+
     ui->pushButton_2->setDisabled(disable);
     ui->pushButton_3->setDisabled(disable);
     ui->pushButton_4->setDisabled(disable);
@@ -345,12 +347,14 @@ void settingsDialog::on_pushButton_5_clicked()
 
         QMessageBox::critical(this, "Aktualizace", QString("Nelze se připojit k internetu nebo server (%1) není dostupný!").arg("api.github.com"));
         settingsDialog::disableWidgets(false);
+
         return;
 
     } else if (error != QNetworkReply::NoError){
-        QMessageBox::critical(this, "Aktualizace", QString("Nastala chyba: %1").arg(replyGet->errorString()));
 
+        QMessageBox::critical(this, "Aktualizace", QString("Nastala chyba: %1").arg(replyGet->errorString()));
         settingsDialog::disableWidgets(false);
+
         return;
     }
 
@@ -376,7 +380,13 @@ void settingsDialog::on_pushButton_5_clicked()
         dd.otherDownload = true;
         dd.downloadLink = QString("https://github.com/RxiPland/y2mate_desktop/releases/download/%1/y2mate_setup.exe").arg(newestVersion);
         dd.customFinishMessage = "Nainstalovat";
-        dd.loadSettings();
+
+        bool loaded = dd.loadSettings();
+        if (!loaded){
+
+            settingsDialog::disableWidgets(false);
+            return;
+        }
 
         QDir downloadFolder(QDir::homePath() + "/Downloads/");
         QString folderPath;
@@ -423,11 +433,14 @@ void settingsDialog::on_pushButton_5_clicked()
 
                 // download was canceled or closed by X
                 if(dd.canceled || !dd.closedWithButton){
+                    settingsDialog::disableWidgets(false);
                     break;
 
                 } else{
                     // download successfull
                     // run setup file
+
+                    settingsDialog::disableWidgets(false);
 
                     QProcess::startDetached(dd.filePath);
                     QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
