@@ -20,7 +20,6 @@ public:
     void loadData();
     bool loadSettings();
 
-    bool closed = false;
     bool running = false;
 
     QString appVersion;
@@ -45,6 +44,9 @@ public:
     bool showDownloadUrlButton = false;
 
     bool exitApp = true;
+
+signals:
+    void closed();
 
 private slots:
     void on_pushButton_clicked();

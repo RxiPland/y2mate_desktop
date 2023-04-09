@@ -32,6 +32,9 @@ public:
 
     bool running = false;
 
+signals:
+    void closed();
+
 private slots:
     void on_action_menu1_1_triggered();
     void on_action_menu1_2_triggered();

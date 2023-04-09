@@ -71,10 +71,10 @@ void settingsDialog::closeEvent(QCloseEvent *bar)
         }
     }
 
-    settingsDialog::closed = true;
 
     if(bar != nullptr){
         bar->accept();
+        emit closed();
     }
 }
 
@@ -343,10 +343,13 @@ void settingsDialog::on_pushButton_5_clicked()
 
     QNetworkReply *replyGet = manager.get(request);
 
-    while (!replyGet->isFinished())
-    {
-        qApp->processEvents();
-    }
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(finishedConn);
+
 
     QNetworkReply::NetworkError error = replyGet->error();
 
@@ -434,9 +437,11 @@ void settingsDialog::on_pushButton_5_clicked()
                 dd.startDownload();
 
                 // wait for close
-                while(!dd.closed){
-                    qApp->processEvents();
-                }
+                QEventLoop loop;
+                QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+                loop.exec();
+
+                QObject::disconnect(closedConn);
                 this->show();
 
                 // download was canceled or closed by X

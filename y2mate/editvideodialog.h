@@ -21,7 +21,6 @@ public:
     void loadData();
     bool loadSettings();
 
-    bool closed = false;
 
     bool startedFromSeachMenu = false;
     bool deleteOriginalFile = true;
@@ -42,6 +41,9 @@ public:
     QString filePath;
     qint64 videoDurationMiliSec = 0;
     qint64 newVideoDurationMiliSec = 0;
+
+signals:
+    void closed();
 
 private slots:
     void readyReadStandardOutput();

@@ -41,10 +41,9 @@ void downloadVideoWindow::closeEvent(QCloseEvent *bar)
         return;
     }
 
-    downloadVideoWindow::closed = true;
-
     if(bar != nullptr){
         bar->accept();
+        emit closed();
     }
 }
 
@@ -416,10 +415,13 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     QNetworkReply *replyPost = manager.post(request, data);
 
-    while (!replyPost->isFinished())
-    {
-        qApp->processEvents();
-    }
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(finishedConn);
+
 
     ui->statusBar->removeWidget(label);
 
@@ -483,9 +485,11 @@ void downloadVideoWindow::on_pushButton_clicked()
     dd.startDownload();
 
     // wait for close
-    while(!dd.closed){
-        qApp->processEvents();
-    }
+    QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(closedConn);
+
 
     // save last path to file with settings if enabled
     if(lastPathEnabled){

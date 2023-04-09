@@ -55,6 +55,7 @@ void searchVideoWindow::closeEvent(QCloseEvent *bar)
 
     if(bar != nullptr){
         bar->accept();
+        emit closed();
     }
 }
 
@@ -98,9 +99,11 @@ bool searchVideoWindow::ffmpegExists()
         dd.startDownload();
 
         // wait for close
-        while(!dd.closed){
-            qApp->processEvents();
-        }
+        QEventLoop loop;
+        QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        QObject::disconnect(closedConn);
 
         // download was canceled
         if(dd.canceled){
@@ -257,10 +260,12 @@ void searchVideoWindow::checkUpdate()
 
     QNetworkReply *replyGet = manager.get(request);
 
-    while (!replyGet->isFinished())
-    {
-        qApp->processEvents();
-    }
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(finishedConn);
 
     if(replyGet->error() != QNetworkReply::NoError){
 
@@ -337,9 +342,11 @@ void searchVideoWindow::checkUpdate()
                 dd.startDownload();
 
                 // wait for close
-                while(!dd.closed){
-                    qApp->processEvents();
-                }
+                QEventLoop loop;
+                QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+                loop.exec();
+
+                QObject::disconnect(closedConn);
 
                 // download was canceled or closed by X
                 if(dd.canceled || !dd.closedWithButton){
@@ -601,9 +608,6 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     settingsDialog sd;
     sd.exec();
 
-    while(!sd.closed){
-        qApp->processEvents();
-    }
 
     searchVideoWindow::loadSettings();
 }
@@ -661,10 +665,13 @@ void searchVideoWindow::on_pushButton_clicked()
 
     QNetworkReply *replyPost = manager.post(request, data);
 
-    while (!replyPost->isFinished())
-    {
-        qApp->processEvents();
-    }
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(finishedConn);
+
 
     ui->statusBar->removeWidget(label);
 
@@ -858,10 +865,12 @@ void searchVideoWindow::on_pushButton_clicked()
     // set data to widgets
     dvw.loadData();
 
-    // wait until closed
-    while(!dvw.closed){
-        qApp->processEvents();
-    }
+    // wait for close
+    QMetaObject::Connection closedConn = QObject::connect(&dvw, SIGNAL(closed()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(closedConn);
+
 
     // exit if pressed X
     if(dvw.exitApp){
@@ -1031,9 +1040,19 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     QProcess process;
     process.start("cmd.exe", QStringList(arguments));
 
-    while(process.state() == QProcess::Running){
-        qApp->processEvents();
-    }
+    //while(process.state() == QProcess::Running){
+    //    qApp->processEvents();
+    //}
+
+
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(finishedConn);
+
+
     ui->statusBar->removeWidget(label);
 
     // ffmpeg will make error output (because output is missing)
@@ -1081,9 +1100,11 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     evd.loadData();
 
     // wait for close
-    while(!evd.closed){
-        qApp->processEvents();
-    }
+    QMetaObject::Connection closedConn = QObject::connect(&evd, SIGNAL(closed()), &loop, SLOT(quit()));
+    loop.exec();
+
+    QObject::disconnect(closedConn);
+
 
     if(evd.changed && lastPathEnabled){
         QStringList path = evd.originalPath.replace('\\', '/').split('/');

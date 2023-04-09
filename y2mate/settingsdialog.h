@@ -21,9 +21,10 @@ public:
 
     bool settingsChanged = false;
 
-    bool closed = false;
     bool running = false;
 
+signals:
+    void closed();
 
 private slots:
     void on_pushButton_clicked();

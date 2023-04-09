@@ -23,8 +23,6 @@ public:
 
     bool loadSettings();
 
-    bool closed = false;
-
     QByteArray userAgent;
     bool showDownloadUrlButton = false;
     bool downloadFinishedSound = true;
@@ -39,10 +37,11 @@ public:
     bool running = false;
     bool closedWithButton = false; // (install / complete) button
 
+signals:
+    void closed();
+
 private slots:
     std::unique_ptr<QFile> openFileForWrite(const QString &fileName);
-
-    void closeEvent(QCloseEvent *bar = nullptr);
 
     void httpFinished();
     void httpReadyRead();
@@ -59,6 +58,8 @@ private:
     std::unique_ptr<QFile> file;
     QNetworkAccessManager manager;
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply;
+
+    void closeEvent(QCloseEvent *bar = nullptr);
 
     bool ffmpegExists();
 

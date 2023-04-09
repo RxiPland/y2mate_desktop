@@ -286,10 +286,10 @@ void downloadDialog::closeEvent(QCloseEvent *bar)
         return;
     }
 
-    downloadDialog::closed = true;
 
     if(bar != nullptr){
         bar->accept();
+        emit closed();
     }
 }
 
@@ -347,11 +347,13 @@ void downloadDialog::on_pushButton_4_clicked()
     evd.loadData();
 
     // wait for close
-    while(!evd.closed){
-        qApp->processEvents();
-    }
+    QEventLoop loop;
+    QMetaObject::Connection closedConn = QObject::connect(&evd, SIGNAL(closed()), &loop, SLOT(quit()));
+    loop.exec();
 
-    // rename back and delete temp
+    QObject::disconnect(closedConn);
+
+    // rename back and delete temp if canceled
     if(evd.running){
         QFile::remove(evd.newFilePath);
 
@@ -449,9 +451,12 @@ bool downloadDialog::ffmpegExists()
         dd.startDownload();
 
         // wait for close
-        while(!dd.closed){
-            qApp->processEvents();
-        }
+        QEventLoop loop;
+        QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        QObject::disconnect(closedConn);
+
         this->show();
 
         // download was canceled

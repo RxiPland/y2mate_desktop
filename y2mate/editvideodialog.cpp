@@ -153,15 +153,22 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
         process.kill();
     }
 
+    // wait for finished
+    QEventLoop loop;
+    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(0)), &loop, SLOT(quit()));
+    loop.exec();
 
-    while(process.state() == QProcess::Running){
-        qApp->processEvents();
-    }
+    QObject::disconnect(finishedConn);
 
-    editVideoDialog::closed = true;
+
+    //while(process.state() == QProcess::Running){
+    //    qApp->processEvents();
+    //}
+
 
     if(bar != nullptr){
         bar->accept();
+        emit closed();
     }
 }
 
@@ -220,9 +227,11 @@ bool editVideoDialog::ffmpegExists()
         dd.startDownload();
 
         // wait for close
-        while(!dd.closed){
-            qApp->processEvents();
-        }
+        QEventLoop loop;
+        QMetaObject::Connection closedConn = QObject::connect(&dd, SIGNAL(closed()), &loop, SLOT(quit()));
+        loop.exec();
+
+        QObject::disconnect(closedConn);
 
         // download was canceled
         if(dd.canceled){
