@@ -25,20 +25,20 @@
 
 # Odkazy ke stažení
 
-- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.1/y2mate_setup.exe) exe (win64) `md5: 3dc00051bc83f2d94bf00e4b1612b70d`
-- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.1/y2mate.zip) (win64) `md5: 9a9558810b871d9ba3f820db996b7a23`
+- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.2/y2mate_setup.exe) exe (win64) `md5: e67f230b8f599fc9048edb13c7065f0c`
+- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.2/y2mate.zip) (win64) `md5: 2e4c46c865f9be7dd0b2dcb84bdf673e`
 
 
 <br/>
 
 # Náhled
-![1](https://user-images.githubusercontent.com/82058894/227772532-c6204aff-ae04-435a-8f15-a712e2abcf34.png)
+![1](https://user-images.githubusercontent.com/82058894/230784145-0680c3ca-90f8-464f-bcf5-5ce51fb4ceb0.png)
 ##
 ![2](https://user-images.githubusercontent.com/82058894/227725073-b48f03c0-0bf6-4648-bd3e-f875f9171071.png)
 ##
 ![3](https://user-images.githubusercontent.com/82058894/225476745-3c9b024e-3c1b-437b-b0b9-6e3e6f8a4b0b.png)
 ##
-![4](https://user-images.githubusercontent.com/82058894/227772538-7da1ecf6-aa77-41f6-9ea8-618014ad4dde.png)
+![4](https://user-images.githubusercontent.com/82058894/230784152-d9ac4bdd-697b-41c1-a3b6-3c4158ac818b.png)
 
 <br/>
 
@@ -50,7 +50,7 @@
 # Poznámky
 
 - Program byl vytvořen v [QT creatoru](https://www.qt.io/product/development-tools)
-- Verze knihovny Qt: 6.4.3
+- Verze knihovny Qt: 6.5.0
 - Při komunikaci v requestech je použit user-agent chromu
 - Pro zjišťování nové verze programu je použito github API
 - FFmpeg.exe je možné stáhnout z tohoto githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
