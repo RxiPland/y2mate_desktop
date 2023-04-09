@@ -336,7 +336,9 @@ void settingsDialog::on_pushButton_5_clicked()
 
     settingsDialog::disableWidgets();
 
+    QEventLoop loop;
     QNetworkRequest request;
+
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
@@ -344,12 +346,12 @@ void settingsDialog::on_pushButton_5_clicked()
     QNetworkReply *replyGet = manager.get(request);
 
     // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    if(!replyGet->isFinished()){
+        QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    QObject::disconnect(finishedConn);
-
+        QObject::disconnect(finishedConn);
+    }
 
     QNetworkReply::NetworkError error = replyGet->error();
 

@@ -253,7 +253,9 @@ void searchVideoWindow::checkUpdate()
         return;
     }
 
+    QEventLoop loop;
     QNetworkRequest request;
+
     request.setUrl(QUrl("https://api.github.com/repos/RxiPland/y2mate_desktop/releases/latest"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     request.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
@@ -261,11 +263,13 @@ void searchVideoWindow::checkUpdate()
     QNetworkReply *replyGet = manager.get(request);
 
     // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    if(!replyGet->isFinished()){
+        QMetaObject::Connection finishedConn = QObject::connect(replyGet, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    QObject::disconnect(finishedConn);
+        QObject::disconnect(finishedConn);
+    }
+
 
     if(replyGet->error() != QNetworkReply::NoError){
 
@@ -617,6 +621,8 @@ void searchVideoWindow::on_pushButton_clicked()
     // search video button
 
     searchVideoWindow::disableWidgets();
+
+    QEventLoop loop;
     QString videoUrl = ui->lineEdit->text().trimmed();
 
     // source: https://regex101.com/r/kM8eW3/1
@@ -666,12 +672,12 @@ void searchVideoWindow::on_pushButton_clicked()
     QNetworkReply *replyPost = manager.post(request, data);
 
     // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    if(!replyPost->isFinished()){
+        QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    QObject::disconnect(finishedConn);
-
+        QObject::disconnect(finishedConn);
+    }
 
     ui->statusBar->removeWidget(label);
 
@@ -1000,6 +1006,9 @@ void searchVideoWindow::on_action_menu3_1_triggered()
 
     searchVideoWindow::disableWidgets();
 
+    QEventLoop loop;
+
+
     if(!ffmpegExists()){
         searchVideoWindow::disableWidgets(false);
         return;
@@ -1040,18 +1049,13 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     QProcess process;
     process.start("cmd.exe", QStringList(arguments));
 
-    //while(process.state() == QProcess::Running){
-    //    qApp->processEvents();
-    //}
-
-
     // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
-    loop.exec();
+    if(process.state() == QProcess::Running){
+        QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
+        loop.exec();
 
-    QObject::disconnect(finishedConn);
-
+        QObject::disconnect(finishedConn);
+    }
 
     ui->statusBar->removeWidget(label);
 

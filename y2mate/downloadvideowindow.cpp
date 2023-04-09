@@ -298,6 +298,8 @@ void downloadVideoWindow::on_pushButton_clicked()
 
     downloadVideoWindow::disableWidgets();
 
+    QEventLoop loop;
+
     QString format = ui->comboBox->currentText().split(' ').first();
     QString quality = ui->comboBox_2->currentText().split(' ').first();
 
@@ -416,12 +418,12 @@ void downloadVideoWindow::on_pushButton_clicked()
     QNetworkReply *replyPost = manager.post(request, data);
 
     // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
-    loop.exec();
+    if(!replyPost->isFinished()){
+        QMetaObject::Connection finishedConn = QObject::connect(replyPost, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
-    QObject::disconnect(finishedConn);
-
+        QObject::disconnect(finishedConn);
+    }
 
     ui->statusBar->removeWidget(label);
 

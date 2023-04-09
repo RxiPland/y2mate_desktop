@@ -172,6 +172,8 @@ void downloadDialog::httpFinished()
 {
     // http request was finished
 
+    QEventLoop loop;
+
     QFileInfo fi;
     if (file){
         fi.setFile(file->fileName());
@@ -234,21 +236,23 @@ void downloadDialog::httpFinished()
             effect.setVolume(0.5f);
 
             // wait for loaded
-            QEventLoop loop;
-            QMetaObject::Connection loadedConn = QObject::connect(&effect, SIGNAL(loadedChanged()), &loop, SLOT(quit()));
-            loop.exec();
+            if(!effect.isLoaded()){
+                QMetaObject::Connection loadedConn = QObject::connect(&effect, SIGNAL(loadedChanged()), &loop, SLOT(quit()));
+                loop.exec();
 
-            QObject::disconnect(loadedConn);
+                QObject::disconnect(loadedConn);
+            }
 
             // play sound
             effect.play();
 
             // wait for played
-            QMetaObject::Connection playedConn = connect(&effect, SIGNAL(playingChanged()), &loop, SLOT(quit()));
-            loop.exec();
+            if(!effect.isPlaying()){
+                QMetaObject::Connection playedConn = connect(&effect, SIGNAL(playingChanged()), &loop, SLOT(quit()));
+                loop.exec();
 
-            QObject::disconnect(playedConn);
-
+                QObject::disconnect(playedConn);
+            }
         }
     }
 
