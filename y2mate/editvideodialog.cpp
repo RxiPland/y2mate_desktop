@@ -155,15 +155,10 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
 
     // wait for finished
     QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(0)), &loop, SLOT(quit()));
+    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
     loop.exec();
 
     QObject::disconnect(finishedConn);
-
-
-    //while(process.state() == QProcess::Running){
-    //    qApp->processEvents();
-    //}
 
 
     if(bar != nullptr){
