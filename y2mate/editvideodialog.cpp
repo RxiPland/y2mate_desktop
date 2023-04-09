@@ -151,15 +151,17 @@ void editVideoDialog::closeEvent(QCloseEvent *bar)
     if(process.state() == QProcess::Running){
         QProcess::startDetached("cmd", QStringList("/C taskkill /IM ffmpeg.exe /F"));
         process.kill();
+
+
+        // wait for finished
+        QEventLoop loop;
+        QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
+        loop.exec();
+
+        QObject::disconnect(finishedConn);
+
+        qInfo() << process.state();
     }
-
-    // wait for finished
-    QEventLoop loop;
-    QMetaObject::Connection finishedConn = QObject::connect(&process, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
-    loop.exec();
-
-    QObject::disconnect(finishedConn);
-
 
     if(bar != nullptr){
         bar->accept();
