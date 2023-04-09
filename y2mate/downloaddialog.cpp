@@ -247,7 +247,7 @@ void downloadDialog::httpFinished()
             effect.play();
 
             // wait for played
-            if(!effect.isPlaying()){
+            if(effect.isPlaying()){
                 QMetaObject::Connection playedConn = connect(&effect, SIGNAL(playingChanged()), &loop, SLOT(quit()));
                 loop.exec();
 
