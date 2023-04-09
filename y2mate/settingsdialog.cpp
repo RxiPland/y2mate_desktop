@@ -444,6 +444,7 @@ void settingsDialog::on_pushButton_5_clicked()
                 loop.exec();
 
                 QObject::disconnect(closedConn);
+
                 this->show();
 
                 // download was canceled or closed by X
