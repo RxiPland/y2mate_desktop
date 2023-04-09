@@ -610,7 +610,10 @@ void searchVideoWindow::on_action_menu1_3_triggered()
     // open settings window
 
     settingsDialog sd;
-    sd.exec();
+
+    QEventLoop loop;
+    QMetaObject::Connection closedConn = QObject::connect(&sd, SIGNAL(closed()), &loop, SLOT(quit()));
+    loop.exec();
 
 
     searchVideoWindow::loadSettings();
