@@ -227,18 +227,28 @@ void downloadDialog::httpFinished()
         QFile soundFile = QDir::currentPath() + "/Data/notification_sound.wav";
 
         if(soundFile.exists()){
+
+            // load sound
             QSoundEffect effect;
             effect.setSource(QUrl::fromLocalFile(soundFile.fileName()));
             effect.setVolume(0.5f);
 
-            while(effect.status() == QSoundEffect::Loading){
-                qApp->processEvents();
-            }
+            // wait for loaded
+            QEventLoop loop;
+            QMetaObject::Connection loadedConn = QObject::connect(&effect, SIGNAL(loadedChanged()), &loop, SLOT(quit()));
+            loop.exec();
+
+            QObject::disconnect(loadedConn);
+
+            // play sound
             effect.play();
 
-            while(effect.isPlaying()){
-                qApp->processEvents();
-            }
+            // wait for played
+            QMetaObject::Connection playedConn = connect(&effect, SIGNAL(playingChanged()), &loop, SLOT(quit()));
+            loop.exec();
+
+            QObject::disconnect(playedConn);
+
         }
     }
 
