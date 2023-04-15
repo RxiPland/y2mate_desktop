@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QTimer>
 
 
 searchVideoWindow::searchVideoWindow(QWidget *parent, bool jsonCorrupted)
@@ -389,6 +390,8 @@ void searchVideoWindow::disableWidgets(bool disable)
     ui->menu_1->menuAction()->setDisabled(disable);
     ui->menu_2->menuAction()->setDisabled(disable);
     ui->menu_3->menuAction()->setDisabled(disable);
+
+    QTimer::singleShot(800, this, SLOT(update()));
 }
 
 bool searchVideoWindow::saveToHistory(QString videoName, QString videoDuration, QString videoUrl)

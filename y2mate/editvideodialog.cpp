@@ -13,6 +13,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QApplication>
+#include <QTimer>
 
 
 editVideoDialog::editVideoDialog(QWidget *parent, bool hidden) :
@@ -181,6 +182,8 @@ void editVideoDialog::disableWidgets(bool disable)
     ui->pushButton->setDisabled(disable);
     ui->pushButton_2->setDisabled(disable);
     ui->pushButton_3->setDisabled(disable);
+
+    QTimer::singleShot(800, this, SLOT(update()));
 }
 
 bool editVideoDialog::ffmpegExists()

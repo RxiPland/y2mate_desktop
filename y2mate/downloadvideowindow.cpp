@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QCloseEvent>
 #include <QApplication>
+#include <QTimer>
 
 
 downloadVideoWindow::downloadVideoWindow(QWidget *parent) :
@@ -83,6 +84,8 @@ void downloadVideoWindow::disableWidgets(bool disable)
 
     ui->pushButton->setDisabled(disable);
     ui->pushButton_2->setDisabled(disable);
+
+    QTimer::singleShot(800, this, SLOT(update()));
 }
 
 bool downloadVideoWindow::savePath()
@@ -383,6 +386,7 @@ void downloadVideoWindow::on_pushButton_clicked()
     QString filePath;
     filePath = QFileDialog::getSaveFileName(this, "Uložit soubor", lastSavePath + videoName, fileExtension).replace("\\", "/");
 
+
     if(filePath.isEmpty()){
         downloadVideoWindow::disableWidgets(false);
         return;
@@ -566,7 +570,6 @@ void downloadVideoWindow::on_comboBox_currentTextChanged(const QString &arg1)
 
     ui->comboBox_2->setDisabled(false);
 }
-
 
 void downloadVideoWindow::on_comboBox_2_currentTextChanged(const QString &arg1)
 {

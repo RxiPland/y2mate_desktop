@@ -13,6 +13,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFileDialog>
+#include <QTimer>
 
 
 settingsDialog::settingsDialog(QWidget *parent) :
@@ -94,6 +95,8 @@ void settingsDialog::disableWidgets(bool disable)
     ui->toolButton_5->setDisabled(disable);
     ui->toolButton_6->setDisabled(disable);
     ui->toolButton_7->setDisabled(disable);
+
+    QTimer::singleShot(800, this, SLOT(update()));
 }
 
 void settingsDialog::loadSettings()
