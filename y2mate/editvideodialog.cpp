@@ -488,7 +488,13 @@ void editVideoDialog::on_pushButton_3_clicked()
         QString tempFilePath = tempPath.join('/') + '/' + random + originalFileType;
 
         QFile tempFile(originalPath);
-        tempFile.rename(tempFilePath);
+        bool renamed = tempFile.rename(tempFilePath);
+
+        if(!renamed){
+            QMessageBox::warning(this, "Chyba", "Soubor je pravděpodobně otevřen v jiném programu a nelze ho přejmenovat!");
+            editVideoDialog::disableWidgets(false);
+            return;
+        }
 
         originalPath = tempFilePath;
     }
