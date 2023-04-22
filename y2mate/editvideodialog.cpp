@@ -252,7 +252,7 @@ void editVideoDialog::readyReadStandardOutput()
 
     if(re.indexIn(processOutput) != -1){
         editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
-        ui->progressBar->setValue(editVideoDialog::microSeconds);
+        ui->progressBar->setValue(editVideoDialog::microSeconds/1000000);
     }
 }
 
@@ -358,7 +358,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     editVideoDialog::newVideoDurationMiliSec = (totalMicroSecondsEnd - totalMicroSecondsStart)/1000;
 
     ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum(totalMicroSecondsEnd - totalMicroSecondsStart);
+    ui->progressBar->setMaximum((totalMicroSecondsEnd - totalMicroSecondsStart)/1000000);
     ui->progressBar->setValue(0);
 
 
