@@ -251,8 +251,14 @@ void editVideoDialog::readyReadStandardOutput()
     processOutput = process.readAll();
 
     if(re.indexIn(processOutput) != -1){
-        editVideoDialog::microSeconds = re.cap(1).trimmed().toInt();
-        ui->progressBar->setValue(editVideoDialog::microSeconds/1000000);
+
+        QString seconds = re.cap(1).trimmed();
+
+        if(!seconds.isEmpty()){
+            ui->progressBar->setValue(seconds.toLongLong() / 1000000);
+            qInfo() << ui->progressBar->value();
+        }
+
     }
 }
 
@@ -361,6 +367,8 @@ void editVideoDialog::on_pushButton_3_clicked()
     ui->progressBar->setMaximum((totalMicroSecondsEnd - totalMicroSecondsStart)/1000000);
     ui->progressBar->setValue(0);
 
+    qInfo() << "min" << ui->progressBar->minimum();
+    qInfo() << "max" << ui->progressBar->maximum();
 
     QString fullVideoName = editVideoDialog::filePath.split('/').last();
     QStringList videoNameTemp = fullVideoName.split('.');

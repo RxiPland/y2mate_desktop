@@ -61,7 +61,6 @@ private:
 
     QRegExp re = QRegExp("out_time_ms=(\\d+)");
     QString processOutput;
-    qint64 microSeconds = 0;
 
     QProcess process;
     void startEdit();
