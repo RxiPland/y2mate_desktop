@@ -456,7 +456,7 @@ void editVideoDialog::on_pushButton_3_clicked()
 
             bool exists = QFile(finalPath).exists();
 
-            if(originalVideoName == finalVideoName){
+            if((originalVideoName == finalVideoName) && !fileTypeChanged){
                 QMessageBox::warning(this, "Chyba", "Pokud chcete ponechat původní soubor, tak název nemůže být stejný!");
                 editVideoDialog::disableWidgets(false);
                 return;
@@ -542,17 +542,22 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << endTime;
     }
 
-    arguments << "-q:a";
-    arguments << "0";
 
     // apply only for non-video formats
     if(finalFileType != ".mp4"){
+
         // remove video stream
         arguments << "-vn";
 
         // remove subtitles
         arguments << "-map";
         arguments << "a";
+
+    } else{
+
+        // keep everything unchanged
+        arguments << "-c";
+        arguments << "copy";
     }
 
     // add destination (path + name + filetype)
