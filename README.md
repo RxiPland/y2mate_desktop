@@ -32,13 +32,13 @@
 <br/>
 
 # Náhled
-![1](https://user-images.githubusercontent.com/82058894/230784145-0680c3ca-90f8-464f-bcf5-5ce51fb4ceb0.png)
+![1](https://user-images.githubusercontent.com/82058894/233805766-6614355f-6766-4aef-b066-5621a1197e7c.png)
 ##
 ![2](https://user-images.githubusercontent.com/82058894/227725073-b48f03c0-0bf6-4648-bd3e-f875f9171071.png)
 ##
 ![3](https://user-images.githubusercontent.com/82058894/225476745-3c9b024e-3c1b-437b-b0b9-6e3e6f8a4b0b.png)
 ##
-![4](https://user-images.githubusercontent.com/82058894/230784152-d9ac4bdd-697b-41c1-a3b6-3c4158ac818b.png)
+![4](https://user-images.githubusercontent.com/82058894/233805769-234e5849-5d6d-4a49-b44f-0af4e77d4381.png)
 
 <br/>
 
