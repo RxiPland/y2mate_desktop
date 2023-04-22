@@ -1105,6 +1105,7 @@ void searchVideoWindow::on_action_menu3_1_triggered()
 
     } else{
         evd.show();
+        this->hide();
     }
 
     evd.loadData();
@@ -1112,6 +1113,8 @@ void searchVideoWindow::on_action_menu3_1_triggered()
     // wait for close
     QMetaObject::Connection closedConn = QObject::connect(&evd, SIGNAL(closed()), &loop, SLOT(quit()));
     loop.exec();
+
+    this->show();
 
     QObject::disconnect(closedConn);
 
