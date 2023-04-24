@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(y2mate VERSION 2.2.3 LANGUAGES CXX)
+project(y2mate VERSION 2.2.4 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
