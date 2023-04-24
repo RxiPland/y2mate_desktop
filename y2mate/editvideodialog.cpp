@@ -524,7 +524,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     arguments << "-";
     arguments << "-nostats";
     arguments << "-loglevel";
-    arguments << "error";
+    arguments << "quiet";
     arguments << "-i";
     arguments << originalPath;
 
