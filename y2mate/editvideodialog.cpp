@@ -536,6 +536,7 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << "-ss";
         arguments << startTime;
     }
+
     if(endTimeChanged){
         // add end time
 
@@ -550,7 +551,6 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     // put path for original file deletion
     editVideoDialog::filePath = originalPath;
-
 
 
     if(finalFileType == ".mp4"){
