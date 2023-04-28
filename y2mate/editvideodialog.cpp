@@ -252,10 +252,10 @@ void editVideoDialog::readyReadStandardOutput()
 
     if(re.indexIn(processOutput) != -1){
 
-        QString seconds = re.cap(1).trimmed();
+        QString microSeconds = re.cap(1).trimmed();
 
-        if(!seconds.isEmpty()){
-            ui->progressBar->setValue(seconds.toLongLong() / 1000000);
+        if(!microSeconds.isEmpty()){
+            ui->progressBar->setValue(microSeconds.toULongLong() / 1000000);
         }
 
     }
@@ -345,25 +345,26 @@ void editVideoDialog::on_pushButton_3_clicked()
     }
 
 
-    qint64 totalMicroSecondsStart = 0;
-    qint64 totalMicroSecondsEnd = 0;
+    quint64 totalMiliSecondsStart = 0;
+    quint64 totalMiliSecondsEnd = 0;
 
     // start time
-    totalMicroSecondsStart += timeStart.hour() * 3600000000;
-    totalMicroSecondsStart += timeStart.minute() * 60000000;
-    totalMicroSecondsStart += timeStart.second() * 1000000;
-    totalMicroSecondsStart += timeStart.msec() * 1000;
+    totalMiliSecondsStart += timeStart.hour() * 3600000;
+    totalMiliSecondsStart += timeStart.minute() * 60000;
+    totalMiliSecondsStart += timeStart.second() * 1000;
+    totalMiliSecondsStart += timeStart.msec();
+
 
     // end time
-    totalMicroSecondsEnd += timeEnd.hour() * 3600000000;
-    totalMicroSecondsEnd += timeEnd.minute() * 60000000;
-    totalMicroSecondsEnd += timeEnd.second() * 1000000;
-    totalMicroSecondsEnd += timeEnd.msec() * 1000;
+    totalMiliSecondsEnd += timeEnd.hour() * 3600000;
+    totalMiliSecondsEnd += timeEnd.minute() * 60000;
+    totalMiliSecondsEnd += timeEnd.second() * 1000;
+    totalMiliSecondsEnd += timeEnd.msec();
 
-    editVideoDialog::newVideoDurationMiliSec = (totalMicroSecondsEnd - totalMicroSecondsStart)/1000;
+    editVideoDialog::newVideoDurationMiliSec = totalMiliSecondsEnd - totalMiliSecondsStart;
 
     ui->progressBar->setMinimum(0);
-    ui->progressBar->setMaximum((totalMicroSecondsEnd - totalMicroSecondsStart)/1000000);
+    ui->progressBar->setMaximum((totalMiliSecondsEnd - totalMiliSecondsStart)/1000);
     ui->progressBar->setValue(0);
 
 
@@ -522,14 +523,11 @@ void editVideoDialog::on_pushButton_3_clicked()
     arguments << "-y";
     arguments << "-progress";
     arguments << "-";
+    arguments << "-stats_period";
+    arguments << "0.3";
     arguments << "-nostats";
     arguments << "-loglevel";
     arguments << "fatal";
-    arguments << "-i";
-    arguments << originalPath;
-
-    // put path for original file deletion
-    editVideoDialog::filePath = originalPath;
 
     if(startTimeChanged){
         // add start time
@@ -539,6 +537,14 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << startTime;
     }
 
+    // add input file
+    arguments << "-i";
+    arguments << originalPath;
+
+    // put path for original file deletion
+    editVideoDialog::filePath = originalPath;
+
+
     if(endTimeChanged){
         // add end time
 
@@ -546,7 +552,6 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << "-to";
         arguments << endTime;
     }
-
 
     if(finalFileType == ".mp4"){
 
@@ -565,6 +570,7 @@ void editVideoDialog::on_pushButton_3_clicked()
     arguments << finalPath;
 
     editVideoDialog::newFilePath = finalPath;
+
 
     // start conversion
     process.start("cmd.exe", QStringList(arguments));
