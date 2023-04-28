@@ -536,6 +536,13 @@ void editVideoDialog::on_pushButton_3_clicked()
         arguments << "-ss";
         arguments << startTime;
     }
+    if(endTimeChanged){
+        // add end time
+
+        QString endTime = timeEnd.toString("HH:mm:ss.zzz");
+        arguments << "-to";
+        arguments << endTime;
+    }
 
     // add input file
     arguments << "-i";
@@ -545,19 +552,16 @@ void editVideoDialog::on_pushButton_3_clicked()
     editVideoDialog::filePath = originalPath;
 
 
-    if(endTimeChanged){
-        // add end time
-
-        QString endTime = timeEnd.toString("HH:mm:ss.zzz");
-        arguments << "-to";
-        arguments << endTime;
-    }
 
     if(finalFileType == ".mp4"){
 
-        // keep audio unchanged (reencode video stream)
-        arguments << "-c:a";
+        // keep everything unchanged
+        //arguments << "-c:a";
+        arguments << "-c";
         arguments << "copy";
+
+        arguments << "-avoid_negative_ts";
+        arguments << "1";
 
     } else{
 
