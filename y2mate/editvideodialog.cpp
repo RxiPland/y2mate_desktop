@@ -555,13 +555,9 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     if(finalFileType == ".mp4"){
 
-        // keep everything unchanged
-        //arguments << "-c:a";
-        arguments << "-c";
+        // keep audio unchanged
+        arguments << "-c:a";
         arguments << "copy";
-
-        arguments << "-avoid_negative_ts";
-        arguments << "1";
 
     } else{
 
