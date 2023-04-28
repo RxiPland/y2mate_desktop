@@ -25,20 +25,20 @@
 
 # Odkazy ke stažení
 
-- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.3/y2mate_setup.exe) exe (win64) `md5: 0afadde193c5cd441d5fca37691fb886`
-- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.3/y2mate.zip) (win64) `md5: c7e1066864e1b34359457e3a9c666cba`
+- [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.4/y2mate_setup.exe) exe (win64) `md5: 4cc71a27164145e6787447a38d0e3c93`
+- [Stáhnout zip](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.4/y2mate.zip) (win64) `md5: 6e2ec770975a17ad90286b06b6681fe6`
 
 
 <br/>
 
 # Náhled
-![1](https://user-images.githubusercontent.com/82058894/233805766-6614355f-6766-4aef-b066-5621a1197e7c.png)
+![1](https://user-images.githubusercontent.com/82058894/235271286-7d90c600-c5ed-4fbe-8b5a-50a8f899afb0.png)
 ##
 ![2](https://user-images.githubusercontent.com/82058894/227725073-b48f03c0-0bf6-4648-bd3e-f875f9171071.png)
 ##
 ![3](https://user-images.githubusercontent.com/82058894/225476745-3c9b024e-3c1b-437b-b0b9-6e3e6f8a4b0b.png)
 ##
-![4](https://user-images.githubusercontent.com/82058894/233805769-234e5849-5d6d-4a49-b44f-0af4e77d4381.png)
+![4](https://user-images.githubusercontent.com/82058894/235271288-77ed9266-48dc-4011-9494-dc47587775bf.png)
 
 <br/>
 
