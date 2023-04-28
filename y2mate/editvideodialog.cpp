@@ -548,21 +548,17 @@ void editVideoDialog::on_pushButton_3_clicked()
     }
 
 
-    // apply only for non-video formats
-    if(finalFileType != ".mp4"){
+    if(finalFileType == ".mp4"){
 
-        // remove video stream
-        arguments << "-vn";
-
-        // remove subtitles
-        arguments << "-map";
-        arguments << "a";
+        // keep audio unchanged (reencode video stream)
+        arguments << "-c:a";
+        arguments << "copy";
 
     } else{
 
-        // keep everything unchanged
-        arguments << "-c";
-        arguments << "copy";
+        // take "only" audio
+        arguments << "-map";
+        arguments << "a";
     }
 
     // add destination (path + name + filetype)
