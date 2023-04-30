@@ -55,3 +55,4 @@
 - Pro zjišťování nové verze programu je použito github API
 - FFmpeg.exe je možné stáhnout z tohoto githubu z releasu v1.8.0 (poté je umístěn {složka programu}/Data/ffmpeg.exe)
 - Při automatickém stahování (instalování) aktualizací se vždy stáhne instalačka (i přes to, že byl program stáhnut jako .zip)
+- Každá konverze videa přes FFmpeg o trochu sníží kvalitu (bitrate), kvůli re-encodingu
