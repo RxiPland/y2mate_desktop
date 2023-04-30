@@ -555,7 +555,7 @@ void editVideoDialog::on_pushButton_3_clicked()
 
     if(finalFileType == ".mp4"){
 
-        // nothing
+        // nothing (reencode everything)
 
     } else{
 
