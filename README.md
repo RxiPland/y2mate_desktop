@@ -23,6 +23,11 @@
 
 <br/>
 
+# Podobné projekty
+- [y2mate mobile](https://github.com/RxiPland/y2mate-mobile) pro Android
+
+<br/>
+
 # Odkazy ke stažení
 
 - [Stáhnout instalačku](https://github.com/RxiPland/y2mate_desktop/releases/download/v2.2.5/y2mate_setup.exe) exe (win64) `md5: 37a2bcd9abaa31d0207540860368e6cc`
