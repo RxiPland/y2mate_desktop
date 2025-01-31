@@ -1,3 +1,6 @@
+# Již nefunguje! (kvůli změně API)
+
+
 # y2mate Youtube downloader
 
 - Nenáročný program na stahování videí/hudby z youtube
